@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌐 HYOJIN.AI 도메인 포털</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 3rem;
+            font-size: 1.2rem;
+        }
+
+        .domains-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .domain-card {
+            background: #f8f9ff;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 2px solid #e0e0e0;
+        }
+
+        .domain-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .domain-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .domain-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .domain-description {
+            color: #666;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .domain-links {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .link-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .landing-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .demo-btn {
+            background: #10b981;
+            color: white;
+        }
+
+        .api-btn {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .link-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .stats {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 3rem 0;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-label {
+            opacity: 0.9;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌐 HYOJIN.AI 도메인 포털</h1>
+        <p class="subtitle">6개 AI 도메인의 완전한 클라우드 시스템</p>
+        
+        <div class="stats">
+            <h2>📊 전체 통계</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number">6</span>
+                    <div class="stat-label">AI 도메인</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">99.9%</span>
+                    <div class="stat-label">가동률</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">24/7</span>
+                    <div class="stat-label">지원</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">100%</span>
+                    <div class="stat-label">소스 보호</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="domains-grid">
+            <div class="domain-card">
+                <div class="domain-icon">💳</div>
+                <div class="domain-name">PaymentApp AI System</div>
+                <div class="domain-description">토스, 카카오페이 스타일의 완전한 결제 시스템</div>
+                <div class="domain-links">
+                    <a href="paymentapp_landing.html" class="link-btn landing-btn">📄 상세보기</a>
+                    <a href="https://paymentapp.hyojin.ai" class="link-btn demo-btn" target="_blank">🚀 데모</a>
+                    <a href="https://api.hyojin.ai/payment" class="link-btn api-btn" target="_blank">🔌 API</a>
+                </div>
+            </div>
+            <div class="domain-card">
+                <div class="domain-icon">🛵</div>
+                <div class="domain-name">DeliveryService AI System</div>
+                <div class="domain-description">배달의민족, 쿠팡이츠 스타일의 배달 플랫폼</div>
+                <div class="domain-links">
+                    <a href="deliveryservice_landing.html" class="link-btn landing-btn">📄 상세보기</a>
+                    <a href="https://delivery.hyojin.ai" class="link-btn demo-btn" target="_blank">🚀 데모</a>
+                    <a href="https://api.hyojin.ai/delivery" class="link-btn api-btn" target="_blank">🔌 API</a>
+                </div>
+            </div>
+            <div class="domain-card">
+                <div class="domain-icon">🛒</div>
+                <div class="domain-name">OnlineShopping AI System</div>
+                <div class="domain-description">쿠팡, 11번가 스타일의 이커머스 플랫폼</div>
+                <div class="domain-links">
+                    <a href="onlineshopping_landing.html" class="link-btn landing-btn">📄 상세보기</a>
+                    <a href="https://shopping.hyojin.ai" class="link-btn demo-btn" target="_blank">🚀 데모</a>
+                    <a href="https://api.hyojin.ai/shopping" class="link-btn api-btn" target="_blank">🔌 API</a>
+                </div>
+            </div>
+            <div class="domain-card">
+                <div class="domain-icon">🏠</div>
+                <div class="domain-name">RealEstateApp AI System</div>
+                <div class="domain-description">직방, 다방 스타일의 부동산 플랫폼</div>
+                <div class="domain-links">
+                    <a href="realestateapp_landing.html" class="link-btn landing-btn">📄 상세보기</a>
+                    <a href="https://realestate.hyojin.ai" class="link-btn demo-btn" target="_blank">🚀 데모</a>
+                    <a href="https://api.hyojin.ai/realestate" class="link-btn api-btn" target="_blank">🔌 API</a>
+                </div>
+            </div>
+            <div class="domain-card">
+                <div class="domain-icon">📚</div>
+                <div class="domain-name">OnlineEducation AI System</div>
+                <div class="domain-description">클래스101, 엘리스 스타일의 온라인 교육</div>
+                <div class="domain-links">
+                    <a href="onlineeducation_landing.html" class="link-btn landing-btn">📄 상세보기</a>
+                    <a href="https://education.hyojin.ai" class="link-btn demo-btn" target="_blank">🚀 데모</a>
+                    <a href="https://api.hyojin.ai/education" class="link-btn api-btn" target="_blank">🔌 API</a>
+                </div>
+            </div>
+            <div class="domain-card">
+                <div class="domain-icon">💼</div>
+                <div class="domain-name">JobPlatform AI System</div>
+                <div class="domain-description">원티드, 사람인 스타일의 채용 플랫폼</div>
+                <div class="domain-links">
+                    <a href="jobplatform_landing.html" class="link-btn landing-btn">📄 상세보기</a>
+                    <a href="https://jobs.hyojin.ai" class="link-btn demo-btn" target="_blank">🚀 데모</a>
+                    <a href="https://api.hyojin.ai/jobs" class="link-btn api-btn" target="_blank">🔌 API</a>
+                </div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin: 3rem 0;">
+            <h2>🎯 구독하고 모든 도메인 사용하기</h2>
+            <p style="margin: 1rem 0; color: #666;">월 29.9만원으로 6개 AI 시스템 모두 무제한 사용</p>
+            <a href="https://spring-kr.github.io/project/" 
+               style="display: inline-block; background: linear-gradient(45deg, #667eea, #764ba2); 
+                      color: white; padding: 15px 30px; border-radius: 25px; text-decoration: none; 
+                      font-weight: bold; font-size: 1.1rem;">
+                💳 지금 구독하기
+            </a>
+        </div>
+    </div>
+</body>
+</html>

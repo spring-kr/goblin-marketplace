@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💼 JobPlatform AI System - HYOJIN.AI</title>
+    <meta name="description" content="원티드, 사람인 스타일의 채용 플랫폼">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #06b6d4 0%, #667eea 100%);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #06b6d4;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #06b6d4;
+        }
+
+        .cta-button {
+            background: linear-gradient(45deg, #06b6d4, #667eea);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 120px 0 60px;
+            text-align: center;
+            color: white;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero p {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin: 3rem 0;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 80px 0;
+            background: white;
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #333;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: #f8f9ff;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border-left: 5px solid #06b6d4;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        /* API Section */
+        .api-section {
+            padding: 80px 0;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .api-section h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #333;
+        }
+
+        .api-demo {
+            background: #2d3748;
+            color: #68d391;
+            padding: 2rem;
+            border-radius: 15px;
+            font-family: 'Courier New', monospace;
+            margin: 2rem 0;
+            overflow-x: auto;
+        }
+
+        .api-response {
+            background: #1a202c;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+        }
+
+        /* Demo Section */
+        .demo-section {
+            padding: 80px 0;
+            background: white;
+        }
+
+        .demo-iframe {
+            width: 100%;
+            height: 600px;
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Examples Section */
+        .examples {
+            padding: 80px 0;
+            background: #06b6d4;
+            color: white;
+        }
+
+        .examples h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .example-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Footer */
+        footer {
+            background: #333;
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-stats {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav class="container">
+            <div class="logo">💼 JobPlatform AI System</div>
+            <ul class="nav-links">
+                <li><a href="#features">기능</a></li>
+                <li><a href="#api">API</a></li>
+                <li><a href="#demo">데모</a></li>
+                <li><a href="#examples">예시</a></li>
+            </ul>
+            <a href="https://jobs.hyojin.ai" class="cta-button" target="_blank">🚀 라이브 데모</a>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>💼</h1>
+            <h2>JobPlatform AI System</h2>
+            <p>원티드, 사람인 스타일의 채용 플랫폼</p>
+            <div class="hero-stats">
+                <div class="stat">
+                    <span class="stat-number">99.9%</span>
+                    <span class="stat-label">가동률</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">< 100ms</span>
+                    <span class="stat-label">응답속도</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">24/7</span>
+                    <span class="stat-label">지원</span>
+                </div>
+            </div>
+            <a href="https://jobs.hyojin.ai" class="cta-button" style="font-size: 1.2rem; padding: 15px 30px;" target="_blank">
+                🎯 지금 바로 체험하기
+            </a>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <h2>🌟 주요 기능</h2>
+            <div class="features-grid">
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>AI 매칭 시스템</h3>
+                    <p>최신 AI 기술을 적용한 혁신적인 기능</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📋</div>
+                    <h3>자동 이력서 분석</h3>
+                    <p>최신 AI 기술을 적용한 혁신적인 기능</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">💬</div>
+                    <h3>실시간 면접 지원</h3>
+                    <p>최신 AI 기술을 적용한 혁신적인 기능</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📈</div>
+                    <h3>채용 트렌드 분석</h3>
+                    <p>최신 AI 기술을 적용한 혁신적인 기능</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3>스마트 검색</h3>
+                    <p>최신 AI 기술을 적용한 혁신적인 기능</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📧</div>
+                    <h3>맞춤 알림</h3>
+                    <p>최신 AI 기술을 적용한 혁신적인 기능</p>
+                </div>
+                
+            </div>
+        </div>
+    </section>
+
+    <!-- API Section -->
+    <section class="api-section" id="api">
+        <div class="container">
+            <h2>🔌 API 사용법</h2>
+            <p style="text-align: center; font-size: 1.2rem; margin-bottom: 2rem;">
+                간단한 API 호출로 강력한 JobPlatform AI System 기능을 바로 사용하세요
+            </p>
+            
+            <div class="api-demo">
+                <div style="color: #68d391; margin-bottom: 1rem;">// API 요청 예시</div>
+                <div style="color: #f7fafc;">
+curl -X POST https://api.hyojin.ai/jobs \<br>
+  -H "Authorization: Bearer YOUR_API_KEY" \<br>
+  -H "Content-Type: application/json" \<br>
+  -d '{"action": "process", "data": "user_input"}'
+                </div>
+                
+                <div class="api-response">
+                    <div style="color: #68d391; margin-bottom: 1rem;">// API 응답</div>
+                    <div style="color: #f7fafc;">
+{<br>
+  "status": "success",<br>
+  "result": {<br>
+    "processed_data": "...",<br>
+    "confidence": 0.98,<br>
+    "processing_time": "150ms"<br>
+  },<br>
+  "usage": {<br>
+    "api_calls_remaining": 995<br>
+  }<br>
+}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo Section -->
+    <section class="demo-section" id="demo">
+        <div class="container">
+            <h2>🎮 라이브 데모</h2>
+            <p style="text-align: center; font-size: 1.2rem; margin-bottom: 2rem;">
+                실제 작동하는 JobPlatform AI System을 직접 체험해보세요
+            </p>
+            <iframe src="https://jobs.hyojin.ai" class="demo-iframe"></iframe>
+        </div>
+    </section>
+
+    <!-- Examples Section -->
+    <section class="examples" id="examples">
+        <div class="container">
+            <h2>📱 성공 사례</h2>
+            <p style="text-align: center; font-size: 1.2rem; margin-bottom: 2rem;">
+                이미 검증된 비즈니스 모델들을 AI로 구현
+            </p>
+            <div class="examples-grid">
+                
+                <div class="example-card">
+                    <h3>🏆 원티드</h3>
+                    <p>원티드 스타일의 완전한 AI 시스템</p>
+                </div>
+                
+                <div class="example-card">
+                    <h3>🏆 사람인</h3>
+                    <p>사람인 스타일의 완전한 AI 시스템</p>
+                </div>
+                
+                <div class="example-card">
+                    <h3>🏆 잡코리아</h3>
+                    <p>잡코리아 스타일의 완전한 AI 시스템</p>
+                </div>
+                
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 HYOJIN.AI. 모든 권리 보유.</p>
+            <p>📧 support@hyojin.ai | 📱 1588-0000</p>
+            <p style="margin-top: 10px;">
+                <a href="https://spring-kr.github.io/project/" style="color: #68d391;">메인 사이트로 돌아가기</a>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // 부드러운 스크롤
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // 스크롤 애니메이션
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('header');
+            if (window.scrollY > 100) {
+                header.style.background = 'rgba(255, 255, 255, 0.98)';
+            } else {
+                header.style.background = 'rgba(255, 255, 255, 0.95)';
+            }
+        });
+    </script>
+</body>
+</html>

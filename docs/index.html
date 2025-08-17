@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HYOJIN.AI - 24개 도메인 AI 플랫폼</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #667eea;
+        }
+
+        .cta-button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 120px 0 60px;
+            text-align: center;
+            color: white;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #fff, #f0f8ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin: 3rem 0;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 80px 0;
+            background: white;
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #333;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background: #f8f9ff;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        /* Domains Section */
+        .domains {
+            padding: 80px 0;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .domains h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #333;
+        }
+
+        .domains-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .domain-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .domain-card:hover {
+            transform: scale(1.05);
+        }
+
+        .domain-type {
+            font-size: 0.9rem;
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .domain-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .domain-example {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* Pricing Section */
+        .pricing {
+            padding: 80px 0;
+            background: white;
+        }
+
+        .pricing h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #333;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .pricing-card {
+            background: white;
+            border: 2px solid #f0f0f0;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .pricing-card.popular {
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+
+        .popular-badge {
+            background: #667eea;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .plan-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .plan-price {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .plan-period {
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .plan-features {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .plan-features li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .plan-features li:last-child {
+            border-bottom: none;
+        }
+
+        .plan-button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .plan-button:hover {
+            opacity: 0.9;
+        }
+
+        /* Security Section */
+        .security {
+            padding: 80px 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .security h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .security-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .security-item {
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        .security-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.9;
+        }
+
+        /* Footer */
+        footer {
+            background: #333;
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 15px;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #f0f0f0;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-stats {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .pricing-card.popular {
+                transform: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav class="container">
+            <div class="logo">🚀 HYOJIN.AI</div>
+            <ul class="nav-links">
+                <li><a href="#features">기능</a></li>
+                <li><a href="#domains">도메인</a></li>
+                <li><a href="#pricing">요금제</a></li>
+                <li><a href="#security">보안</a></li>
+            </ul>
+            <button class="cta-button" onclick="openModal()">무료 체험 시작</button>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>실무형 AI 도메인 플랫폼</h1>
+            <p>토스부터 쿠팡까지, 검증된 비즈니스의 AI 시스템을 바로 구현</p>
+            <div class="hero-stats">
+                <div class="stat">
+                    <span class="stat-number">12</span>
+                    <span class="stat-label">개 도메인</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">100%</span>
+                    <span class="stat-label">소스 보호</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">30초</span>
+                    <span class="stat-label">생성 시간</span>
+                </div>
+            </div>
+            <button class="cta-button" onclick="openModal()" style="font-size: 1.2rem; padding: 15px 30px;">
+                🎯 7일 무료체험 시작하기
+            </button>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <h2>🌟 핵심 기능</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🏦</div>
+                    <h3>검증된 비즈니스</h3>
+                    <p>토스, 배달의민족, 쿠팡 같은 성공한 비즈니스 모델 기반</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💼</div>
+                    <h3>실무 중심</h3>
+                    <p>실제 기업에서 바로 사용 가능한 현실적인 AI 시스템</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>완전한 보안</h3>
+                    <p>소스코드 100% 서버 보호, 결과물만 다운로드</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>즉시 생성</h3>
+                    <p>30초 만에 완전한 AI 시스템 생성</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Domains Section -->
+    <section class="domains" id="domains">
+        <div class="container">
+            <h2>🎯 12개 실무 도메인 목록</h2>
+            <div class="domains-grid">
+                <!-- 현실적 비즈니스 도메인 -->
+                <div class="domain-card">
+                    <div class="domain-type">💼 핀테크</div>
+                    <div class="domain-name">PaymentApp</div>
+                    <div class="domain-example">토스, 카카오페이</div>
+                </div>
+                <div class="domain-card">
+                    <div class="domain-type">💼 배달/푸드테크</div>
+                    <div class="domain-name">DeliveryService</div>
+                    <div class="domain-example">배달의민족, 쿠팡이츠</div>
+                </div>
+                <div class="domain-card">
+                    <div class="domain-type">💼 이커머스</div>
+                    <div class="domain-name">OnlineShopping</div>
+                    <div class="domain-example">쿠팡, 11번가</div>
+                </div>
+                <div class="domain-card">
+                    <div class="domain-type">💼 프롭테크</div>
+                    <div class="domain-name">RealEstateApp</div>
+                    <div class="domain-example">직방, 다방</div>
+                </div>
+                <div class="domain-card">
+                    <div class="domain-type">💼 에듀테크</div>
+                    <div class="domain-name">OnlineEducation</div>
+                    <div class="domain-example">클래스101, 엘리스</div>
+                </div>
+                <div class="domain-card">
+                    <div class="domain-type">💼 HR테크</div>
+                    <div class="domain-name">JobPlatform</div>
+                    <div class="domain-example">원티드, 사람인</div>
+                </div>
+
+                <!-- 기본 비즈니스 도메인 -->
+                <div class="domain-card">
+                    <div class="domain-type">🏦 금융</div>
+                    <div class="domain-name">Finance AI</div>
+                    <div class="domain-example">은행, 보험 AI 시스템</div>
+                </div>
+                <div class="domain-card">
+                    <div class="domain-type">🏦 의료</div>
+                    <div class="domain-name">Healthcare AI</div>
+                    <div class="domain-example">병원, 클리닉 시스템</div>
+                </div>
+                <div class="domain-card">
+                    <div class="domain-type">🏦 제조</div>
+                    <div class="domain-name">Manufacturing AI</div>
+                    <div class="domain-example">공장 자동화 시스템</div>
+                </div>
+                <div class="domain-card">
+                    <div class="domain-type">🏦 소매</div>
+                    <div class="domain-name">Retail AI</div>
+                    <div class="domain-example">매장 관리 시스템</div>
+                </div>
+                <div class="domain-card">
+                    <div class="domain-type">🏦 물류</div>
+                    <div class="domain-name">Logistics AI</div>
+                    <div class="domain-example">배송 최적화 시스템</div>
+                </div>
+                <div class="domain-card">
+                    <div class="domain-type">🏦 고객서비스</div>
+                    <div class="domain-name">Customer Service AI</div>
+                    <div class="domain-example">챗봇, 상담 시스템</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="pricing" id="pricing">
+        <div class="container">
+            <h2>💰 요금제</h2>
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <div class="plan-name">Starter</div>
+                    <div class="plan-price">99,000원</div>
+                    <div class="plan-period">월 구독</div>
+                    <ul class="plan-features">
+                        <li>✅ 도메인 2개</li>
+                        <li>✅ 월 50회 생성</li>
+                        <li>✅ 제한적 API</li>
+                        <li>✅ FAQ 지원</li>
+                        <li>✅ 100% 소스 보호</li>
+                    </ul>
+                    <button class="plan-button" onclick="selectPlan('starter')">시작하기</button>
+                </div>
+
+                <div class="pricing-card popular">
+                    <div class="popular-badge">⭐ 인기</div>
+                    <div class="plan-name">Professional</div>
+                    <div class="plan-price">299,000원</div>
+                    <div class="plan-period">월 구독</div>
+                    <ul class="plan-features">
+                        <li>✅ 도메인 6개</li>
+                        <li>✅ 월 300회 생성</li>
+                        <li>✅ 표준 API</li>
+                        <li>✅ 이메일 지원</li>
+                        <li>✅ 팀 협업</li>
+                        <li>✅ 100% 소스 보호</li>
+                    </ul>
+                    <button class="plan-button" onclick="selectPlan('professional')">시작하기</button>
+                </div>
+
+                <div class="pricing-card">
+                    <div class="plan-name">Business</div>
+                    <div class="plan-price">599,000원</div>
+                    <div class="plan-period">월 구독</div>
+                    <ul class="plan-features">
+                        <li>✅ 전체 12개 도메인</li>
+                        <li>✅ 월 1000회 생성</li>
+                        <li>✅ 고급 API</li>
+                        <li>✅ 전화 지원</li>
+                        <li>✅ 커스텀 도메인</li>
+                        <li>✅ 보안 감사</li>
+                    </ul>
+                    <button class="plan-button" onclick="selectPlan('business')">시작하기</button>
+                </div>
+
+                <div class="pricing-card">
+                    <div class="plan-name">Enterprise</div>
+                    <div class="plan-price">1,299,000원</div>
+                    <div class="plan-period">월 구독</div>
+                    <ul class="plan-features">
+                        <li>✅ 전체 12개 도메인</li>
+                        <li>✅ 무제한 생성</li>
+                        <li>✅ 완전 API</li>
+                        <li>✅ 전담팀 지원</li>
+                        <li>✅ 온프레미스 옵션</li>
+                        <li>✅ 보안 컨설팅</li>
+                    </ul>
+                    <button class="plan-button" onclick="selectPlan('enterprise')">문의하기</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Security Section -->
+    <section class="security" id="security">
+        <div class="container">
+            <h2>🔒 완전한 보안</h2>
+            <div class="security-features">
+                <div class="security-item">
+                    <div class="security-icon">🛡️</div>
+                    <h3>소스코드 100% 보호</h3>
+                    <p>서버에서만 실행, 절대 노출 불가</p>
+                </div>
+                <div class="security-item">
+                    <div class="security-icon">📦</div>
+                    <h3>결과물만 다운로드</h3>
+                    <p>실행파일과 문서만 제공</p>
+                </div>
+                <div class="security-item">
+                    <div class="security-icon">🔐</div>
+                    <h3>토큰 기반 인증</h3>
+                    <p>보안 토큰으로 접근 제어</p>
+                </div>
+                <div class="security-item">
+                    <div class="security-icon">📊</div>
+                    <h3>실시간 모니터링</h3>
+                    <p>사용량 추적 및 제한</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 HYOJIN.AI. 모든 권리 보유.</p>
+            <p>📧 support@hyojin.ai | 📱 1588-0000</p>
+        </div>
+    </footer>
+
+    <!-- Subscription Modal -->
+    <div id="subscriptionModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>🚀 HYOJIN.AI 구독 시작</h2>
+            <form id="subscriptionForm">
+                <div class="form-group">
+                    <label for="email">이메일</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="company">회사명</label>
+                    <input type="text" id="company" name="company">
+                </div>
+                <div class="form-group">
+                    <label for="plan">플랜 선택</label>
+                    <select id="plan" name="plan" required>
+                        <option value="">플랜을 선택하세요</option>
+                        <option value="trial">7일 무료체험 (0원)</option>
+                        <option value="starter">Starter (99,000원/월)</option>
+                        <option value="professional">Professional (299,000원/월) ⭐</option>
+                        <option value="business">Business (599,000원/월)</option>
+                        <option value="enterprise">Enterprise (1,299,000원/월)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="phone">연락처</label>
+                    <input type="tel" id="phone" name="phone">
+                </div>
+                <button type="submit" class="cta-button" style="width: 100%; margin-top: 1rem;">
+                    🎯 구독 시작하기
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openModal() {
+            document.getElementById('subscriptionModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('subscriptionModal').style.display = 'none';
+        }
+
+        function selectPlan(planType) {
+            document.getElementById('plan').value = planType;
+            openModal();
+        }
+
+        // 모달 외부 클릭 시 닫기
+        window.onclick = function(event) {
+            const modal = document.getElementById('subscriptionModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // 폼 제출 처리
+        document.getElementById('subscriptionForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+            
+            // 실제로는 서버로 데이터 전송
+            console.log('구독 데이터:', data);
+            
+            // 성공 메시지
+            alert(`🎉 ${data.email}님의 ${data.plan} 플랜 구독이 시작되었습니다!\n\n📧 이메일로 API 키와 사용법을 전송해드렸습니다.`);
+            
+            closeModal();
+            this.reset();
+        });
+
+        // 스크롤 애니메이션
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('header');
+            if (window.scrollY > 100) {
+                header.style.background = 'rgba(255, 255, 255, 0.98)';
+            } else {
+                header.style.background = 'rgba(255, 255, 255, 0.95)';
+            }
+        });
+
+        // 카운터 애니메이션
+        function animateCounter(element, target) {
+            let current = 0;
+            const increment = target / 100;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    element.textContent = target;
+                    clearInterval(timer);
+                } else {
+                    element.textContent = Math.floor(current);
+                }
+            }, 20);
+        }
+
+        // 페이지 로드 시 카운터 애니메이션 시작
+        window.addEventListener('load', function() {
+            const statNumbers = document.querySelectorAll('.stat-number');
+            statNumbers[0] && animateCounter(statNumbers[0], 24);
+            statNumbers[1] && (statNumbers[1].textContent = '100%');
+            statNumbers[2] && (statNumbers[2].textContent = '30초');
+        });
+    </script>
+</body>
+</html>
