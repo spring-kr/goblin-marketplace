@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>구독자 관리 - HYOJIN.AI</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 15px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            display: block;
+        }
+        .subscribers-table {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            overflow: hidden;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background: #667eea;
+            color: white;
+        }
+        .refresh-btn {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        .plan-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        .starter { background: #FFC107; color: #333; }
+        .professional { background: #2196F3; color: white; }
+        .business { background: #FF5722; color: white; }
+        .enterprise { background: #9C27B0; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 HYOJIN.AI 구독자 관리</h1>
+        
+        <button class="refresh-btn" onclick="loadSubscribers()">🔄 새로고침</button>
+        
+        <div class="stats" id="stats">
+            <!-- 통계 카드들이 여기에 표시됩니다 -->
+        </div>
+        
+        <div class="subscribers-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>구독 ID</th>
+                        <th>이메일</th>
+                        <th>회사명</th>
+                        <th>플랜</th>
+                        <th>가입일</th>
+                        <th>상태</th>
+                    </tr>
+                </thead>
+                <tbody id="subscribers-list">
+                    <!-- 구독자 목록이 여기에 표시됩니다 -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        async function loadSubscribers() {
+            try {
+                const response = await fetch('https://hyojin-ai-mvp.onrender.com/subscribers');
+                const data = await response.json();
+                
+                // 통계 표시
+                document.getElementById('stats').innerHTML = `
+                    <div class="stat-card">
+                        <span class="stat-number">${data.total_subscribers}</span>
+                        <span>총 구독자</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">${data.by_plan.starter || 0}</span>
+                        <span>Starter</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">${data.by_plan.professional || 0}</span>
+                        <span>Professional</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">${data.by_plan.business || 0}</span>
+                        <span>Business</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">${data.by_plan.enterprise || 0}</span>
+                        <span>Enterprise</span>
+                    </div>
+                `;
+                
+                // 구독자 목록 표시
+                const tbody = document.getElementById('subscribers-list');
+                tbody.innerHTML = '';
+                
+                if (data.subscribers.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem;">아직 구독자가 없습니다.</td></tr>';
+                } else {
+                    data.subscribers.forEach(subscriber => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${subscriber.id}</td>
+                            <td>${subscriber.email}</td>
+                            <td>${subscriber.company || '-'}</td>
+                            <td><span class="plan-badge ${subscriber.plan}">${subscriber.plan}</span></td>
+                            <td>${new Date(subscriber.timestamp).toLocaleString()}</td>
+                            <td>${subscriber.status}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                }
+                
+            } catch (error) {
+                console.error('구독자 정보 로드 오류:', error);
+                alert('구독자 정보를 불러오는데 실패했습니다.');
+            }
+        }
+        
+        // 페이지 로드 시 구독자 정보 로드
+        window.addEventListener('load', loadSubscribers);
+        
+        // 5초마다 자동 새로고침
+        setInterval(loadSubscribers, 5000);
+    </script>
+</body>
+</html>

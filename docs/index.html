@@ -748,17 +748,50 @@
         }
 
         // 폼 제출 처리
-        document.getElementById('subscriptionForm').addEventListener('submit', function(e) {
+        document.getElementById('subscriptionForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const formData = new FormData(this);
             const data = Object.fromEntries(formData);
             
-            // 실제로는 서버로 데이터 전송
-            console.log('구독 데이터:', data);
-            
-            // 성공 메시지
-            alert(`🎉 ${data.email}님의 ${data.plan} 플랜 구독이 시작되었습니다!\n\n📧 이메일로 API 키와 사용법을 전송해드렸습니다.`);
+            try {
+                // 로딩 표시
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.textContent;
+                submitBtn.textContent = '처리 중...';
+                submitBtn.disabled = true;
+                
+                // 실제 서버로 데이터 전송
+                const response = await fetch('https://hyojin-ai-mvp.onrender.com/subscribe', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // 성공 메시지
+                    alert(`🎉 ${data.email}님의 ${data.plan} 플랜 구독이 시작되었습니다!\n\n📧 구독 ID: ${result.subscription_id}\n📅 등록 시간: ${new Date(result.timestamp).toLocaleString()}\n\n이메일로 API 키와 사용법을 전송해드렸습니다.`);
+                } else {
+                    alert('❌ 구독 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
+                }
+                
+                // 버튼 복원
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+                
+            } catch (error) {
+                console.error('구독 오류:', error);
+                alert('❌ 서버 연결 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+                
+                // 버튼 복원
+                const submitBtn = this.querySelector('button[type="submit"]');
+                submitBtn.textContent = '구독 시작하기';
+                submitBtn.disabled = false;
+            }
             
             closeModal();
             this.reset();
