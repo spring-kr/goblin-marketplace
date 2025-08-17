@@ -53,10 +53,104 @@ class SubscriptionResponse(BaseModel):
     message: str
     subscription_id: str
     timestamp: str
+    trial_expires: str = ""
+
+
+# API 요청 시 이메일 기반 인증 모델
+class AuthenticatedRequest(BaseModel):
+    email: str
+    domain: str
+    text: str
 
 
 # 구독자 데이터 저장소 (실제로는 데이터베이스 사용)
 subscribers = []
+
+
+# 무료체험 관리 함수들
+def calculate_trial_expiry():
+    """7일 무료체험 만료일 계산"""
+    return datetime.datetime.now() + datetime.timedelta(days=7)
+
+
+def is_trial_expired(trial_expires_str):
+    """무료체험 만료 여부 확인"""
+    if not trial_expires_str:
+        return True
+    
+    try:
+        trial_expires = datetime.datetime.fromisoformat(trial_expires_str)
+        return datetime.datetime.now() > trial_expires
+    except:
+        return True
+
+
+def get_subscriber_by_email(email):
+    """이메일로 구독자 정보 조회"""
+    for subscriber in subscribers:
+        if subscriber["email"] == email:
+            return subscriber
+    return None
+
+
+def check_api_access(email):
+    """API 접근 권한 확인"""
+    subscriber = get_subscriber_by_email(email)
+    
+    if not subscriber:
+        return {
+            "allowed": False,
+            "reason": "구독되지 않은 이메일입니다.",
+            "error_code": "NOT_SUBSCRIBED"
+        }
+    
+    # 무료체험 만료 확인
+    if subscriber["plan"] == "trial" and is_trial_expired(subscriber.get("trial_expires")):
+        return {
+            "allowed": False,
+            "reason": "7일 무료체험이 만료되었습니다. 유료 플랜으로 업그레이드해주세요.",
+            "error_code": "TRIAL_EXPIRED",
+            "trial_expires": subscriber.get("trial_expires")
+        }
+    
+    # 호출 횟수 제한 확인 (플랜별)
+    daily_calls = subscriber.get("daily_calls", 0)
+    max_calls = get_plan_limits(subscriber["plan"])["daily_calls"]
+    
+    if daily_calls >= max_calls:
+        return {
+            "allowed": False,
+            "reason": f"일일 호출 한도 {max_calls}회를 초과했습니다.",
+            "error_code": "QUOTA_EXCEEDED",
+            "daily_calls": daily_calls,
+            "max_calls": max_calls
+        }
+    
+    return {
+        "allowed": True,
+        "subscriber": subscriber
+    }
+
+
+def get_plan_limits(plan):
+    """플랜별 제한 정보"""
+    limits = {
+        "trial": {"daily_calls": 10, "domains": 2},
+        "starter": {"daily_calls": 50, "domains": 2},
+        "professional": {"daily_calls": 300, "domains": 6},
+        "business": {"daily_calls": 1000, "domains": 12},
+        "enterprise": {"daily_calls": 99999, "domains": 12}
+    }
+    return limits.get(plan, limits["trial"])
+
+
+def increment_usage(email):
+    """API 사용량 증가"""
+    for subscriber in subscribers:
+        if subscriber["email"] == email:
+            subscriber["daily_calls"] = subscriber.get("daily_calls", 0) + 1
+            subscriber["last_used"] = datetime.datetime.now().isoformat()
+            break
 
 
 # 12개 도메인 정의
@@ -268,32 +362,52 @@ async def create_subscription(subscription: SubscriptionRequest):
     """구독 정보 저장"""
     import uuid
     
+    # 기존 구독자 확인
+    existing_subscriber = get_subscriber_by_email(subscription.email)
+    if existing_subscriber:
+        return SubscriptionResponse(
+            success=False,
+            message=f"{subscription.email}은 이미 등록된 이메일입니다.",
+            subscription_id="",
+            timestamp=datetime.datetime.now().isoformat()
+        )
+
     # 구독 ID 생성
     subscription_id = str(uuid.uuid4())[:8]
     
+    # 7일 무료체험 시작 (모든 신규 가입자)
+    trial_expires = calculate_trial_expiry()
+
     # 구독 데이터 생성
     subscription_data = {
         "id": subscription_id,
         "email": subscription.email,
         "company": subscription.company,
-        "plan": subscription.plan,
+        "plan": "trial",  # 모든 신규 가입자는 trial로 시작
+        "original_plan": subscription.plan,  # 원래 선택한 플랜 저장
         "message": subscription.message,
         "timestamp": datetime.datetime.now().isoformat(),
-        "status": "active"
+        "trial_expires": trial_expires.isoformat(),
+        "status": "trial",
+        "daily_calls": 0,
+        "total_calls": 0,
+        "last_used": None
     }
-    
+
     # 구독자 목록에 추가
     subscribers.append(subscription_data)
-    
+
     # 로그 출력 (실제로는 데이터베이스 저장)
-    print(f"🎉 새 구독자: {subscription.email} ({subscription.plan} 플랜)")
+    print(f"🎉 새 구독자: {subscription.email} (7일 무료체험 시작)")
+    print(f"📅 체험 만료일: {trial_expires.strftime('%Y-%m-%d %H:%M')}")
     print(f"📊 총 구독자 수: {len(subscribers)}")
-    
+
     return SubscriptionResponse(
         success=True,
-        message=f"{subscription.email}님의 {subscription.plan} 플랜 구독이 완료되었습니다!",
+        message=f"{subscription.email}님의 7일 무료체험이 시작되었습니다! 체험 만료일: {trial_expires.strftime('%Y-%m-%d')}",
         subscription_id=subscription_id,
-        timestamp=datetime.datetime.now().isoformat()
+        timestamp=datetime.datetime.now().isoformat(),
+        trial_expires=trial_expires.isoformat()
     )
 
 
@@ -305,30 +419,129 @@ async def get_subscribers():
         "subscribers": subscribers,
         "by_plan": {
             "starter": len([s for s in subscribers if s["plan"] == "starter"]),
-            "professional": len([s for s in subscribers if s["plan"] == "professional"]),
+            "professional": len(
+                [s for s in subscribers if s["plan"] == "professional"]
+            ),
             "business": len([s for s in subscribers if s["plan"] == "business"]),
-            "enterprise": len([s for s in subscribers if s["plan"] == "enterprise"])
-        }
+            "enterprise": len([s for s in subscribers if s["plan"] == "enterprise"]),
+        },
     }
 
 
 @app.get("/predict")
 async def predict_simple(domain: str, text: str):
-    """간단한 GET 예측 엔드포인트"""
+    """데모용 무료 예측 엔드포인트 (제한된 기능)"""
     if domain not in DOMAINS:
         raise HTTPException(status_code=404, detail=f"Domain '{domain}' not found")
 
+    # 데모용은 간단한 응답만 제공
+    demo_results = {
+        "paymentapp": {"status": "demo", "message": "데모 결과입니다. 실제 기능은 구독 후 이용 가능합니다."},
+        "healthcare": {"status": "demo", "message": "데모 결과입니다. 실제 기능은 구독 후 이용 가능합니다."},
+        "finance": {"status": "demo", "message": "데모 결과입니다. 실제 기능은 구독 후 이용 가능합니다."}
+    }
+    
     start_time = datetime.datetime.now()
-    result = generate_ai_prediction(domain, text, {})
+    result = demo_results.get(domain, {"status": "demo", "message": "데모 결과입니다. 실제 기능은 구독 후 이용 가능합니다."})
     end_time = datetime.datetime.now()
     processing_time = int((end_time - start_time).total_seconds() * 1000)
 
     return {
         "domain": domain,
         "result": result,
+        "confidence": 0.50,  # 데모용 낮은 신뢰도
+        "timestamp": datetime.datetime.now().isoformat(),
+        "processing_time_ms": processing_time,
+        "demo": True,
+        "message": "🔒 완전한 AI 기능은 무료체험 가입 후 이용 가능합니다."
+    }
+
+
+@app.post("/predict/auth")
+async def predict_authenticated(request: AuthenticatedRequest):
+    """인증된 사용자용 예측 엔드포인트"""
+    # 도메인 확인
+    if request.domain not in DOMAINS:
+        raise HTTPException(status_code=404, detail=f"Domain '{request.domain}' not found")
+    
+    # API 접근 권한 확인
+    access_check = check_api_access(request.email)
+    
+    if not access_check["allowed"]:
+        raise HTTPException(
+            status_code=403, 
+            detail={
+                "error": access_check["reason"],
+                "error_code": access_check["error_code"],
+                "details": {k: v for k, v in access_check.items() if k not in ["allowed", "reason"]}
+            }
+        )
+    
+    subscriber = access_check["subscriber"]
+    
+    # 플랜별 도메인 접근 제한 확인
+    plan_limits = get_plan_limits(subscriber["plan"])
+    if request.domain not in list(DOMAINS.keys())[:plan_limits["domains"]]:
+        raise HTTPException(
+            status_code=403,
+            detail=f"'{request.domain}' 도메인은 {subscriber['plan']} 플랜에서 이용할 수 없습니다."
+        )
+
+    # AI 예측 실행
+    start_time = datetime.datetime.now()
+    result = generate_ai_prediction(request.domain, request.text, {})
+    end_time = datetime.datetime.now()
+    processing_time = int((end_time - start_time).total_seconds() * 1000)
+    
+    # 사용량 증가
+    increment_usage(request.email)
+
+    return {
+        "domain": request.domain,
+        "result": result,
         "confidence": round(random.uniform(0.75, 0.95), 2),
         "timestamp": datetime.datetime.now().isoformat(),
         "processing_time_ms": processing_time,
+        "subscriber": {
+            "email": subscriber["email"],
+            "plan": subscriber["plan"],
+            "daily_calls": subscriber.get("daily_calls", 0) + 1,
+            "trial_expires": subscriber.get("trial_expires"),
+            "remaining_calls": plan_limits["daily_calls"] - (subscriber.get("daily_calls", 0) + 1)
+        }
+    }
+
+
+@app.get("/status/{email}")
+async def check_user_status(email: str):
+    """사용자 상태 및 체험 정보 확인"""
+    subscriber = get_subscriber_by_email(email)
+    
+    if not subscriber:
+        raise HTTPException(status_code=404, detail="등록되지 않은 이메일입니다.")
+    
+    plan_limits = get_plan_limits(subscriber["plan"])
+    trial_expired = is_trial_expired(subscriber.get("trial_expires")) if subscriber["plan"] == "trial" else False
+    
+    return {
+        "email": subscriber["email"],
+        "plan": subscriber["plan"],
+        "original_plan": subscriber.get("original_plan"),
+        "status": subscriber["status"],
+        "trial_expires": subscriber.get("trial_expires"),
+        "trial_expired": trial_expired,
+        "days_remaining": (datetime.datetime.fromisoformat(subscriber.get("trial_expires", "")) - datetime.datetime.now()).days if subscriber.get("trial_expires") and not trial_expired else 0,
+        "usage": {
+            "daily_calls": subscriber.get("daily_calls", 0),
+            "max_daily_calls": plan_limits["daily_calls"],
+            "remaining_calls": plan_limits["daily_calls"] - subscriber.get("daily_calls", 0),
+            "total_calls": subscriber.get("total_calls", 0)
+        },
+        "access": {
+            "available_domains": plan_limits["domains"],
+            "domain_list": list(DOMAINS.keys())[:plan_limits["domains"]]
+        },
+        "last_used": subscriber.get("last_used")
     }
 
 
