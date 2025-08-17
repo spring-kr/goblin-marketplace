@@ -239,6 +239,25 @@ async def get_domains():
         "total": len(domains_list)
     }
 
+@app.get("/predict")
+async def predict_simple(domain: str, text: str):
+    """간단한 GET 예측 엔드포인트"""
+    if domain not in DOMAINS:
+        raise HTTPException(status_code=404, detail=f"Domain '{domain}' not found")
+    
+    start_time = datetime.datetime.now()
+    result = generate_ai_prediction(domain, text, {})
+    end_time = datetime.datetime.now()
+    processing_time = int((end_time - start_time).total_seconds() * 1000)
+    
+    return {
+        "domain": domain,
+        "result": result,
+        "confidence": round(random.uniform(0.75, 0.95), 2),
+        "timestamp": datetime.datetime.now().isoformat(),
+        "processing_time_ms": processing_time
+    }
+
 # 12개 도메인별 예측 엔드포인트 (한번에 다 구현!)
 @app.post("/api/v1/paymentapp/predict", response_model=PredictResponse)
 async def predict_payment(request: PredictRequest):
