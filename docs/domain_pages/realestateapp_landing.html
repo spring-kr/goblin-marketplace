@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏠 RealEstateApp AI System - HYOJIN.AI</title>
-    <meta name="description" content="직방, 다방 스타일의 부동산 플랫폼">
+    <title>부동산 AI - HYOJIN.AI</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
@@ -17,7 +16,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
             color: #333;
-            background: linear-gradient(135deg, #ef4444 0%, #667eea 100%);
+            background: linear-gradient(135deg, #9C27B022 0%, #9C27B011 100%);
         }
 
         .container {
@@ -47,7 +46,7 @@
         .logo {
             font-size: 1.8rem;
             font-weight: bold;
-            color: #ef4444;
+            color: #9C27B0;
         }
 
         .nav-links {
@@ -64,65 +63,71 @@
         }
 
         .nav-links a:hover {
-            color: #ef4444;
+            color: #9C27B0;
         }
 
-        .cta-button {
-            background: linear-gradient(45deg, #ef4444, #667eea);
+        .back-button {
+            background: #9C27B0;
             color: white;
-            padding: 12px 24px;
+            padding: 10px 20px;
             border: none;
-            border-radius: 50px;
+            border-radius: 25px;
             cursor: pointer;
-            font-weight: bold;
             text-decoration: none;
-            transition: transform 0.3s, box-shadow 0.3s;
+            font-weight: bold;
+            transition: transform 0.3s;
         }
 
-        .cta-button:hover {
+        .back-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
         }
 
         /* Hero Section */
         .hero {
             padding: 120px 0 60px;
             text-align: center;
+            background: linear-gradient(135deg, #9C27B0 0%, #9C27B0AA 100%);
             color: white;
         }
 
-        .hero h1 {
-            font-size: 4rem;
+        .domain-icon {
+            font-size: 5rem;
             margin-bottom: 1rem;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
         }
 
         .hero p {
-            font-size: 1.5rem;
-            margin-bottom: 2rem;
+            font-size: 1.3rem;
             opacity: 0.9;
+            margin-bottom: 2rem;
         }
 
-        .hero-stats {
-            display: flex;
-            justify-content: center;
-            gap: 3rem;
-            margin: 3rem 0;
+        .api-demo {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 2rem auto;
+            max-width: 600px;
+            text-align: left;
         }
 
-        .stat {
-            text-align: center;
+        .api-demo h3 {
+            margin-bottom: 15px;
+            color: white;
         }
 
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: bold;
-            display: block;
-        }
-
-        .stat-label {
-            font-size: 1rem;
-            opacity: 0.8;
+        .api-code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            margin: 10px 0;
         }
 
         /* Features Section */
@@ -140,7 +145,7 @@
 
         .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 2rem;
         }
 
@@ -149,24 +154,58 @@
             padding: 2rem;
             border-radius: 15px;
             text-align: center;
+            border-left: 4px solid #9C27B0;
             transition: transform 0.3s, box-shadow 0.3s;
-            border-left: 5px solid #ef4444;
         }
 
         .feature-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
         }
 
         .feature-icon {
-            font-size: 3rem;
+            font-size: 2.5rem;
             margin-bottom: 1rem;
         }
 
-        /* API Section */
-        .api-section {
+        .feature-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: #9C27B0;
+        }
+
+        /* Use Cases Section */
+        .use-cases {
             padding: 80px 0;
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .use-cases h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #333;
+        }
+
+        .use-cases-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .use-case-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-top: 3px solid #9C27B0;
+        }
+
+        /* API Demo Section */
+        .api-section {
+            padding: 80px 0;
+            background: white;
         }
 
         .api-section h2 {
@@ -176,85 +215,88 @@
             color: #333;
         }
 
-        .api-demo {
-            background: #2d3748;
-            color: #68d391;
-            padding: 2rem;
+        .api-demo-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #f8f9fa;
             border-radius: 15px;
+            padding: 2rem;
+        }
+
+        .api-endpoint {
+            background: #9C27B0;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
             font-family: 'Courier New', monospace;
-            margin: 2rem 0;
+            margin-bottom: 20px;
+        }
+
+        .api-input, .api-output {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .api-input h4, .api-output h4 {
+            color: #9C27B0;
+            margin-bottom: 10px;
+        }
+
+        .json-code {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
             overflow-x: auto;
         }
 
-        .api-response {
-            background: #1a202c;
-            padding: 1.5rem;
-            border-radius: 10px;
-            margin: 1rem 0;
-        }
-
-        /* Demo Section */
-        .demo-section {
+        /* CTA Section */
+        .cta-section {
             padding: 80px 0;
-            background: white;
-        }
-
-        .demo-iframe {
-            width: 100%;
-            height: 600px;
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Examples Section */
-        .examples {
-            padding: 80px 0;
-            background: #ef4444;
+            background: #9C27B0;
             color: white;
-        }
-
-        .examples h2 {
             text-align: center;
-            font-size: 2.5rem;
-            margin-bottom: 3rem;
         }
 
-        .examples-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
+        .cta-button {
+            background: white;
+            color: #9C27B0;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: transform 0.3s;
         }
 
-        .example-card {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 2rem;
-            border-radius: 15px;
-            text-align: center;
-            backdrop-filter: blur(10px);
+        .cta-button:hover {
+            transform: translateY(-2px);
         }
 
         /* Footer */
         footer {
             background: #333;
             color: white;
-            padding: 40px 0;
             text-align: center;
+            padding: 2rem 0;
         }
 
         /* Responsive */
         @media (max-width: 768px) {
             .hero h1 {
-                font-size: 2.5rem;
+                font-size: 2rem;
             }
-
-            .hero-stats {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .nav-links {
-                display: none;
+            
+            .features-grid, .use-cases-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -263,119 +305,114 @@
     <!-- Header -->
     <header>
         <nav class="container">
-            <div class="logo">🏠 RealEstateApp AI System</div>
+            <div class="logo">HYOJIN.AI</div>
             <ul class="nav-links">
-                <li><a href="#features">기능</a></li>
-                <li><a href="#api">API</a></li>
-                <li><a href="#demo">데모</a></li>
-                <li><a href="#examples">예시</a></li>
+                <li><a href="../index.html">홈</a></li>
+                <li><a href="../index.html#domains">도메인</a></li>
+                <li><a href="../index.html#pricing">요금제</a></li>
             </ul>
-            <a href="https://realestate.hyojin.ai" class="cta-button" target="_blank">🚀 라이브 데모</a>
+            <a href="../index.html" class="back-button">← 메인으로</a>
         </nav>
     </header>
 
     <!-- Hero Section -->
     <section class="hero">
         <div class="container">
-            <h1>🏠</h1>
-            <h2>RealEstateApp AI System</h2>
-            <p>직방, 다방 스타일의 부동산 플랫폼</p>
-            <div class="hero-stats">
-                <div class="stat">
-                    <span class="stat-number">99.9%</span>
-                    <span class="stat-label">가동률</span>
+            <div class="domain-icon">🏠</div>
+            <h1>부동산 AI</h1>
+            <p>직방, 다방 수준의 부동산 분석 시스템</p>
+            
+            <div class="api-demo">
+                <h3>🚀 실시간 API 테스트</h3>
+                <div class="api-code">
+                    GET /predict?domain=realestateapp&text=아파트 가격 예측 요청
                 </div>
-                <div class="stat">
-                    <span class="stat-number">< 100ms</span>
-                    <span class="stat-label">응답속도</span>
-                </div>
-                <div class="stat">
-                    <span class="stat-number">24/7</span>
-                    <span class="stat-label">지원</span>
+                <div class="api-code">
+                    → {
+  "predicted_price": "8억원",
+  "price_trend": "상승",
+  "investment_score": 8.5,
+  "market_analysis": "강남구 평균 대비 10% 높음"
+}
                 </div>
             </div>
-            <a href="https://realestate.hyojin.ai" class="cta-button" style="font-size: 1.2rem; padding: 15px 30px;" target="_blank">
-                🎯 지금 바로 체험하기
-            </a>
         </div>
     </section>
 
     <!-- Features Section -->
-    <section class="features" id="features">
+    <section class="features">
         <div class="container">
-            <h2>🌟 주요 기능</h2>
+            <h2>🌟 핵심 기능</h2>
             <div class="features-grid">
-                
-                <div class="feature-card">
-                    <div class="feature-icon">🏘️</div>
-                    <h3>AI 매물 추천</h3>
-                    <p>최신 AI 기술을 적용한 혁신적인 기능</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">📊</div>
-                    <h3>시세 분석</h3>
-                    <p>최신 AI 기술을 적용한 혁신적인 기능</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">🗺️</div>
-                    <h3>지역 정보 제공</h3>
-                    <p>최신 AI 기술을 적용한 혁신적인 기능</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">📸</div>
-                    <h3>VR 매물 투어</h3>
-                    <p>최신 AI 기술을 적용한 혁신적인 기능</p>
-                </div>
-                
                 <div class="feature-card">
                     <div class="feature-icon">💰</div>
-                    <h3>대출 계산기</h3>
-                    <p>최신 AI 기술을 적용한 혁신적인 기능</p>
+                    <h3>가격 예측</h3>
+                    <p>AI 기반 부동산 가격 예측</p>
                 </div>
-                
                 <div class="feature-card">
-                    <div class="feature-icon">📱</div>
-                    <h3>실시간 알림</h3>
-                    <p>최신 AI 기술을 적용한 혁신적인 기능</p>
+                    <div class="feature-icon">📈</div>
+                    <h3>시장 분석</h3>
+                    <p>지역별 시장 동향 분석</p>
                 </div>
-                
+                <div class="feature-card">
+                    <div class="feature-icon">⭐</div>
+                    <h3>투자 점수</h3>
+                    <p>투자 가치 평가</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>트렌드 예측</h3>
+                    <p>부동산 시장 트렌드</p>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- API Section -->
-    <section class="api-section" id="api">
+    <!-- Use Cases Section -->
+    <section class="use-cases">
+        <div class="container">
+            <h2>💼 활용 사례</h2>
+            <div class="use-cases-grid">
+                <div class="use-case-card">
+                    <h3>✅ 부동산 중개 플랫폼</h3>
+                </div>
+                <div class="use-case-card">
+                    <h3>✅ 부동산 투자 앱</h3>
+                </div>
+                <div class="use-case-card">
+                    <h3>✅ 시세 조회 서비스</h3>
+                </div>
+                <div class="use-case-card">
+                    <h3>✅ 부동산 컨설팅</h3>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- API Demo Section -->
+    <section class="api-section">
         <div class="container">
             <h2>🔌 API 사용법</h2>
-            <p style="text-align: center; font-size: 1.2rem; margin-bottom: 2rem;">
-                간단한 API 호출로 강력한 RealEstateApp AI System 기능을 바로 사용하세요
-            </p>
-            
-            <div class="api-demo">
-                <div style="color: #68d391; margin-bottom: 1rem;">// API 요청 예시</div>
-                <div style="color: #f7fafc;">
-curl -X POST https://api.hyojin.ai/realestate \<br>
-  -H "Authorization: Bearer YOUR_API_KEY" \<br>
-  -H "Content-Type: application/json" \<br>
-  -d '{"action": "process", "data": "user_input"}'
+            <div class="api-demo-container">
+                <div class="api-endpoint">
+                    https://hyojin-ai-mvp.onrender.com/predict
                 </div>
                 
-                <div class="api-response">
-                    <div style="color: #68d391; margin-bottom: 1rem;">// API 응답</div>
-                    <div style="color: #f7fafc;">
-{<br>
-  "status": "success",<br>
-  "result": {<br>
-    "processed_data": "...",<br>
-    "confidence": 0.98,<br>
-    "processing_time": "150ms"<br>
-  },<br>
-  "usage": {<br>
-    "api_calls_remaining": 995<br>
-  }<br>
+                <div class="api-input">
+                    <h4>📝 입력 예시</h4>
+                    <div class="json-code">
+?domain=realestateapp&text=아파트 가격 예측 요청
+                    </div>
+                </div>
+                
+                <div class="api-output">
+                    <h4>📊 출력 예시</h4>
+                    <div class="json-code">
+{
+  "predicted_price": "8억원",
+  "price_trend": "상승",
+  "investment_score": 8.5,
+  "market_analysis": "강남구 평균 대비 10% 높음"
 }
                     </div>
                 </div>
@@ -383,42 +420,12 @@ curl -X POST https://api.hyojin.ai/realestate \<br>
         </div>
     </section>
 
-    <!-- Demo Section -->
-    <section class="demo-section" id="demo">
+    <!-- CTA Section -->
+    <section class="cta-section">
         <div class="container">
-            <h2>🎮 라이브 데모</h2>
-            <p style="text-align: center; font-size: 1.2rem; margin-bottom: 2rem;">
-                실제 작동하는 RealEstateApp AI System을 직접 체험해보세요
-            </p>
-            <iframe src="https://realestate.hyojin.ai" class="demo-iframe"></iframe>
-        </div>
-    </section>
-
-    <!-- Examples Section -->
-    <section class="examples" id="examples">
-        <div class="container">
-            <h2>📱 성공 사례</h2>
-            <p style="text-align: center; font-size: 1.2rem; margin-bottom: 2rem;">
-                이미 검증된 비즈니스 모델들을 AI로 구현
-            </p>
-            <div class="examples-grid">
-                
-                <div class="example-card">
-                    <h3>🏆 직방</h3>
-                    <p>직방 스타일의 완전한 AI 시스템</p>
-                </div>
-                
-                <div class="example-card">
-                    <h3>🏆 다방</h3>
-                    <p>다방 스타일의 완전한 AI 시스템</p>
-                </div>
-                
-                <div class="example-card">
-                    <h3>🏆 부동산114</h3>
-                    <p>부동산114 스타일의 완전한 AI 시스템</p>
-                </div>
-                
-            </div>
+            <h2>지금 바로 시작하세요!</h2>
+            <p>7일 무료체험으로 부동산 AI 기능을 체험해보세요</p>
+            <a href="../index.html#pricing" class="cta-button">무료 체험 시작하기</a>
         </div>
     </section>
 
@@ -427,32 +434,12 @@ curl -X POST https://api.hyojin.ai/realestate \<br>
         <div class="container">
             <p>&copy; 2025 HYOJIN.AI. 모든 권리 보유.</p>
             <p>📧 support@hyojin.ai | 📱 1588-0000</p>
-            <p style="margin-top: 10px;">
-                <a href="https://spring-kr.github.io/project/" style="color: #68d391;">메인 사이트로 돌아가기</a>
-            </p>
         </div>
     </footer>
 
     <script>
-        // 부드러운 스크롤
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
-            });
-        });
-
-        // 스크롤 애니메이션
-        window.addEventListener('scroll', function() {
-            const header = document.querySelector('header');
-            if (window.scrollY > 100) {
-                header.style.background = 'rgba(255, 255, 255, 0.98)';
-            } else {
-                header.style.background = 'rgba(255, 255, 255, 0.95)';
-            }
-        });
+        // 페이지 로드 시 API 엔드포인트 테스트 (선택사항)
+        console.log('🚀 부동산 AI 페이지 로드 완료');
     </script>
 </body>
 </html>

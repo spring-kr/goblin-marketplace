@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>온라인 교육 AI - HYOJIN.AI</title>
+    <title>헬스케어 AI - HYOJIN.AI</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
@@ -16,7 +16,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
             color: #333;
-            background: linear-gradient(135deg, #FF980022 0%, #FF980011 100%);
+            background: linear-gradient(135deg, #4CAF5022 0%, #4CAF5011 100%);
         }
 
         .container {
@@ -46,7 +46,7 @@
         .logo {
             font-size: 1.8rem;
             font-weight: bold;
-            color: #FF9800;
+            color: #4CAF50;
         }
 
         .nav-links {
@@ -63,11 +63,11 @@
         }
 
         .nav-links a:hover {
-            color: #FF9800;
+            color: #4CAF50;
         }
 
         .back-button {
-            background: #FF9800;
+            background: #4CAF50;
             color: white;
             padding: 10px 20px;
             border: none;
@@ -86,7 +86,7 @@
         .hero {
             padding: 120px 0 60px;
             text-align: center;
-            background: linear-gradient(135deg, #FF9800 0%, #FF9800AA 100%);
+            background: linear-gradient(135deg, #4CAF50 0%, #4CAF50AA 100%);
             color: white;
         }
 
@@ -154,7 +154,7 @@
             padding: 2rem;
             border-radius: 15px;
             text-align: center;
-            border-left: 4px solid #FF9800;
+            border-left: 4px solid #4CAF50;
             transition: transform 0.3s, box-shadow 0.3s;
         }
 
@@ -171,7 +171,7 @@
         .feature-card h3 {
             font-size: 1.3rem;
             margin-bottom: 1rem;
-            color: #FF9800;
+            color: #4CAF50;
         }
 
         /* Use Cases Section */
@@ -199,7 +199,7 @@
             border-radius: 10px;
             text-align: center;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            border-top: 3px solid #FF9800;
+            border-top: 3px solid #4CAF50;
         }
 
         /* API Demo Section */
@@ -224,7 +224,7 @@
         }
 
         .api-endpoint {
-            background: #FF9800;
+            background: #4CAF50;
             color: white;
             padding: 15px;
             border-radius: 8px;
@@ -241,7 +241,7 @@
         }
 
         .api-input h4, .api-output h4 {
-            color: #FF9800;
+            color: #4CAF50;
             margin-bottom: 10px;
         }
 
@@ -258,14 +258,14 @@
         /* CTA Section */
         .cta-section {
             padding: 80px 0;
-            background: #FF9800;
+            background: #4CAF50;
             color: white;
             text-align: center;
         }
 
         .cta-button {
             background: white;
-            color: #FF9800;
+            color: #4CAF50;
             padding: 15px 30px;
             border: none;
             border-radius: 50px;
@@ -318,26 +318,24 @@
     <!-- Hero Section -->
     <section class="hero">
         <div class="container">
-            <div class="domain-icon">📚</div>
-            <h1>온라인 교육 AI</h1>
-            <p>클래스101, 패스트캠퍼스 수준의 교육 시스템</p>
+            <div class="domain-icon">🏥</div>
+            <h1>헬스케어 AI</h1>
+            <p>삼성병원, 서울대병원 수준의 의료 AI</p>
             
             <div class="api-demo">
                 <h3>🚀 실시간 API 테스트</h3>
                 <div class="api-code">
-                    GET /predict?domain=onlineeducation&text=Python 학습 계획 요청
+                    GET /predict?domain=healthcare&text=건강 상태 진단 요청
                 </div>
                 <div class="api-code">
                     → {
-  "learning_path": [
-    "기초",
-    "중급",
-    "고급",
-    "전문가"
+  "health_score": 82.5,
+  "risk_factors": [
+    "고혈압",
+    "당뇨"
   ],
-  "estimated_completion": "90일",
-  "difficulty_score": 7.2,
-  "recommended_study_time": "일 2시간"
+  "recommended_checkup": "6개월 후",
+  "lifestyle_advice": "규칙적인 운동 필요"
 }
                 </div>
             </div>
@@ -350,24 +348,24 @@
             <h2>🌟 핵심 기능</h2>
             <div class="features-grid">
                 <div class="feature-card">
-                    <div class="feature-icon">🛤️</div>
-                    <h3>학습 경로</h3>
-                    <p>개인화된 학습 로드맵</p>
+                    <div class="feature-icon">💗</div>
+                    <h3>건강 점수</h3>
+                    <p>종합 건강 상태 평가</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">📈</div>
-                    <h3>진도 관리</h3>
-                    <p>학습 진행상황 추적</p>
+                    <div class="feature-icon">⚠️</div>
+                    <h3>위험 요소</h3>
+                    <p>건강 위험 요소 분석</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">🎯</div>
-                    <h3>난이도 평가</h3>
-                    <p>콘텐츠 난이도 분석</p>
+                    <div class="feature-icon">📅</div>
+                    <h3>검진 추천</h3>
+                    <p>최적 검진 시기 추천</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">⏰</div>
-                    <h3>학습 시간</h3>
-                    <p>최적 학습 시간 추천</p>
+                    <div class="feature-icon">💪</div>
+                    <h3>생활 조언</h3>
+                    <p>맞춤형 건강 관리</p>
                 </div>
             </div>
         </div>
@@ -379,16 +377,16 @@
             <h2>💼 활용 사례</h2>
             <div class="use-cases-grid">
                 <div class="use-case-card">
-                    <h3>✅ 온라인 강의 플랫폼</h3>
+                    <h3>✅ 병원 진단 보조</h3>
                 </div>
                 <div class="use-case-card">
-                    <h3>✅ 에듀테크 앱</h3>
+                    <h3>✅ 헬스케어 앱</h3>
                 </div>
                 <div class="use-case-card">
-                    <h3>✅ 기업 교육 시스템</h3>
+                    <h3>✅ 건강 관리 시스템</h3>
                 </div>
                 <div class="use-case-card">
-                    <h3>✅ 개인 학습 관리</h3>
+                    <h3>✅ 의료 데이터 분석</h3>
                 </div>
             </div>
         </div>
@@ -406,7 +404,7 @@
                 <div class="api-input">
                     <h4>📝 입력 예시</h4>
                     <div class="json-code">
-?domain=onlineeducation&text=Python 학습 계획 요청
+?domain=healthcare&text=건강 상태 진단 요청
                     </div>
                 </div>
                 
@@ -414,15 +412,13 @@
                     <h4>📊 출력 예시</h4>
                     <div class="json-code">
 {
-  "learning_path": [
-    "기초",
-    "중급",
-    "고급",
-    "전문가"
+  "health_score": 82.5,
+  "risk_factors": [
+    "고혈압",
+    "당뇨"
   ],
-  "estimated_completion": "90일",
-  "difficulty_score": 7.2,
-  "recommended_study_time": "일 2시간"
+  "recommended_checkup": "6개월 후",
+  "lifestyle_advice": "규칙적인 운동 필요"
 }
                     </div>
                 </div>
@@ -434,7 +430,7 @@
     <section class="cta-section">
         <div class="container">
             <h2>지금 바로 시작하세요!</h2>
-            <p>7일 무료체험으로 온라인 교육 AI 기능을 체험해보세요</p>
+            <p>7일 무료체험으로 헬스케어 AI 기능을 체험해보세요</p>
             <a href="../index.html#pricing" class="cta-button">무료 체험 시작하기</a>
         </div>
     </section>
@@ -449,7 +445,7 @@
 
     <script>
         // 페이지 로드 시 API 엔드포인트 테스트 (선택사항)
-        console.log('🚀 온라인 교육 AI 페이지 로드 완료');
+        console.log('🚀 헬스케어 AI 페이지 로드 완료');
     </script>
 </body>
 </html>
