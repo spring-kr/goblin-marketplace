@@ -1350,70 +1350,82 @@
         </div>
     </section>
 
-    <!-- Pricing Section -->
-    <section class="pricing" id="pricing">
+    <!-- 요금제 섹션 (다른 섹션과 동일한 스타일) -->
+    <section class="ai-domains" id="pricing">
         <div class="container">
-            <h2>💰 요금제</h2>
-            <div class="pricing-grid">
-                <div class="pricing-card">
-                    <div class="plan-name">Starter</div>
-                    <div class="plan-price">99,000원</div>
-                    <div class="plan-period">월 구독</div>
-                    <ul class="plan-features">
-                        <li>✅ 도메인 2개</li>
-                        <li>✅ 월 50회 API 호출</li>
-                        <li>✅ 제한적 API</li>
-                        <li>✅ FAQ 지원</li>
-                        <li>✅ 실시간 AI 예측</li>
-                    </ul>
-                    <button class="plan-button" onclick="selectPlan('starter')">시작하기</button>
+            <div class="domains-header">
+                <div class="domains-badge">💰 엔터프라이즈 솔루션</div>
+                <h2 class="domains-title">투자 수준별 AI 도입</h2>
+                <p class="domains-subtitle">스타트업부터 대기업까지, 기업 규모에 맞는 검증된 AI 솔루션</p>
+                
+                <div class="domains-stats">
+                    <div class="domain-stat">
+                        <span class="domain-stat-number">7일</span>
+                        <span class="domain-stat-label">무료체험</span>
+                    </div>
+                    <div class="domain-stat">
+                        <span class="domain-stat-number">4개</span>
+                        <span class="domain-stat-label">요금제</span>
+                    </div>
+                    <div class="domain-stat">
+                        <span class="domain-stat-number">즉시</span>
+                        <span class="domain-stat-label">시작 가능</span>
+                    </div>
                 </div>
+            </div>
 
-                <div class="pricing-card popular">
-                    <div class="popular-badge">⭐ 인기</div>
-                    <div class="plan-name">Professional</div>
-                    <div class="plan-price">299,000원</div>
-                    <div class="plan-period">월 구독</div>
-                    <ul class="plan-features">
-                        <li>✅ 도메인 6개</li>
-                        <li>✅ 월 300회 API 호출</li>
-                        <li>✅ 표준 API</li>
-                        <li>✅ 이메일 지원</li>
-                        <li>✅ 팀 협업</li>
-                        <li>✅ 실시간 AI 예측</li>
-                    </ul>
-                    <button class="plan-button" onclick="selectPlan('professional')">시작하기</button>
-                </div>
+            <div class="domains-grid">
+                <!-- 스타트업 플랜 -->
+                <a href="#" class="domain-card" onclick="selectPlan('startup'); return false;">
+                    <div class="domain-type">🚀 스타트업</div>
+                    <div class="domain-icon">💼</div>
+                    <h3>Startup</h3>
+                    <p><strong style="font-size: 2rem; color: #00d4ff;">99,000원</strong><br>월 구독</p>
+                    <div class="domain-features">
+                        <span class="domain-feature">도메인 2개</span>
+                        <span class="domain-feature">월 50회 호출</span>
+                        <span class="domain-feature">이메일 지원</span>
+                    </div>
+                </a>
 
-                <div class="pricing-card">
-                    <div class="plan-name">Business</div>
-                    <div class="plan-price">599,000원</div>
-                    <div class="plan-period">월 구독</div>
-                    <ul class="plan-features">
-                        <li>✅ 전체 12개 도메인</li>
-                        <li>✅ 월 1000회 API 호출</li>
-                        <li>✅ 고급 API</li>
-                        <li>✅ 전화 지원</li>
-                        <li>✅ 커스텀 도메인</li>
-                        <li>✅ 보안 감사</li>
-                    </ul>
-                    <button class="plan-button" onclick="selectPlan('business')">시작하기</button>
-                </div>
+                <!-- 프로페셔널 플랜 (인기) -->
+                <a href="#" class="domain-card" onclick="selectPlan('professional'); return false;" style="transform: scale(1.05); border: 2px solid #ff0080;">
+                    <div class="domain-type">⭐ 가장 인기</div>
+                    <div class="domain-icon">🎯</div>
+                    <h3>Professional</h3>
+                    <p><strong style="font-size: 2rem; color: #ff0080;">299,000원</strong><br>월 구독</p>
+                    <div class="domain-features">
+                        <span class="domain-feature">도메인 6개</span>
+                        <span class="domain-feature">월 300회 호출</span>
+                        <span class="domain-feature">우선 지원</span>
+                    </div>
+                </a>
 
-                <div class="pricing-card">
-                    <div class="plan-name">Enterprise</div>
-                    <div class="plan-price">1,299,000원</div>
-                    <div class="plan-period">월 구독</div>
-                    <ul class="plan-features">
-                        <li>✅ 전체 12개 도메인</li>
-                        <li>✅ 무제한 API 호출</li>
-                        <li>✅ 완전 API</li>
-                        <li>✅ 전담팀 지원</li>
-                        <li>✅ 온프레미스 옵션</li>
-                        <li>✅ 보안 컨설팅</li>
-                    </ul>
-                    <button class="plan-button" onclick="selectPlan('enterprise')">문의하기</button>
-                </div>
+                <!-- 비즈니스 플랜 -->
+                <a href="#" class="domain-card" onclick="selectPlan('business'); return false;">
+                    <div class="domain-type">⚡ 중견기업</div>
+                    <div class="domain-icon">🏢</div>
+                    <h3>Business</h3>
+                    <p><strong style="font-size: 2rem; color: #8000ff;">599,000원</strong><br>월 구독</p>
+                    <div class="domain-features">
+                        <span class="domain-feature">전체 12개 도메인</span>
+                        <span class="domain-feature">월 1000회 호출</span>
+                        <span class="domain-feature">전담 지원</span>
+                    </div>
+                </a>
+
+                <!-- 엔터프라이즈 플랜 -->
+                <a href="#" class="domain-card" onclick="selectPlan('enterprise'); return false;">
+                    <div class="domain-type">🏛️ 대기업</div>
+                    <div class="domain-icon">🌐</div>
+                    <h3>Enterprise</h3>
+                    <p><strong style="font-size: 2rem; color: #00d4ff;">1,299,000원</strong><br>월 구독</p>
+                    <div class="domain-features">
+                        <span class="domain-feature">무제한 도메인</span>
+                        <span class="domain-feature">무제한 호출</span>
+                        <span class="domain-feature">24/7 지원</span>
+                    </div>
+                </a>
             </div>
         </div>
     </section>
