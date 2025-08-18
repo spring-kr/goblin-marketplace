@@ -1078,29 +1078,40 @@
         
         // 성공 메시지 표시
         function showSuccess(orderData, subscriptionId, status = 'completed', result = null) {
+            console.log('🎯 showSuccess 호출됨:', { orderData, subscriptionId, status, result });
+            
             // 🔗 결제 완료 후 가상 링크 포함된 성공 페이지로 리다이렉트
             if (result && result.redirect_url) {
-                // 서버에서 제공한 리다이렉트 URL 사용
-                setTimeout(() => {
-                    window.location.href = result.redirect_url;
-                }, 2000); // 2초 후 리다이렉트
+                console.log('✅ redirect_url 발견:', result.redirect_url);
                 
                 // 일시적으로 성공 메시지 표시
                 const successEl = document.getElementById('paymentSuccess');
                 const detailsEl = document.getElementById('subscriptionDetails');
                 
-                detailsEl.innerHTML = `
-                    <div style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 8px;">
-                        <p><strong>구독 ID:</strong> ${subscriptionId}</p>
-                        <p><strong>상태:</strong> <span style="color: #2ecc71">결제 완료</span></p>
-                        <p><strong>가상 서비스 링크:</strong> ${result.links_count || 0}개 생성</p>
-                        <p style="color: #f39c12; margin-top: 10px;">🔗 가상 서비스 링크 페이지로 이동합니다...</p>
-                    </div>
-                `;
+                if (successEl) successEl.style.display = 'block';
                 
-                successEl.style.display = 'block';
-                return;
-            }
+                if (detailsEl) {
+                    detailsEl.innerHTML = `
+                        <div style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                            <p><strong>구독 ID:</strong> ${subscriptionId}</p>
+                            <p><strong>상태:</strong> <span style="color: #2ecc71">결제 완료</span></p>
+                            <p><strong>가상 서비스 링크:</strong> ${result.links_count || 0}개 생성</p>
+                            <p style="color: #f39c12; margin-top: 10px;">🔗 잠시 후 가상 서비스 링크 페이지로 이동합니다...</p>
+                        </div>
+                    `;
+                }
+                
+                // 즉시 리다이렉트 (지연 시간 단축)
+                console.log('🚀 1초 후 리다이렉트 시작...');
+                setTimeout(() => {
+                    console.log('🔗 리다이렉트 실행:', result.redirect_url);
+                    window.location.href = result.redirect_url;
+                }, 1000); // 1초 후 리다이렉트
+                
+                return; // 조기 종료
+            } 
+            
+            console.log('❌ redirect_url이 없음. 기본 성공 페이지 표시');
             
             // 기존 로직 (리다이렉트 정보가 없는 경우)
             const successEl = document.getElementById('paymentSuccess');
@@ -1109,17 +1120,19 @@
             let statusText = status === 'pending' ? '입금 확인 대기 중' : '활성화됨';
             let statusColor = status === 'pending' ? '#f39c12' : '#2ecc71';
             
-            detailsEl.innerHTML = `
-                <div style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 8px;">
-                    <p><strong>구독 ID:</strong> ${subscriptionId}</p>
-                    <p><strong>상태:</strong> <span style="color: ${statusColor}">${statusText}</span></p>
-                    <p><strong>월 결제액:</strong> $${orderData.total}</p>
-                    <p><strong>구독 상품:</strong> ${orderData.items.length}개</p>
-                    ${status === 'pending' ? '<p style="color: #f39c12; margin-top: 10px;">💡 입금 완료 후 24시간 내에 서비스가 활성화됩니다.</p>' : ''}
-                </div>
-            `;
+            if (detailsEl) {
+                detailsEl.innerHTML = `
+                    <div style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                        <p><strong>구독 ID:</strong> ${subscriptionId}</p>
+                        <p><strong>상태:</strong> <span style="color: ${statusColor}">${statusText}</span></p>
+                        <p><strong>월 결제액:</strong> $${orderData.total}</p>
+                        <p><strong>구독 상품:</strong> ${orderData.items.length}개</p>
+                        ${status === 'pending' ? '<p style="color: #f39c12; margin-top: 10px;">💡 입금 완료 후 24시간 내에 서비스가 활성화됩니다.</p>' : ''}
+                    </div>
+                `;
+            }
             
-            successEl.style.display = 'block';
+            if (successEl) successEl.style.display = 'block';
             
             // 이메일 전송
             sendConfirmationEmail(orderData, subscriptionId, status);
@@ -1130,7 +1143,7 @@
                 updateCartDisplay();
                 document.getElementById('checkoutSection').classList.add('hidden');
                 document.getElementById('checkoutForm').reset();
-                successEl.style.display = 'none';
+                if (successEl) successEl.style.display = 'none';
             }, 10000); // 10초 후 자동 초기화
         }
         
