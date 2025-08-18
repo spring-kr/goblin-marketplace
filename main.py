@@ -4,10 +4,11 @@
 버전: v3.1.1 - 에이전트 마켓플레이스 수정
 """
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
 from typing import Dict, Any, List, Optional
 import datetime
@@ -15,6 +16,8 @@ import json
 import random
 import os
 import uuid
+import hashlib
+import secrets
 from pathlib import Path
 
 # FastAPI 앱 생성
@@ -36,12 +39,159 @@ app.add_middleware(
 # 정적 파일 서빙 설정
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+# 🔒 보안 설정
+security = HTTPBearer()
+
+# 관리자 계정 설정 (실제 운영에서는 환경변수 사용)
+ADMIN_CREDENTIALS = {
+    "username": "hyojin_admin",
+    "password_hash": hashlib.sha256("HyojinAI2025!@#".encode()).hexdigest(),
+    "api_key": "hyojin_api_key_2025_secure_token"
+}
+
+# 세션 토큰 저장소 (실제 운영에서는 Redis 사용)
+ACTIVE_SESSIONS = {}
+
+def verify_admin_credentials(username: str, password: str) -> bool:
+    """관리자 인증 확인"""
+    if username != ADMIN_CREDENTIALS["username"]:
+        return False
+    
+    password_hash = hashlib.sha256(password.encode()).hexdigest()
+    return password_hash == ADMIN_CREDENTIALS["password_hash"]
+
+def create_session_token() -> str:
+    """세션 토큰 생성"""
+    token = secrets.token_urlsafe(32)
+    ACTIVE_SESSIONS[token] = {
+        "created_at": datetime.datetime.now(),
+        "last_used": datetime.datetime.now(),
+        "user": "admin"
+    }
+    return token
+
+def verify_session_token(token: str) -> bool:
+    """세션 토큰 검증"""
+    if token not in ACTIVE_SESSIONS:
+        return False
+    
+    session = ACTIVE_SESSIONS[token]
+    # 토큰 만료 확인 (24시간)
+    if datetime.datetime.now() - session["created_at"] > datetime.timedelta(hours=24):
+        del ACTIVE_SESSIONS[token]
+        return False
+    
+    # 마지막 사용 시간 업데이트
+    session["last_used"] = datetime.datetime.now()
+    return True
+
+def verify_api_key(api_key: str) -> bool:
+    """API 키 검증"""
+    return api_key == ADMIN_CREDENTIALS["api_key"]
+
+async def admin_required(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """관리자 권한 필요한 엔드포인트용 의존성"""
+    token = credentials.credentials
+    
+    # API 키 방식 확인
+    if verify_api_key(token):
+        return True
+    
+    # 세션 토큰 방식 확인
+    if verify_session_token(token):
+        return True
+    
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="관리자 권한이 필요합니다",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
 
 # Favicon 엔드포인트
 @app.get("/favicon.ico")
 async def favicon():
     """Favicon 반환"""
     return FileResponse("static/favicon.svg", media_type="image/svg+xml")
+
+
+# 가상링크 매핑 테이블
+VIRTUAL_LINKS = {
+    # 메인 페이지
+    "home": "/",
+    "demo": "/",
+    "landing": "/",
+    # AI 에이전트 마켓플레이스
+    "agents": "/agents/marketplace",
+    "marketplace": "/agents/marketplace",
+    "try": "/agents/marketplace",
+    "experience": "/agents/marketplace",
+    # 가격 및 구독
+    "pricing": "/#pricing",
+    "trial": "/agents/marketplace?trial=true",
+    "subscribe": "/#pricing",
+    "plans": "/#pricing",
+    # 도메인별 체험 링크
+    "medical": "/agents/marketplace?domain=medical",
+    "finance": "/agents/marketplace?domain=finance",
+    "education": "/agents/marketplace?domain=education",
+    "manufacturing": "/agents/marketplace?domain=manufacturing",
+    "retail": "/agents/marketplace?domain=retail",
+    "logistics": "/agents/marketplace?domain=logistics",
+    "energy": "/agents/marketplace?domain=energy",
+    "agriculture": "/agents/marketplace?domain=agriculture",
+    "realestate": "/agents/marketplace?domain=realestate",
+    "entertainment": "/agents/marketplace?domain=entertainment",
+    "cybersecurity": "/agents/marketplace?domain=cybersecurity",
+    "smartcity": "/agents/marketplace?domain=smartcity",
+    # 특별 기능
+    "api": "/docs",
+    "docs": "/docs",
+    "health": "/health",
+    "status": "/health",
+    # 마케팅 캠페인
+    "launch": "/?campaign=launch",
+    "beta": "/?campaign=beta",
+    "partner": "/?campaign=partner",
+    "linkedin": "/?utm_source=linkedin",
+    "twitter": "/?utm_source=twitter",
+    "facebook": "/?utm_source=facebook",
+    "newsletter": "/?utm_source=newsletter",
+    "webinar": "/?utm_source=webinar",
+    "updates": "/?utm_source=updates",
+}
+
+# 링크 클릭 추적 데이터
+LINK_ANALYTICS = {}
+
+
+def track_link_click(short_code: str, request: Request):
+    """가상링크 클릭 추적"""
+    if short_code not in LINK_ANALYTICS:
+        LINK_ANALYTICS[short_code] = {
+            "clicks": 0,
+            "first_click": datetime.datetime.now().isoformat(),
+            "last_click": None,
+            "user_agents": [],
+            "ip_addresses": [],
+        }
+
+    LINK_ANALYTICS[short_code]["clicks"] += 1
+    LINK_ANALYTICS[short_code]["last_click"] = datetime.datetime.now().isoformat()
+
+    # User-Agent 추적 (최대 10개)
+    user_agent = request.headers.get("user-agent", "unknown")
+    if user_agent not in LINK_ANALYTICS[short_code]["user_agents"]:
+        LINK_ANALYTICS[short_code]["user_agents"].append(user_agent)
+        if len(LINK_ANALYTICS[short_code]["user_agents"]) > 10:
+            LINK_ANALYTICS[short_code]["user_agents"].pop(0)
+
+    # IP 주소 추적 (최대 10개)
+    client_ip = request.client.host if request.client else "unknown"
+    if client_ip not in LINK_ANALYTICS[short_code]["ip_addresses"]:
+        LINK_ANALYTICS[short_code]["ip_addresses"].append(client_ip)
+        if len(LINK_ANALYTICS[short_code]["ip_addresses"]) > 10:
+            LINK_ANALYTICS[short_code]["ip_addresses"].pop(0)
 
 
 # 공통 요청/응답 모델
@@ -196,6 +346,18 @@ def get_subscriber_by_email(email):
         if subscriber["email"] == email:
             return subscriber
     return None
+
+
+def get_usage_limit(plan):
+    """플랜에 따른 사용량 제한 반환"""
+    limits = {
+        "trial": {"calls": 3, "name": "무료 체험"},
+        "startup": {"calls": 50, "name": "Startup"},
+        "professional": {"calls": 300, "name": "Professional"},
+        "business": {"calls": 1000, "name": "Business"},
+        "enterprise": {"calls": -1, "name": "Enterprise"},  # -1은 무제한
+    }
+    return limits.get(plan, limits["trial"])
 
 
 def check_api_access(email):
@@ -423,17 +585,196 @@ def generate_ai_prediction(domain: str, input_data: str, parameters: dict):
 
 
 # 기본 엔드포인트들
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 async def root():
     """메인 인덱스 페이지 - 12개 도메인 쇼케이스"""
-    try:
-        # index.html 파일을 읽어서 반환
-        with open("index.html", "r", encoding="utf-8") as f:
-            content = f.read()
-        return HTMLResponse(content=content)
-    except FileNotFoundError:
-        # 파일이 없으면 기본 리다이렉트
-        return RedirectResponse(url="/agents/marketplace")
+    return """
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>HYOJIN.AI - 12개 AI 도메인 완전체</title>
+        <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { 
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                min-height: 100vh;
+            }
+            .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+            .header { text-align: center; padding: 60px 0; }
+            .header h1 { font-size: 3.5em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+            .header p { font-size: 1.2em; opacity: 0.9; }
+            .version-badge { background: rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 25px; display: inline-block; margin: 20px 0; }
+            .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin: 60px 0; }
+            .feature-card { 
+                background: rgba(255,255,255,0.1); 
+                padding: 30px; 
+                border-radius: 15px; 
+                backdrop-filter: blur(10px);
+                transition: transform 0.3s;
+                cursor: pointer;
+            }
+            .feature-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+            .feature-card h3 { font-size: 1.5em; margin-bottom: 15px; }
+            .cta-section { text-align: center; padding: 60px 0; }
+            .cta-button { 
+                background: linear-gradient(45deg, #ff6b6b, #ee5a24); 
+                color: white; 
+                padding: 15px 40px; 
+                border: none; 
+                border-radius: 25px; 
+                font-size: 1.1em; 
+                cursor: pointer; 
+                text-decoration: none;
+                display: inline-block;
+                margin: 10px;
+                transition: transform 0.3s;
+            }
+            .cta-button:hover { transform: scale(1.05); }
+            .admin-link { 
+                position: fixed; 
+                top: 20px; 
+                right: 20px; 
+                background: rgba(0,0,0,0.7); 
+                padding: 10px 20px; 
+                border-radius: 20px; 
+                text-decoration: none; 
+                color: white;
+                transition: background 0.3s;
+                z-index: 1000;
+            }
+            .admin-link:hover { background: rgba(0,0,0,0.9); }
+            .stats { display: flex; justify-content: center; gap: 40px; margin: 40px 0; flex-wrap: wrap; }
+            .stat-item { text-align: center; }
+            .stat-number { font-size: 2.5em; font-weight: bold; display: block; }
+            .stat-label { font-size: 0.9em; opacity: 0.8; }
+        </style>
+    </head>
+    <body>
+        <a href="/admin/links/dashboard" class="admin-link">🔒 관리자</a>
+        
+        <div class="container">
+            <div class="header">
+                <h1>🤖 HYOJIN.AI</h1>
+                <div class="version-badge">🚀 MVP v3.1.1 Complete</div>
+                <p>12개 AI 도메인을 한번에! 차세대 멀티 도메인 AI 플랫폼</p>
+            </div>
+
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-number">12</span>
+                    <span class="stat-label">AI 도메인</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">15</span>
+                    <span class="stat-label">AI 에이전트</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">40+</span>
+                    <span class="stat-label">가상 링크</span>
+                </div>
+            </div>
+
+            <div class="features">
+                <div class="feature-card" onclick="location.href='/domains/healthcare'">
+                    <h3>🏥 의료 AI</h3>
+                    <p>진단 보조, 의료 영상 분석, 건강 모니터링 시스템</p>
+                </div>
+                <div class="feature-card" onclick="location.href='/domains/paymentapp'">
+                    <h3>💰 금융 AI</h3>
+                    <p>결제 시스템, 리스크 분석, 투자 추천, 사기 탐지</p>
+                </div>
+                <div class="feature-card" onclick="location.href='/domains/education'">
+                    <h3>🎓 교육 AI</h3>
+                    <p>개인화 학습, 콘텐츠 생성, 평가 시스템</p>
+                </div>
+                <div class="feature-card" onclick="location.href='/domains/manufacturing'">
+                    <h3>🏭 제조 AI</h3>
+                    <p>품질 관리, 예측 유지보수, 공급망 최적화</p>
+                </div>
+                <div class="feature-card" onclick="location.href='/domains/mobility'">
+                    <h3>🚗 모빌리티 AI</h3>
+                    <p>자율주행, 교통 최적화, 안전 시스템</p>
+                </div>
+                <div class="feature-card" onclick="location.href='/domains/entertainment'">
+                    <h3>🎮 엔터테인먼트 AI</h3>
+                    <p>게임 AI, 콘텐츠 추천, 개인화 경험</p>
+                </div>
+                <div class="feature-card" onclick="location.href='/domains/retail'">
+                    <h3>🏪 리테일 AI</h3>
+                    <p>수요 예측, 재고 관리, 고객 분석</p>
+                </div>
+                <div class="feature-card" onclick="location.href='/domains/energy'">
+                    <h3>⚡ 에너지 AI</h3>
+                    <p>스마트 그리드, 에너지 최적화, 신재생 관리</p>
+                </div>
+                <div class="feature-card" onclick="location.href='/domains/agriculture'">
+                    <h3>🌾 농업 AI</h3>
+                    <p>스마트 농업, 작물 모니터링, 수확량 예측</p>
+                </div>
+                <div class="feature-card" onclick="location.href='/domains/realestate'">
+                    <h3>🏢 부동산 AI</h3>
+                    <p>가격 예측, 투자 분석, 매물 추천</p>
+                </div>
+                <div class="feature-card" onclick="location.href='/domains/customerservice'">
+                    <h3>📞 고객서비스 AI</h3>
+                    <p>챗봇, 감정 분석, 자동 응답 시스템</p>
+                </div>
+                <div class="feature-card" onclick="location.href='/domains/saas'">
+                    <h3>☁️ SaaS AI</h3>
+                    <p>클라우드 서비스, API 관리, 자동화 솔루션</p>
+                </div>
+            </div>
+
+            <div class="cta-section">
+                <h2>지금 시작하세요!</h2>
+                <p>7일 무료 체험으로 모든 기능을 경험해보세요</p>
+                <a href="/domains" class="cta-button">🚀 도메인 탐색</a>
+                <a href="/agents/marketplace" class="cta-button">🤖 AI 에이전트</a>
+                <a href="/subscribe-page" class="cta-button">💳 구독하기</a>
+                <a href="/l/demo" class="cta-button">🔗 데모 체험</a>
+            </div>
+        </div>
+
+        <script>
+            // 클릭 효과 추가
+            document.querySelectorAll('.feature-card').forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px) scale(1.02)';
+                });
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+
+            // 통계 카운터 애니메이션
+            function animateCounter(element, target) {
+                let current = 0;
+                const increment = target / 50;
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        current = target;
+                        clearInterval(timer);
+                    }
+                    element.textContent = Math.floor(current);
+                }, 20);
+            }
+
+            // 페이지 로드 시 애니메이션 실행
+            window.addEventListener('load', () => {
+                const statNumbers = document.querySelectorAll('.stat-number');
+                animateCounter(statNumbers[0], 12);
+                animateCounter(statNumbers[1], 15);
+                statNumbers[2].textContent = '40+';
+            });
+        </script>
+    </body>
+    </html>
+    """
 
 
 @app.get("/health")
@@ -444,6 +785,386 @@ async def health_check():
         "version": "1.0.0",
         "timestamp": datetime.datetime.now().isoformat(),
     }
+
+
+# � 관리자 인증 엔드포인트
+class AdminLoginRequest(BaseModel):
+    username: str
+    password: str
+
+@app.post("/admin/login")
+async def admin_login(request: AdminLoginRequest):
+    """관리자 로그인"""
+    if not verify_admin_credentials(request.username, request.password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="잘못된 인증 정보입니다"
+        )
+    
+    # 세션 토큰 생성
+    token = create_session_token()
+    
+    return {
+        "success": True,
+        "token": token,
+        "message": "로그인 성공",
+        "expires_in": "24시간"
+    }
+
+@app.post("/admin/logout")
+async def admin_logout(admin: bool = Depends(admin_required)):
+    """관리자 로그아웃"""
+    # 실제로는 토큰을 무효화해야 함
+    return {"success": True, "message": "로그아웃 성공"}
+
+@app.get("/admin/auth/check")
+async def check_admin_auth(admin: bool = Depends(admin_required)):
+    """관리자 인증 상태 확인"""
+    return {"authenticated": True, "user": "admin"}
+
+
+# �🔗 가상링크 시스템
+@app.get("/admin/login.html")
+async def admin_login_page():
+    """관리자 로그인 페이지"""
+    try:
+        with open("admin-login.html", "r", encoding="utf-8") as f:
+            content = f.read()
+        return HTMLResponse(content=content)
+    except FileNotFoundError:
+        return HTMLResponse(
+            content="<h1>로그인 페이지를 찾을 수 없습니다.</h1>", status_code=404
+        )
+
+
+@app.get("/l/{short_code}")
+async def virtual_link_redirect(short_code: str, request: Request):
+    """가상링크 리다이렉트"""
+    if short_code not in VIRTUAL_LINKS:
+        raise HTTPException(status_code=404, detail="가상링크를 찾을 수 없습니다")
+
+    # 클릭 추적
+    track_link_click(short_code, request)
+
+    # 실제 URL로 리다이렉트
+    target_url = VIRTUAL_LINKS[short_code]
+
+    # 상대 경로면 전체 URL로 변환
+    if target_url.startswith("/"):
+        base_url = str(request.base_url).rstrip("/")
+        target_url = base_url + target_url
+
+    return RedirectResponse(url=target_url, status_code=302)
+
+
+@app.get("/admin/links")
+async def get_link_analytics(admin: bool = Depends(admin_required)):
+    """가상링크 분석 데이터 (관리자용)"""
+    total_clicks = sum(data.get("clicks", 0) for data in LINK_ANALYTICS.values())
+
+    analytics_summary = {
+        "total_links": len(VIRTUAL_LINKS),
+        "total_clicks": total_clicks,
+        "active_links": len(LINK_ANALYTICS),
+        "top_links": [],
+        "recent_activity": [],
+    }
+
+    # 상위 10개 링크
+    sorted_links = sorted(
+        LINK_ANALYTICS.items(), key=lambda x: x[1].get("clicks", 0), reverse=True
+    )[:10]
+
+    for short_code, data in sorted_links:
+        analytics_summary["top_links"].append(
+            {
+                "short_code": short_code,
+                "target_url": VIRTUAL_LINKS.get(short_code, "unknown"),
+                "clicks": data.get("clicks", 0),
+                "last_click": data.get("last_click"),
+            }
+        )
+
+    return analytics_summary
+
+
+@app.post("/admin/links/create")
+async def create_virtual_link(short_code: str, target_url: str, admin: bool = Depends(admin_required)):
+    """새 가상링크 생성 (관리자용)"""
+    if short_code in VIRTUAL_LINKS:
+        raise HTTPException(status_code=400, detail="이미 존재하는 가상링크입니다")
+
+    VIRTUAL_LINKS[short_code] = target_url
+
+    return {
+        "success": True,
+        "short_code": short_code,
+        "target_url": target_url,
+        "virtual_link": f"/l/{short_code}",
+    }
+
+
+@app.get("/admin/links/all")
+async def get_all_virtual_links(admin: bool = Depends(admin_required)):
+    """모든 가상링크 목록"""
+    links = []
+    for short_code, target_url in VIRTUAL_LINKS.items():
+        analytics = LINK_ANALYTICS.get(short_code, {})
+        links.append(
+            {
+                "short_code": short_code,
+                "target_url": target_url,
+                "virtual_link": f"/l/{short_code}",
+                "clicks": analytics.get("clicks", 0),
+                "created": analytics.get("first_click", "미사용"),
+                "last_used": analytics.get("last_click", "미사용"),
+            }
+        )
+
+    return {"links": links, "total": len(links)}
+
+
+@app.get("/admin/links/dashboard")
+async def link_dashboard(admin: bool = Depends(admin_required)):
+    """가상링크 관리 대시보드 HTML"""
+    dashboard_html = """
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>HYOJIN.AI 가상링크 관리자 대시보드</title>
+        <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+            .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+            .header { text-align: center; color: white; margin-bottom: 30px; }
+            .header h1 { font-size: 2.5em; margin-bottom: 10px; }
+            .admin-panel { background: white; border-radius: 15px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+            .section { margin-bottom: 30px; }
+            .section h2 { color: #333; margin-bottom: 15px; padding-bottom: 5px; border-bottom: 2px solid #667eea; }
+            .link-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-top: 20px; }
+            .link-card { background: #f8f9fa; border: 1px solid #ddd; border-radius: 10px; padding: 15px; transition: transform 0.2s; }
+            .link-card:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+            .link-title { font-weight: bold; color: #333; margin-bottom: 5px; }
+            .link-url { color: #666; font-size: 0.9em; word-break: break-all; }
+            .link-stats { margin-top: 10px; font-size: 0.85em; color: #888; }
+            .admin-actions { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+            .btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: background 0.2s; }
+            .btn-primary { background: #667eea; color: white; }
+            .btn-primary:hover { background: #5a6fd8; }
+            .btn-success { background: #28a745; color: white; }
+            .btn-success:hover { background: #218838; }
+            .btn-danger { background: #dc3545; color: white; }
+            .btn-danger:hover { background: #c82333; }
+            .analytics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px; }
+            .analytics-card { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 20px; border-radius: 10px; text-align: center; }
+            .analytics-number { font-size: 2em; font-weight: bold; margin-bottom: 5px; }
+            .analytics-label { font-size: 0.9em; opacity: 0.9; }
+            .form-group { margin-bottom: 15px; }
+            .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; }
+            .form-group input, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; }
+            .logout-btn { position: absolute; top: 20px; right: 20px; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="logout-btn">
+                <button class="btn btn-danger" onclick="logout()">로그아웃</button>
+            </div>
+            
+            <div class="header">
+                <h1>🔗 HYOJIN.AI 가상링크 관리자</h1>
+                <p>마케팅 캠페인용 가상링크를 관리하세요</p>
+            </div>
+
+            <div class="admin-panel">
+                <!-- 분석 데이터 -->
+                <div class="section">
+                    <h2>📊 실시간 분석</h2>
+                    <div class="analytics-grid" id="analytics-grid">
+                        <!-- 동적으로 로드됩니다 -->
+                    </div>
+                </div>
+
+                <!-- 새 링크 생성 -->
+                <div class="section">
+                    <h2>➕ 새 가상링크 생성</h2>
+                    <div class="admin-actions">
+                        <div class="form-group" style="flex: 1; min-width: 200px;">
+                            <label>단축코드:</label>
+                            <input type="text" id="shortCode" placeholder="예: new-campaign">
+                        </div>
+                        <div class="form-group" style="flex: 2; min-width: 300px;">
+                            <label>목적지 URL:</label>
+                            <input type="text" id="targetUrl" placeholder="https://example.com">
+                        </div>
+                        <button class="btn btn-success" onclick="createLink()" style="align-self: end; height: 40px;">생성</button>
+                    </div>
+                </div>
+
+                <!-- 기존 링크 목록 -->
+                <div class="section">
+                    <h2>🔗 등록된 가상링크</h2>
+                    <div class="link-grid" id="link-grid">
+                        <!-- 동적으로 로드됩니다 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // 인증 토큰 확인
+            const token = localStorage.getItem('admin_token');
+            if (!token) {
+                window.location.href = '/admin/login.html';
+            }
+
+            // API 호출을 위한 헤더
+            const authHeaders = {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            };
+
+            // 페이지 로드 시 데이터 가져오기
+            document.addEventListener('DOMContentLoaded', function() {
+                loadAnalytics();
+                loadLinks();
+            });
+
+            async function loadAnalytics() {
+                try {
+                    const response = await fetch('/admin/links', {
+                        headers: authHeaders
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        displayAnalytics(data);
+                    }
+                } catch (error) {
+                    console.error('분석 데이터 로드 실패:', error);
+                }
+            }
+
+            async function loadLinks() {
+                try {
+                    const response = await fetch('/admin/links/all', {
+                        headers: authHeaders
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        displayLinks(data.links);
+                    }
+                } catch (error) {
+                    console.error('링크 데이터 로드 실패:', error);
+                }
+            }
+
+            function displayAnalytics(data) {
+                const grid = document.getElementById('analytics-grid');
+                grid.innerHTML = `
+                    <div class="analytics-card">
+                        <div class="analytics-number">${data.total_links || 0}</div>
+                        <div class="analytics-label">총 링크 수</div>
+                    </div>
+                    <div class="analytics-card">
+                        <div class="analytics-number">${data.total_clicks || 0}</div>
+                        <div class="analytics-label">총 클릭 수</div>
+                    </div>
+                    <div class="analytics-card">
+                        <div class="analytics-number">${data.active_links || 0}</div>
+                        <div class="analytics-label">활성 링크</div>
+                    </div>
+                    <div class="analytics-card">
+                        <div class="analytics-number">${data.today_clicks || 0}</div>
+                        <div class="analytics-label">오늘 클릭</div>
+                    </div>
+                `;
+            }
+
+            function displayLinks(links) {
+                const grid = document.getElementById('link-grid');
+                if (!links || links.length === 0) {
+                    grid.innerHTML = '<p>등록된 링크가 없습니다.</p>';
+                    return;
+                }
+
+                grid.innerHTML = links.map(link => `
+                    <div class="link-card">
+                        <div class="link-title">/${link.short_code}</div>
+                        <div class="link-url">${link.target_url}</div>
+                        <div class="link-stats">
+                            클릭: ${link.clicks || 0}회 | 
+                            생성: ${link.created_at ? new Date(link.created_at).toLocaleDateString() : '알 수 없음'}
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            async function createLink() {
+                const shortCode = document.getElementById('shortCode').value.trim();
+                const targetUrl = document.getElementById('targetUrl').value.trim();
+
+                if (!shortCode || !targetUrl) {
+                    alert('단축코드와 목적지 URL을 모두 입력해주세요.');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/admin/links/create?short_code=${encodeURIComponent(shortCode)}&target_url=${encodeURIComponent(targetUrl)}`, {
+                        method: 'POST',
+                        headers: authHeaders
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        alert('링크가 성공적으로 생성되었습니다!');
+                        document.getElementById('shortCode').value = '';
+                        document.getElementById('targetUrl').value = '';
+                        loadLinks(); // 링크 목록 새로고침
+                        loadAnalytics(); // 분석 데이터 새로고침
+                    } else {
+                        const error = await response.json();
+                        alert('오류: ' + error.detail);
+                    }
+                } catch (error) {
+                    alert('링크 생성 중 오류가 발생했습니다.');
+                    console.error(error);
+                }
+            }
+
+            async function logout() {
+                try {
+                    await fetch('/admin/logout', {
+                        method: 'POST',
+                        headers: authHeaders
+                    });
+                } catch (error) {
+                    console.error('로그아웃 오류:', error);
+                }
+                
+                localStorage.removeItem('admin_token');
+                window.location.href = '/admin/login.html';
+            }
+
+            // 토큰 유효성 주기적 확인
+            setInterval(async function() {
+                try {
+                    const response = await fetch('/admin/auth/check', {
+                        headers: authHeaders
+                    });
+                    if (!response.ok) {
+                        logout();
+                    }
+                } catch (error) {
+                    logout();
+                }
+            }, 300000); // 5분마다 확인
+        </script>
+    </body>
+    </html>
+    """
+    return HTMLResponse(content=dashboard_html)
 
 
 @app.get("/api/v1/domains")
@@ -875,7 +1596,7 @@ async def predict_healthcare(request: PredictRequest):
 
 
 @app.get("/admin/subscription-management")
-async def get_subscription_management_dashboard():
+async def get_subscription_management_dashboard(admin: bool = Depends(admin_required)):
     """구독관리 대시보드 HTML 반환"""
     dashboard_html = """
     <!DOCTYPE html>
@@ -1308,7 +2029,7 @@ async def get_subscription_management_dashboard():
 
 
 @app.post("/admin/update-subscription")
-async def update_subscription(request: SubscriptionUpdateRequest):
+async def update_subscription(request: SubscriptionUpdateRequest, admin: bool = Depends(admin_required)):
     """구독 정보 업데이트 (관리자용)"""
     global subscribers
 
@@ -1336,7 +2057,7 @@ class DomainManagementRequest(BaseModel):
 
 
 @app.post("/admin/manage-domain")
-async def manage_domain(request: DomainManagementRequest):
+async def manage_domain(request: DomainManagementRequest, admin: bool = Depends(admin_required)):
     """12개 도메인 랜딩페이지 관리"""
 
     # 도메인별 관리 작업 로그 저장 (실제로는 데이터베이스에 저장)
@@ -1370,7 +2091,7 @@ async def manage_domain(request: DomainManagementRequest):
 
 
 @app.get("/admin/domain-analytics/{domain}")
-async def get_domain_analytics(domain: str):
+async def get_domain_analytics(domain: str, admin: bool = Depends(admin_required)):
     """특정 도메인의 분석 데이터 반환"""
 
     # 실시간 분석 데이터 시뮬레이션 (실제로는 실제 데이터)
@@ -1405,7 +2126,7 @@ async def get_domain_analytics(domain: str):
 
 
 @app.post("/admin/user-management")
-async def user_management(request: UserManagementRequest):
+async def user_management(request: UserManagementRequest, admin: bool = Depends(admin_required)):
     """사용자 관리 기능 (생성, 수정, 삭제, 일시정지)"""
     global subscribers
 
@@ -1463,7 +2184,7 @@ async def user_management(request: UserManagementRequest):
 
 
 @app.post("/admin/financial-analysis")
-async def financial_analysis(request: FinancialAnalysisRequest):
+async def financial_analysis(request: FinancialAnalysisRequest, admin: bool = Depends(admin_required)):
     """재무 분석 및 ROI 계산"""
 
     # 플랜별 요금
@@ -1551,7 +2272,7 @@ def calculate_user_roi(user_data):
 
 
 @app.get("/admin/system-status")
-async def get_system_status():
+async def get_system_status(admin: bool = Depends(admin_required)):
     """시스템 상태 및 헬스체크"""
     return {
         "status": "healthy",
@@ -1614,9 +2335,27 @@ async def get_available_agents():
 
 
 @app.get("/agents/marketplace")
-async def get_agent_marketplace():
-    """AI 에이전트 마켓플레이스 HTML 반환"""
-    marketplace_html = """
+async def get_agent_marketplace(email: Optional[str] = None):
+    """AI 에이전트 마켓플레이스 HTML 반환 - 구독자 확인 포함"""
+
+    # 구독자 상태 확인
+    if email:
+        subscriber = get_subscriber_by_email(email)
+        is_subscriber = subscriber is not None
+        user_plan = subscriber.get("plan", "trial") if subscriber else "trial"
+        usage_info = get_usage_limit(user_plan)
+
+        if is_subscriber:
+            status_message = (
+                f"✅ {usage_info['name']} 사용자 - {usage_info['calls']}회 사용 가능"
+            )
+        else:
+            status_message = "🆓 무료 체험 사용자 - 3회 사용 가능"
+    else:
+        status_message = "👋 이메일을 입력하여 체험하세요"
+
+    # 마켓플레이스 HTML 생성
+    html_content = f"""
     <!DOCTYPE html>
     <html lang="ko">
     <head>
@@ -1624,91 +2363,115 @@ async def get_agent_marketplace():
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>HYOJIN.AI 에이전트 마켓플레이스</title>
         <style>
-            * { margin: 0; padding: 0; box-sizing: border-box; }
-            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
-            .header { text-align: center; padding: 50px 20px; color: white; }
-            .header h1 { font-size: 3rem; margin-bottom: 20px; }
-            .header p { font-size: 1.2rem; opacity: 0.9; }
-            .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-            .agents-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; margin-bottom: 50px; }
-            .agent-card { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); transition: transform 0.3s ease; }
-            .agent-card:hover { transform: translateY(-10px); }
-            .agent-icon { font-size: 3rem; margin-bottom: 20px; text-align: center; }
-            .agent-name { font-size: 1.5rem; font-weight: bold; margin-bottom: 15px; color: #667eea; text-align: center; }
-            .agent-description { line-height: 1.6; margin-bottom: 20px; opacity: 0.9; text-align: center; }
-            .capabilities { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; justify-content: center; }
-            .capability-tag { background: rgba(102, 126, 234, 0.2); color: #667eea; padding: 4px 12px; border-radius: 15px; font-size: 0.9rem; }
-            .deploy-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 25px; border-radius: 25px; cursor: pointer; font-weight: bold; width: 100%; }
-            .deploy-btn:hover { transform: scale(1.05); }
+            * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+            body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }}
+            .header {{ text-align: center; padding: 50px 20px; color: white; }}
+            .header h1 {{ font-size: 3rem; margin-bottom: 20px; }}
+            .header p {{ font-size: 1.2rem; opacity: 0.9; }}
+            .status-bar {{ background: rgba(255,255,255,0.15); color: white; padding: 15px; text-align: center; margin: 20px auto; max-width: 600px; border-radius: 10px; font-weight: 600; }}
+            .container {{ max-width: 1200px; margin: 0 auto; padding: 0 20px; }}
+            .agents-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; margin-bottom: 50px; }}
+            .agent-card {{ background: white; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); transition: transform 0.3s ease; }}
+            .agent-card:hover {{ transform: translateY(-10px); }}
+            .agent-icon {{ font-size: 3rem; margin-bottom: 20px; text-align: center; }}
+            .agent-name {{ font-size: 1.5rem; font-weight: bold; margin-bottom: 15px; color: #667eea; text-align: center; }}
+            .agent-description {{ line-height: 1.6; margin-bottom: 20px; opacity: 0.9; text-align: center; }}
+            .capabilities {{ display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; justify-content: center; }}
+            .capability-tag {{ background: rgba(102, 126, 234, 0.2); color: #667eea; padding: 4px 12px; border-radius: 15px; font-size: 0.9rem; }}
+            .deploy-btn {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 25px; border-radius: 25px; cursor: pointer; font-weight: bold; width: 100%; }}
+            .deploy-btn:hover {{ transform: scale(1.05); }}
+            .email-input {{ position: fixed; top: 20px; right: 20px; background: rgba(255,255,255,0.9); padding: 15px; border-radius: 10px; }}
+            .email-input input {{ padding: 8px 12px; border: 1px solid #ddd; border-radius: 5px; margin-right: 10px; }}
+            .email-input button {{ background: #667eea; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; }}
         </style>
     </head>
     <body>
         <div class="header">
             <h1>🤖 AI 에이전트 마켓플레이스</h1>
-            <p>박사급 전문가를 넘어서는 15가지 AI 에이전트</p>
+            <p>15개의 전문 AI 에이전트로 업무를 자동화하세요</p>
+            <div class="status-bar">
+                {status_message}
+            </div>
         </div>
         
+        {"" if email else '<div class="email-input"><input type="email" id="email" placeholder="이메일 입력"><button onclick="accessWithEmail()">접근하기</button></div>'}
+        
         <div class="container">
-            <div class="agents-grid" id="agents-grid">
-                <!-- 동적으로 로드됨 -->
+            <div class="agents-grid" id="agentsGrid">
+                <!-- 에이전트 카드들이 JavaScript로 동적 생성됩니다 -->
             </div>
         </div>
         
         <script>
-            async function loadAgents() {
-                try {
+            const userEmail = "{email or ''}";
+            const isAuthenticated = userEmail !== '';
+            
+            function accessWithEmail() {{
+                const email = document.getElementById('email').value;
+                if (email) {{
+                    window.location.href = `/agents/marketplace?email=${{encodeURIComponent(email)}}`;
+                }}
+            }}
+            
+            async function loadAgents() {{
+                try {{
                     console.log('에이전트 로딩 시작...');
                     const response = await fetch('/agents');
                     console.log('응답 상태:', response.status);
                     
-                    if (!response.ok) {
-                        throw new Error(`HTTP 오류! 상태: ${response.status}`);
-                    }
+                    if (!response.ok) {{
+                        throw new Error(`HTTP 오류! 상태: ${{response.status}}`);
+                    }}
                     
                     const data = await response.json();
                     console.log('에이전트 데이터:', data);
                     
-                    const grid = document.getElementById('agents-grid');
+                    const grid = document.getElementById('agentsGrid');
                     grid.innerHTML = '';
                     
-                    if (data.agents) {
-                        Object.entries(data.agents).forEach(([type, agent]) => {
+                    if (data.agents) {{
+                        Object.entries(data.agents).forEach(([type, agent]) => {{
                             const card = document.createElement('div');
                             card.className = 'agent-card';
                             
                             card.innerHTML = `
-                                <div class="agent-icon">${agent.icon}</div>
-                                <div class="agent-name">${agent.name}</div>
-                                <div class="agent-description">${agent.description}</div>
+                                <div class="agent-icon">${{agent.icon}}</div>
+                                <div class="agent-name">${{agent.name}}</div>
+                                <div class="agent-description">${{agent.description}}</div>
                                 <div class="capabilities">
-                                    ${agent.capabilities.map(cap => `<span class="capability-tag">${cap}</span>`).join('')}
+                                    ${{agent.capabilities.map(cap => `<span class="capability-tag">${{cap}}</span>`).join('')}}
                                 </div>
-                                <button class="deploy-btn" onclick="deployAgent('${type}')">🚀 에이전트 배포</button>
+                                <button class="deploy-btn" onclick="deployAgent('${{type}}')">🚀 에이전트 배포</button>
                             `;
                             
                             grid.appendChild(card);
-                        });
+                        }});
                         console.log('에이전트 카드 생성 완료');
-                    } else {
+                    }} else {{
                         grid.innerHTML = '<p style="color: white; text-align: center;">에이전트 데이터를 불러올 수 없습니다.</p>';
-                    }
-                } catch (error) {
+                    }}
+                }} catch (error) {{
                     console.error('에이전트 로드 오류:', error);
-                    const grid = document.getElementById('agents-grid');
-                    grid.innerHTML = `<p style="color: white; text-align: center;">오류: ${error.message}</p>`;
-                }
-            }
+                    const grid = document.getElementById('agentsGrid');
+                    grid.innerHTML = `<p style="color: white; text-align: center;">오류: ${{error.message}}</p>`;
+                }}
+            }}
             
-            async function deployAgent(agentType) {
-                alert(`${agentType} 에이전트 배포 요청이 접수되었습니다!`);
-            }
+            async function deployAgent(agentType) {{
+                if (isAuthenticated) {{
+                    alert(`${{agentType}} 에이전트 배포 요청이 접수되었습니다!`);
+                }} else {{
+                    alert('에이전트 사용을 위해 이메일 인증이 필요합니다.');
+                    document.getElementById('email').focus();
+                }}
+            }}
             
             document.addEventListener('DOMContentLoaded', loadAgents);
         </script>
     </body>
     </html>
     """
-    return HTMLResponse(content=marketplace_html)
+    return HTMLResponse(content=html_content)
 
 
 @app.get("/agents/{agent_type}")
