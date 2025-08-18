@@ -1,7 +1,7 @@
 """
-🚀 HYOJIN.AI MVP - 12개 도메인 완전체 + 구독관리회사시스템 통합
-한방에 모든 AI 도메인 구현 + 엔터프라이즈 구독관리!
-버전: v3.1.1 - 에이전트 마켓플레이스 수정
+🚀 HYOJIN.AI MVP - 12개 도메인 완전체 + 고급 보안 시스템
+한방에 모든 AI 도메인 구현 + 엔터프라이즈 보안!
+버전: v3.2.0 - 고급 보안 시스템 적용
 """
 
 from fastapi import FastAPI, HTTPException, Request, Depends, status
@@ -18,46 +18,156 @@ import os
 import uuid
 import hashlib
 import secrets
+import re
 from pathlib import Path
 
 # FastAPI 앱 생성
 app = FastAPI(
-    title="Hyojin AI MVP + Subscription Management",
-    description="12개 AI 비즈니스 도메인 + 엔터프라이즈 구독관리 시스템",
-    version="2.0.0",
+    title="Hyojin AI MVP + Advanced Security",
+    description="12개 AI 비즈니스 도메인 + 고급 보안 시스템",
+    version="3.2.0",
 )
 
-# CORS 설정 (프론트엔드 연동용)
+# 🔒 보안 함수들
+def sanitize_input(input_data: str) -> str:
+    """XSS 방지를 위한 입력 살균"""
+    if not isinstance(input_data, str):
+        return str(input_data)
+
+    # HTML 태그 제거
+    clean_data = re.sub(r"<[^>]*>", "", input_data)
+    # 스크립트 태그 제거
+    clean_data = re.sub(r"<script.*?</script>", "", clean_data, flags=re.IGNORECASE)
+    # 특수 문자 이스케이프
+    clean_data = clean_data.replace("<", "&lt;").replace(">", "&gt;")
+    clean_data = clean_data.replace('"', "&quot;").replace("'", "&#x27;")
+
+    return clean_data.strip()
+
+def hash_password(password: str) -> str:
+    """비밀번호 해싱"""
+    salt = secrets.token_hex(16)
+    pwd_hash = hashlib.pbkdf2_hmac("sha256", password.encode(), salt.encode(), 100000)
+    return f"{salt}${pwd_hash.hex()}"
+
+def verify_password(password: str, hashed: str) -> bool:
+    """비밀번호 검증"""
+    try:
+        salt, pwd_hash = hashed.split("$")
+        return (
+            hashlib.pbkdf2_hmac(
+                "sha256", password.encode(), salt.encode(), 100000
+            ).hex()
+            == pwd_hash
+        )
+    except:
+        return False
+
+def log_security_event(event_type: str, user_id: str, details: Dict[str, Any]):
+    """보안 이벤트 로깅"""
+    log_entry = {
+        "timestamp": datetime.datetime.utcnow().isoformat(),
+        "event_type": event_type,
+        "user_id": user_id,
+        "details": details,
+    }
+    print(f"🔒 Security Event: {log_entry}")
+
+def get_client_ip(request: Request) -> str:
+    """클라이언트 IP 주소 가져오기"""
+    return getattr(request.client, "host", "unknown") if request.client else "unknown"
+
+# CORS 설정 (보안 강화)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:3000",
+        "http://localhost:8000",
+        "http://localhost:8001",
+        "https://hyojin.ai",
+    ],  # 특정 도메인만 허용
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["*"],
 )
 
 # 정적 파일 서빙 설정
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# 🔒 보안 설정
+# 🔒 고급 보안 설정
 security = HTTPBearer()
 
-# 관리자 계정 설정 (실제 운영에서는 환경변수 사용)
+# 관리자 계정 설정 (고급 보안)
 ADMIN_CREDENTIALS = {
     "username": "hyojin_admin",
-    "password_hash": hashlib.sha256("HyojinAI2025!@#".encode()).hexdigest(),
-    "api_key": "hyojin_api_key_2025_secure_token"
+    "password_hash": hash_password("HyojinAI2025!@#"),  # 강화된 해싱
+    "api_key": "sk-" + secrets.token_urlsafe(32),
+    "role": "super_admin",
+    "permissions": ["admin", "read", "write", "delete"],
+    "created_at": datetime.datetime.now().isoformat(),
 }
 
 # 세션 토큰 저장소 (실제 운영에서는 Redis 사용)
 ACTIVE_SESSIONS = {}
 
 def verify_admin_credentials(username: str, password: str) -> bool:
-    """관리자 인증 확인"""
+    """관리자 인증 확인 (강화된 보안)"""
+    # 입력 살균
+    username = sanitize_input(username)
+    
     if username != ADMIN_CREDENTIALS["username"]:
         return False
     
-    password_hash = hashlib.sha256(password.encode()).hexdigest()
+    return verify_password(password, ADMIN_CREDENTIALS["password_hash"])
+
+def create_session_token() -> str:
+    """보안 세션 토큰 생성"""
+    token = secrets.token_urlsafe(32)
+    ACTIVE_SESSIONS[token] = {
+        "created_at": datetime.datetime.now(),
+        "last_used": datetime.datetime.now(),
+        "user": ADMIN_CREDENTIALS["username"],
+        "ip": None,
+    }
+    return token
+
+def verify_session_token(token: str) -> bool:
+    """세션 토큰 검증"""
+    if token not in ACTIVE_SESSIONS:
+        return False
+    
+    session = ACTIVE_SESSIONS[token]
+    
+    # 24시간 만료 확인
+    if datetime.datetime.now() - session["created_at"] > datetime.timedelta(hours=24):
+        del ACTIVE_SESSIONS[token]
+        return False
+    
+    # 마지막 사용 시간 업데이트
+    session["last_used"] = datetime.datetime.now()
+    return True
+
+def verify_api_key(api_key: str) -> bool:
+    """API 키 검증"""
+    return api_key == ADMIN_CREDENTIALS["api_key"]
+
+async def admin_required(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """관리자 권한 필요한 엔드포인트용 의존성"""
+    token = credentials.credentials
+    
+    # API 키 방식 확인
+    if verify_api_key(token):
+        return True
+    
+    # 세션 토큰 방식 확인  
+    if verify_session_token(token):
+        return True
+    
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="관리자 권한이 필요합니다",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
     return password_hash == ADMIN_CREDENTIALS["password_hash"]
 
 def create_session_token() -> str:
@@ -657,13 +767,11 @@ async def root():
         <a href="/admin/links/dashboard" class="admin-link">🔒 관리자</a>
         
         <div class="container">
-            <div class="header">
-                <h1>🤖 HYOJIN.AI</h1>
-                <div class="version-badge">🚀 MVP v3.1.1 Complete</div>
-                <p>12개 AI 도메인을 한번에! 차세대 멀티 도메인 AI 플랫폼</p>
-            </div>
-
-            <div class="stats">
+        <div class="header">
+            <h1>🤖 HYOJIN.AI</h1>
+            <div class="version-badge">🚀 MVP v3.2.0 + Security</div>
+            <p>12개 AI 도메인을 한번에! 고급 보안으로 보호되는 차세대 AI 플랫폼</p>
+        </div>            <div class="stats">
                 <div class="stat-item">
                     <span class="stat-number">12</span>
                     <span class="stat-label">AI 도메인</span>
