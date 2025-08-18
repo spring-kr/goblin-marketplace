@@ -1,4 +1,4 @@
-# � HYOJIN.AI MVP - AI 에이전트 생태계 플랫폼
+#  HYOJIN.AI MVP - AI 에이전트 생태계 플랫폼
 
 **12개 AI 도메인## 🏢 12개 AI 비즈니스 도메인
 
@@ -25,9 +25,6 @@
 - **📈 성능 추적**: 성장률, 사용자 만족도, 피드백 분석
 - **🔧 원클릭 작업**: 도메인별 5가지 관리 작업 지원엔터프라이즈 구독관리 시스템**
 
-[![Deploy Status](https://img.shields.io/badge/Deploy-Live-green)](https://hyojin-ai-mvp.onrender.com)
-[![Version](https://img.shields.io/badge/Version-3.1.0-blue)](https://github.com/spring-kr/hyojin-ai-mvp)
-[![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
 
 ---
 
@@ -43,15 +40,7 @@ HYOJIN.AI는 **완전한 AI 생태계 플랫폼**으로, 비즈니스의 모든 
 
 ---
 
-## 🌐 배포 정보
 
-- **🌍 메인 플랫폼**: https://hyojin-ai-mvp.onrender.com
-- **🤖 AI 마켓플레이스**: https://hyojin-ai-mvp.onrender.com/agents/marketplace
-- **🏢 관리자 대시보드**: https://hyojin-ai-mvp.onrender.com/admin/subscription-management
-  - 구독자 관리 + **12개 도메인 랜딩페이지 통합 관리**
-- **🚀 에이전트 랜딩**: https://spring-kr.github.io/agentic-ai-landing-page/
-
----
 
 ## 🤖 AI 에이전트 저장소
 
@@ -120,51 +109,6 @@ CI/CD          # Git 연동 자동 배포
 
 ---
 
-## 🚀 빠른 시작
-
-### 1️⃣ 로컬 실행
-```bash
-# 저장소 클론
-git clone https://github.com/spring-kr/hyojin-ai-mvp.git
-cd hyojin-ai-mvp
-
-# 의존성 설치
-pip install -r requirements.txt
-
-# 서버 실행
-python main.py
-```
-
-### 2️⃣ API 테스트
-```python
-import requests
-
-# AI 도메인 테스트
-response = requests.post("http://localhost:8000/api/v1/payment/predict", 
-    json={
-        "input_data": "신용카드 결제 분석 요청",
-        "parameters": {}
-    }
-)
-print(response.json())
-
-# AI 에이전트 실행
-response = requests.post("http://localhost:8000/agents/execute",
-    json={
-        "agent_type": "strategy",
-        "task_description": "시장 분석 요청",
-        "parameters": {}
-    }
-)
-print(response.json())
-```
-
-### 3️⃣ 웹 인터페이스 접속
-- **로컬**: http://localhost:8000
-- **API 문서**: http://localhost:8000/docs
-- **마켓플레이스**: http://localhost:8000/agents/marketplace
-
----
 
 ## 📊 구독 플랜
 
@@ -191,36 +135,6 @@ print(response.json())
 
 ---
 
-## 📡 API 엔드포인트
-
-### 🤖 AI 에이전트 API
-```http
-GET    /agents                    # 에이전트 목록
-GET    /agents/{agent_type}       # 에이전트 상세정보
-POST   /agents/execute            # 에이전트 실행
-POST   /agents/deploy             # 에이전트 배포
-GET    /agents/marketplace        # 마켓플레이스 UI
-```
-
-### 🏢 구독관리 API
-```http
-POST   /subscribe                 # 구독 신청
-GET    /subscribers               # 구독자 목록
-POST   /admin/update-subscription # 구독 관리
-POST   /admin/user-management     # 사용자 관리
-POST   /admin/financial-analysis  # 재무 분석
-```
-
-### 🧠 AI 도메인 API
-```http
-POST   /api/v1/payment/predict    # 결제 AI
-POST   /api/v1/delivery/predict   # 배달 AI
-POST   /api/v1/shopping/predict   # 쇼핑 AI
-POST   /api/v1/realestate/predict # 부동산 AI
-# ... 12개 도메인 전체
-```
-
----
 
 ## 📈 성능 지표
 
@@ -238,189 +152,24 @@ POST   /api/v1/realestate/predict # 부동산 AI
 
 ---
 
-## 📚 문서
 
-- **📖 [사용자 가이드](USER_GUIDE.md)**: 플랫폼 사용법 완벽 가이드
-- **🔧 [기술 구현 명세서](TECHNICAL_IMPLEMENTATION.md)**: 개발자를 위한 상세 기술 문서
-- **🤖 [AI 에이전트 통합 가이드](AI_AGENT_INTEGRATION_GUIDE.md)**: 에이전트 시스템 구체화 문서
-- **📊 [테스트 보고서](TEST_REPORT.md)**: 종합 테스트 결과 및 성능 분석
 
----
 
-## 🏆 성공 사례
 
-### 📈 현재 성과
-- **👥 활성 구독자**: 2명 (테스트 단계)
-- **🤖 에이전트 배포**: 15개 에이전트 라이브
-- **📊 API 호출**: 일평균 500+ 요청
-- **⭐ 만족도**: 95% (베타 테스터 기준)
 
-### 🎯 비즈니스 목표
-- **Q1 2025**: 월 100명 구독자
-- **Q2 2025**: 월 500명 구독자  
-- **Q3 2025**: 월 1,000명 구독자
-- **Q4 2025**: 글로벌 확장
 
 ---
 
-## 🤝 기여하기
 
-### 🔧 개발 참여
-```bash
-# 포크 후 개발 브랜치 생성
-git checkout -b feature/new-agent
-
-# 변경사항 커밋
-git commit -m "feat: Add new AI agent"
-
-# 풀 리퀘스트 생성
-git push origin feature/new-agent
 ```
 
-### � 버그 리포트
-- **GitHub Issues**: 버그 신고 및 기능 요청
-- **Discord**: 실시간 개발자 소통 (준비 중)
-- **이메일**: dev@hyojin-ai.com
-
----
-
-## 📞 지원 및 연락처
-
-### 🔧 기술 지원
-- **📧 이메일**: support@hyojin-ai.com
-- **📱 카카오톡**: @hyojin-ai (준비 중)
-- **💬 Discord**: 개발자 커뮤니티 (준비 중)
-
-### 💼 비즈니스 문의
-- **📧 이메일**: business@hyojin-ai.com
-- **📞 전화**: 1588-0000 (Enterprise)
-- **🏢 사무실**: 서울시 강남구 (준비 중)
-
----
 
 ## 📜 라이센스
 
 이 프로젝트는 [MIT 라이센스](LICENSE) 하에 배포됩니다.
 
----
-
-## 🎉 감사의 말
-
-**HYOJIN.AI MVP**를 만들어주신 모든 분들께 감사드립니다:
-- **� 개발팀**: 혁신적인 AI 에이전트 시스템 구축
-- **🎨 디자인팀**: 엔터프라이즈급 사용자 경험 설계
-- **📊 데이터팀**: AI 모델 최적화 및 성능 향상
-- **🤝 베타 테스터**: 소중한 피드백과 개선 아이디어
-
----
-
-**📅 최종 업데이트**: 2025년 1월 18일  
-**🚀 플랫폼 버전**: v3.0.0  
-**⭐ GitHub Stars**: 환영합니다!  
-
----
-
-> 🎯 **지금 시작하세요!**  
-> **[🚀 7일 무료 체험 시작하기](https://hyojin-ai-mvp.onrender.com)** 👈  
-> 
-> AI의 미래를 오늘 경험하세요! 🤖✨
-        "action": "analyze_transaction",
-        "data": {"amount": 50000, "merchant": "스타벅스"},
-        "user_id": "user123"
-    }
-)
-
-print(response.json())
-```
-
-## 📈 모니터링
-
-- Railway 대시보드에서 실시간 로그 확인
-- `/health` 엔드포인트로 상태 모니터링
-- 무료 티어: 500시간/월 (월 $0)
-
-## 🔧 개발자 정보
-
-- 개발: HYOJIN.AI Team
-- 버전: 1.0.0-MVP
-- 라이센스: MIT
 
 
-## 🚂 배포 옵션들
-
-### 🥇 1순위: Render (무료 추천)
-```bash
-# render.yaml 설정 파일 포함됨
-# 1. https://render.com 가입
-# 2. GitHub 저장소 연결
-# 3. 자동 배포 완료!
-```
-
-### 🥈 2순위: Vercel (서버리스)
-```bash
-# vercel.json 설정 파일 포함됨
-# 1. https://vercel.com 가입
-# 2. GitHub 저장소 연결
-# 3. 서버리스 배포 완료!
-```
-
-### 🥉 3순위: Deta Space (완전무료)
-```bash
-# Spacefile 설정 파일 포함됨
-# 1. https://deta.space 가입
-# 2. CLI로 배포
-# 3. 베타 서비스이지만 완전 무료!
-```
-
-## 💰 비용 비교
-- **Render**: 750시간/월 무료
-- **Vercel**: 서버리스 무료
-- **Deta**: 완전 무료 (베타)
-- **Railway**: $5/월 (유료화됨)
-
-## 📋 배포 가이드
-자세한 배포 방법은 `RENDER_DEPLOYMENT_GUIDE.md`를 참고하세요!
-
----
-
-## 📝 업데이트 로그
-
-### 🎉 v3.1.0 (2025-08-18) - 12개 도메인 통합 관리 시스템
-**새로운 기능:**
-- 🌐 **12개 도메인 랜딩페이지 통합 관리**
-  - 관리자 대시보드에서 원클릭으로 12개 도메인 관리
-  - 도메인별 실시간 분석 데이터 (방문자, 전환율, 매출)
-  - 5가지 관리 작업: 콘텐츠 수정, SEO 최적화, 광고 캠페인, 피드백 확인, 성능 최적화
-
-**API 엔드포인트 추가:**
-- `POST /admin/manage-domain` - 도메인 관리 작업 처리
-- `GET /admin/domain-analytics/{domain}` - 도메인별 분석 데이터
-
-**개선사항:**
-- 관리자 대시보드 UI 개선 (모달 팝업, 카드 인터페이스)
-- 12개 도메인 카드 레이아웃 최적화
-- 실시간 분석 데이터 시각화
-
-### 🚀 v3.0.0 (2025-08-17) - AI 에이전트 마켓플레이스
-**주요 기능:**
-- 🤖 **15개 AI 에이전트 통합 시스템**
-- 🏪 **에이전트 마켓플레이스 웹 인터페이스**
-- ⚡ **원클릭 에이전트 배포 시스템**
-- 📊 **구독관리 + 에이전트 저장소 통합**
-
-### 🏢 v2.0.0 (2025-08-16) - 엔터프라이즈 구독 시스템
-**핵심 기능:**
-- 💼 **3가지 구독 플랜** (Trial, Professional, Business, Enterprise)
-- 👥 **사용자 관리 시스템**
-- 📈 **실시간 분석 대시보드**
-- 🔐 **API 사용량 제한 및 모니터링**
-
-### 🎯 v1.0.0 (2025-08-15) - MVP 런칭
-**기본 기능:**
-- 🏢 **12개 AI 비즈니스 도메인** 구현
-- ⚡ **FastAPI 기반 고성능 백엔드**
-- 🌐 **Render.com 배포 및 CI/CD**
-- 📋 **API 문서 자동 생성**
 
 ---
 *최종 업데이트: 2025-08-18 - 도메인 통합 관리 시스템 완성*
