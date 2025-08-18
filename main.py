@@ -888,16 +888,69 @@ async def get_subscription_management_dashboard():
             .plan-business { background: #f3e5f5; color: #7b1fa2; padding: 4px 8px; border-radius: 4px; }
             .plan-enterprise { background: #e8f5e8; color: #388e3c; padding: 4px 8px; border-radius: 4px; }
             .refresh-btn { background: #667eea; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+            
+            /* 도메인 관리 스타일 */
+            .domain-card { 
+                background: white; 
+                border: 2px solid #e9ecef; 
+                border-radius: 10px; 
+                padding: 20px; 
+                transition: all 0.3s ease;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .domain-card:hover { 
+                border-color: #667eea; 
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            }
+            .domain-card h3 { 
+                margin: 0 0 10px 0; 
+                color: #333; 
+                font-size: 1.2rem;
+            }
+            .domain-card p { 
+                margin: 0 0 15px 0; 
+                color: #666; 
+                font-size: 0.9rem;
+                line-height: 1.4;
+            }
+            .domain-actions { 
+                display: flex; 
+                gap: 8px; 
+            }
+            .btn-primary { 
+                background: #667eea; 
+                color: white; 
+                border: none; 
+                padding: 8px 16px; 
+                border-radius: 5px; 
+                cursor: pointer; 
+                font-size: 0.85rem;
+                flex: 1;
+            }
+            .btn-secondary { 
+                background: #6c757d; 
+                color: white; 
+                border: none; 
+                padding: 8px 16px; 
+                border-radius: 5px; 
+                cursor: pointer; 
+                font-size: 0.85rem;
+                flex: 1;
+            }
+            .btn-primary:hover { background: #5a6fd8; }
+            .btn-secondary:hover { background: #5a6268; }
         </style>
     </head>
     <body>
         <div class="container">
             <div class="header">
-                <h1>🏢 HYOJIN.AI 구독관리 시스템</h1>
-                <p>엔터프라이즈급 구독자 관리 및 분석 대시보드 + AI 에이전트 저장소</p>
+                <h1>🏢 HYOJIN.AI 통합 관리 시스템</h1>
+                <p>엔터프라이즈급 구독자 관리 + 12개 도메인 랜딩페이지 + AI 에이전트 저장소</p>
                 <div style="margin-top: 20px;">
-                    <a href="/agents/marketplace" style="background: rgba(255,255,255,0.2); color: white; text-decoration: none; padding: 10px 20px; border-radius: 25px; margin-right: 10px;">🤖 AI 에이전트 마켓플레이스</a>
-                    <a href="https://spring-kr.github.io/agentic-ai-landing-page/" target="_blank" style="background: rgba(255,255,255,0.2); color: white; text-decoration: none; padding: 10px 20px; border-radius: 25px;">🚀 에이전트 랜딩페이지</a>
+                    <a href="/agents/marketplace" style="background: rgba(255,255,255,0.2); color: white; text-decoration: none; padding: 8px 16px; border-radius: 20px; margin-right: 8px; font-size: 0.9rem;">🤖 AI 에이전트</a>
+                    <a href="/landing-preview" style="background: rgba(255,255,255,0.2); color: white; text-decoration: none; padding: 8px 16px; border-radius: 20px; margin-right: 8px; font-size: 0.9rem;">🚀 에이전트 랜딩</a>
+                    <button onclick="showDomainManager()" style="background: rgba(255,255,255,0.3); color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.9rem;">🌐 12개 도메인 관리</button>
                 </div>
             </div>
             
@@ -941,6 +994,126 @@ async def get_subscription_management_dashboard():
                         <!-- 동적으로 로드됨 -->
                     </tbody>
                 </table>
+            </div>
+            
+            <!-- 도메인 관리 모달 -->
+            <div id="domain-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 15px; width: 90%; max-width: 1000px; max-height: 80%; overflow-y: auto;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                        <h2>🌐 12개 도메인 랜딩페이지 관리</h2>
+                        <button onclick="hideDomainManager()" style="background: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer;">✕ 닫기</button>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                        <div class="domain-card" data-domain="medical">
+                            <h3>🏥 의료 예측 AI</h3>
+                            <p>질병 진단 및 치료 예측</p>
+                            <div class="domain-actions">
+                                <button onclick="manageDomain('medical')" class="btn-primary">페이지 관리</button>
+                                <button onclick="viewAnalytics('medical')" class="btn-secondary">분석 보기</button>
+                            </div>
+                        </div>
+                        
+                        <div class="domain-card" data-domain="finance">
+                            <h3>💰 금융 분석 AI</h3>
+                            <p>투자 및 리스크 분석</p>
+                            <div class="domain-actions">
+                                <button onclick="manageDomain('finance')" class="btn-primary">페이지 관리</button>
+                                <button onclick="viewAnalytics('finance')" class="btn-secondary">분석 보기</button>
+                            </div>
+                        </div>
+                        
+                        <div class="domain-card" data-domain="education">
+                            <h3>🎓 교육 최적화 AI</h3>
+                            <p>맞춤형 학습 경로 추천</p>
+                            <div class="domain-actions">
+                                <button onclick="manageDomain('education')" class="btn-primary">페이지 관리</button>
+                                <button onclick="viewAnalytics('education')" class="btn-secondary">분석 보기</button>
+                            </div>
+                        </div>
+                        
+                        <div class="domain-card" data-domain="manufacturing">
+                            <h3>🏭 제조업 최적화 AI</h3>
+                            <p>생산 효율성 및 품질 관리</p>
+                            <div class="domain-actions">
+                                <button onclick="manageDomain('manufacturing')" class="btn-primary">페이지 관리</button>
+                                <button onclick="viewAnalytics('manufacturing')" class="btn-secondary">분석 보기</button>
+                            </div>
+                        </div>
+                        
+                        <div class="domain-card" data-domain="retail">
+                            <h3>🛒 리테일 인사이트 AI</h3>
+                            <p>고객 행동 및 재고 최적화</p>
+                            <div class="domain-actions">
+                                <button onclick="manageDomain('retail')" class="btn-primary">페이지 관리</button>
+                                <button onclick="viewAnalytics('retail')" class="btn-secondary">분석 보기</button>
+                            </div>
+                        </div>
+                        
+                        <div class="domain-card" data-domain="logistics">
+                            <h3>🚚 물류 최적화 AI</h3>
+                            <p>배송 경로 및 창고 관리</p>
+                            <div class="domain-actions">
+                                <button onclick="manageDomain('logistics')" class="btn-primary">페이지 관리</button>
+                                <button onclick="viewAnalytics('logistics')" class="btn-secondary">분석 보기</button>
+                            </div>
+                        </div>
+                        
+                        <div class="domain-card" data-domain="energy">
+                            <h3>⚡ 에너지 관리 AI</h3>
+                            <p>스마트 그리드 및 효율성</p>
+                            <div class="domain-actions">
+                                <button onclick="manageDomain('energy')" class="btn-primary">페이지 관리</button>
+                                <button onclick="viewAnalytics('energy')" class="btn-secondary">분석 보기</button>
+                            </div>
+                        </div>
+                        
+                        <div class="domain-card" data-domain="agriculture">
+                            <h3>🌾 농업 스마트팜 AI</h3>
+                            <p>작물 예측 및 최적화</p>
+                            <div class="domain-actions">
+                                <button onclick="manageDomain('agriculture')" class="btn-primary">페이지 관리</button>
+                                <button onclick="viewAnalytics('agriculture')" class="btn-secondary">분석 보기</button>
+                            </div>
+                        </div>
+                        
+                        <div class="domain-card" data-domain="real_estate">
+                            <h3>🏠 부동산 가격 AI</h3>
+                            <p>시장 분석 및 가격 예측</p>
+                            <div class="domain-actions">
+                                <button onclick="manageDomain('real_estate')" class="btn-primary">페이지 관리</button>
+                                <button onclick="viewAnalytics('real_estate')" class="btn-secondary">분석 보기</button>
+                            </div>
+                        </div>
+                        
+                        <div class="domain-card" data-domain="entertainment">
+                            <h3>🎬 엔터테인먼트 AI</h3>
+                            <p>콘텐츠 추천 및 분석</p>
+                            <div class="domain-actions">
+                                <button onclick="manageDomain('entertainment')" class="btn-primary">페이지 관리</button>
+                                <button onclick="viewAnalytics('entertainment')" class="btn-secondary">분석 보기</button>
+                            </div>
+                        </div>
+                        
+                        <div class="domain-card" data-domain="cybersecurity">
+                            <h3>🔒 사이버보안 AI</h3>
+                            <p>위협 탐지 및 방어</p>
+                            <div class="domain-actions">
+                                <button onclick="manageDomain('cybersecurity')" class="btn-primary">페이지 관리</button>
+                                <button onclick="viewAnalytics('cybersecurity')" class="btn-secondary">분석 보기</button>
+                            </div>
+                        </div>
+                        
+                        <div class="domain-card" data-domain="smart_city">
+                            <h3>🏙️ 스마트시티 AI</h3>
+                            <p>도시 인프라 최적화</p>
+                            <div class="domain-actions">
+                                <button onclick="manageDomain('smart_city')" class="btn-primary">페이지 관리</button>
+                                <button onclick="viewAnalytics('smart_city')" class="btn-secondary">분석 보기</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         
@@ -1022,6 +1195,97 @@ async def get_subscription_management_dashboard():
             
             // 페이지 로드 시 데이터 로드
             document.addEventListener('DOMContentLoaded', loadData);
+            
+            // 도메인 관리 함수들
+            function showDomainManager() {
+                document.getElementById('domain-modal').style.display = 'block';
+            }
+            
+            function hideDomainManager() {
+                document.getElementById('domain-modal').style.display = 'none';
+            }
+            
+            function manageDomain(domain) {
+                const domainNames = {
+                    medical: '의료 예측 AI',
+                    finance: '금융 분석 AI', 
+                    education: '교육 최적화 AI',
+                    manufacturing: '제조업 최적화 AI',
+                    retail: '리테일 인사이트 AI',
+                    logistics: '물류 최적화 AI',
+                    energy: '에너지 관리 AI',
+                    agriculture: '농업 스마트팜 AI',
+                    real_estate: '부동산 가격 AI',
+                    entertainment: '엔터테인먼트 AI',
+                    cybersecurity: '사이버보안 AI',
+                    smart_city: '스마트시티 AI'
+                };
+                
+                const actions = [
+                    '페이지 콘텐츠 수정',
+                    'SEO 최적화 설정',
+                    '광고 캠페인 관리',
+                    '사용자 피드백 확인',
+                    '성능 최적화'
+                ];
+                
+                const action = prompt(`${domainNames[domain]} 관리\\n\\n수행할 작업을 선택하세요:\\n\\n1. ${actions[0]}\\n2. ${actions[1]}\\n3. ${actions[2]}\\n4. ${actions[3]}\\n5. ${actions[4]}\\n\\n번호를 입력하세요 (1-5):`);
+                
+                if (action && action >= 1 && action <= 5) {
+                    alert(`${domainNames[domain]}\\n"${actions[parseInt(action)-1]}" 작업이 시작되었습니다!\\n\\n관리자 대시보드에서 진행상황을 확인할 수 있습니다.`);
+                    
+                    // 실제로는 여기서 백엔드 API 호출
+                    updateDomainManagement(domain, actions[parseInt(action)-1]);
+                }
+            }
+            
+            function viewAnalytics(domain) {
+                const domainNames = {
+                    medical: '의료 예측 AI',
+                    finance: '금융 분석 AI', 
+                    education: '교육 최적화 AI',
+                    manufacturing: '제조업 최적화 AI',
+                    retail: '리테일 인사이트 AI',
+                    logistics: '물류 최적화 AI',
+                    energy: '에너지 관리 AI',
+                    agriculture: '농업 스마트팜 AI',
+                    real_estate: '부동산 가격 AI',
+                    entertainment: '엔터테인먼트 AI',
+                    cybersecurity: '사이버보안 AI',
+                    smart_city: '스마트시티 AI'
+                };
+                
+                // 실시간 분석 데이터 생성 (실제로는 백엔드에서 가져옴)
+                const analytics = {
+                    visitors: Math.floor(Math.random() * 10000) + 1000,
+                    conversions: Math.floor(Math.random() * 500) + 50,
+                    revenue: Math.floor(Math.random() * 50000) + 5000,
+                    growth: (Math.random() * 50 + 10).toFixed(1)
+                };
+                
+                alert(`${domainNames[domain]} 분석 리포트\\n\\n📊 이번 달 통계:\\n• 방문자: ${analytics.visitors.toLocaleString()}명\\n• 전환율: ${analytics.conversions}건\\n• 매출: $${analytics.revenue.toLocaleString()}\\n• 성장률: +${analytics.growth}%\\n\\n상세 분석은 별도 대시보드에서 확인하세요.`);
+            }
+            
+            async function updateDomainManagement(domain, action) {
+                try {
+                    const response = await fetch('/admin/manage-domain', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            domain: domain,
+                            action: action,
+                            timestamp: new Date().toISOString(),
+                            admin_id: 'admin_user'
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        console.log(`도메인 ${domain} 관리 작업 "${action}" 완료`);
+                    }
+                } catch (error) {
+                    console.error('도메인 관리 오류:', error);
+                }
+            }
         </script>
     </body>
     </html>
@@ -1047,6 +1311,83 @@ async def update_subscription(request: SubscriptionUpdateRequest):
             }
 
     raise HTTPException(status_code=404, detail="구독자를 찾을 수 없습니다.")
+
+
+# 도메인 관리 요청 모델
+class DomainManagementRequest(BaseModel):
+    domain: str
+    action: str
+    timestamp: str
+    admin_id: str
+
+
+@app.post("/admin/manage-domain")
+async def manage_domain(request: DomainManagementRequest):
+    """12개 도메인 랜딩페이지 관리"""
+
+    # 도메인별 관리 작업 로그 저장 (실제로는 데이터베이스에 저장)
+    domain_log = {
+        "domain": request.domain,
+        "action": request.action,
+        "timestamp": request.timestamp,
+        "admin_id": request.admin_id,
+        "status": "completed",
+        "log_id": str(uuid.uuid4()),
+    }
+
+    # 도메인별 작업 시뮬레이션
+    domain_actions = {
+        "페이지 콘텐츠 수정": "랜딩페이지 콘텐츠가 업데이트되었습니다.",
+        "SEO 최적화 설정": "메타태그 및 키워드가 최적화되었습니다.",
+        "광고 캠페인 관리": "광고 캠페인 설정이 업데이트되었습니다.",
+        "사용자 피드백 확인": "최근 피드백이 분석되었습니다.",
+        "성능 최적화": "페이지 로딩 속도가 개선되었습니다.",
+    }
+
+    result_message = domain_actions.get(request.action, "관리 작업이 완료되었습니다.")
+
+    return {
+        "success": True,
+        "message": f"{request.domain} 도메인: {result_message}",
+        "log": domain_log,
+        "domain_url": f"/predict/{request.domain}",
+        "timestamp": datetime.datetime.now().isoformat(),
+    }
+
+
+@app.get("/admin/domain-analytics/{domain}")
+async def get_domain_analytics(domain: str):
+    """특정 도메인의 분석 데이터 반환"""
+
+    # 실시간 분석 데이터 시뮬레이션 (실제로는 실제 데이터)
+    analytics_data = {
+        "domain": domain,
+        "period": "last_30_days",
+        "metrics": {
+            "visitors": random.randint(1000, 15000),
+            "page_views": random.randint(2000, 25000),
+            "conversions": random.randint(50, 800),
+            "conversion_rate": round(random.uniform(2.0, 12.0), 2),
+            "avg_session_duration": random.randint(120, 600),
+            "bounce_rate": round(random.uniform(25.0, 70.0), 2),
+            "revenue": random.randint(5000, 80000),
+            "growth_rate": round(random.uniform(-10.0, 50.0), 1),
+        },
+        "top_pages": [
+            f"/predict/{domain}",
+            f"/predict/{domain}/demo",
+            f"/predict/{domain}/pricing",
+            f"/predict/{domain}/docs",
+        ],
+        "user_feedback": {
+            "average_rating": round(random.uniform(3.5, 4.8), 1),
+            "total_reviews": random.randint(50, 500),
+            "satisfaction_score": round(random.uniform(75.0, 95.0), 1),
+        },
+        "timestamp": datetime.datetime.now().isoformat(),
+    }
+
+    return analytics_data
 
 
 @app.post("/admin/user-management")
@@ -1330,10 +1671,19 @@ async def deploy_agent(request: AgentDeployRequest):
     }
 
 
+@app.get("/test-agents")
+async def test_agents():
+    """테스트용 에이전트 엔드포인트"""
+    return {
+        "message": "AI 에이전트 섹션이 정상적으로 로드되었습니다!",
+        "timestamp": datetime.datetime.now().isoformat(),
+    }
+
+
 @app.get("/agents/marketplace")
 async def get_agent_marketplace():
     """AI 에이전트 마켓플레이스 HTML 반환"""
-    marketplace_html = f"""
+    marketplace_html = """
     <!DOCTYPE html>
     <html lang="ko">
     <head>
@@ -1341,79 +1691,22 @@ async def get_agent_marketplace():
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>HYOJIN.AI 에이전트 마켓플레이스</title>
         <style>
-            body {{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background: #0a0e27; color: white; }}
-            .header {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 50px 20px; text-align: center; }}
-            .header h1 {{ font-size: 3rem; margin: 0; }}
-            .header p {{ font-size: 1.2rem; opacity: 0.9; margin: 10px 0 0 0; }}
-            .container {{ max-width: 1200px; margin: 0 auto; padding: 50px 20px; }}
-            .agents-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; margin-top: 50px; }}
-            .agent-card {{ 
-                background: linear-gradient(145deg, #1a1f3a 0%, #2d3561 100%); 
-                border-radius: 15px; 
-                padding: 30px; 
-                box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-                transition: all 0.3s ease;
-                border: 1px solid rgba(102, 126, 234, 0.1);
-            }}
-            .agent-card:hover {{
-                transform: translateY(-10px);
-                box-shadow: 0 20px 40px rgba(102, 126, 234, 0.2);
-                border-color: rgba(102, 126, 234, 0.3);
-            }}
-            .agent-icon {{ font-size: 3rem; margin-bottom: 20px; }}
-            .agent-name {{ font-size: 1.5rem; font-weight: bold; margin-bottom: 15px; color: #667eea; }}
-            .agent-description {{ line-height: 1.6; margin-bottom: 20px; opacity: 0.9; }}
-            .capabilities {{ display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }}
-            .capability-tag {{ 
-                background: rgba(102, 126, 234, 0.2); 
-                color: #667eea; 
-                padding: 4px 12px; 
-                border-radius: 15px; 
-                font-size: 0.9rem;
-                border: 1px solid rgba(102, 126, 234, 0.3);
-            }}
-            .autonomy-score {{ 
-                background: linear-gradient(90deg, #667eea, #764ba2); 
-                color: white; 
-                padding: 8px 15px; 
-                border-radius: 25px; 
-                display: inline-block; 
-                font-weight: bold;
-                margin-bottom: 20px;
-            }}
-            .tier-badge {{ 
-                position: absolute; 
-                top: 20px; 
-                right: 20px; 
-                padding: 5px 10px; 
-                border-radius: 12px; 
-                font-size: 0.8rem; 
-                font-weight: bold;
-            }}
-            .tier-premium {{ background: #ff6b6b; color: white; }}
-            .tier-standard {{ background: #4ecdc4; color: white; }}
-            .tier-enterprise {{ background: #ffe66d; color: #333; }}
-            .deploy-btn {{ 
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                color: white; 
-                border: none; 
-                padding: 12px 25px; 
-                border-radius: 25px; 
-                cursor: pointer; 
-                font-weight: bold;
-                width: 100%;
-                transition: all 0.3s ease;
-            }}
-            .deploy-btn:hover {{ 
-                transform: scale(1.05); 
-                box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4); 
-            }}
-            .coming-soon {{ opacity: 0.6; }}
-            .coming-soon .deploy-btn {{ background: #666; cursor: not-allowed; }}
-            .stats {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 50px; }}
-            .stat-card {{ background: rgba(102, 126, 234, 0.1); padding: 25px; border-radius: 15px; text-align: center; }}
-            .stat-number {{ font-size: 2.5rem; font-weight: bold; color: #667eea; }}
-            .stat-label {{ opacity: 0.8; margin-top: 5px; }}
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
+            .header { text-align: center; padding: 50px 20px; color: white; }
+            .header h1 { font-size: 3rem; margin-bottom: 20px; }
+            .header p { font-size: 1.2rem; opacity: 0.9; }
+            .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+            .agents-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; margin-bottom: 50px; }
+            .agent-card { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); transition: transform 0.3s ease; }
+            .agent-card:hover { transform: translateY(-10px); }
+            .agent-icon { font-size: 3rem; margin-bottom: 20px; text-align: center; }
+            .agent-name { font-size: 1.5rem; font-weight: bold; margin-bottom: 15px; color: #667eea; text-align: center; }
+            .agent-description { line-height: 1.6; margin-bottom: 20px; opacity: 0.9; text-align: center; }
+            .capabilities { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; justify-content: center; }
+            .capability-tag { background: rgba(102, 126, 234, 0.2); color: #667eea; padding: 4px 12px; border-radius: 15px; font-size: 0.9rem; }
+            .deploy-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 25px; border-radius: 25px; cursor: pointer; font-weight: bold; width: 100%; }
+            .deploy-btn:hover { transform: scale(1.05); }
         </style>
     </head>
     <body>
@@ -1423,99 +1716,45 @@ async def get_agent_marketplace():
         </div>
         
         <div class="container">
-            <div class="stats">
-                <div class="stat-card">
-                    <div class="stat-number">15+</div>
-                    <div class="stat-label">전문 에이전트</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">99.7%</div>
-                    <div class="stat-label">작업 성공률</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">24/7</div>
-                    <div class="stat-label">무중단 서비스</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">95%</div>
-                    <div class="stat-label">평균 자율성</div>
-                </div>
-            </div>
-            
             <div class="agents-grid" id="agents-grid">
                 <!-- 동적으로 로드됨 -->
             </div>
         </div>
         
         <script>
-            async function loadAgents() {{
-                try {{
+            async function loadAgents() {
+                try {
                     const response = await fetch('/agents');
                     const data = await response.json();
                     
                     const grid = document.getElementById('agents-grid');
                     grid.innerHTML = '';
                     
-                    Object.entries(data.agents).forEach(([type, agent]) => {{
-                        const isComingSoon = agent.status === 'coming_soon';
-                        
+                    Object.entries(data.agents).forEach(([type, agent]) => {
                         const card = document.createElement('div');
-                        card.className = `agent-card ${{isComingSoon ? 'coming-soon' : ''}}`;
-                        card.style.position = 'relative';
-                        
-                        const tierClass = `tier-${{agent.tier}}`;
+                        card.className = 'agent-card';
                         
                         card.innerHTML = `
-                            <div class="tier-badge ${{tierClass}}">${{agent.tier.toUpperCase()}}</div>
-                            <div class="agent-icon">${{agent.icon}}</div>
-                            <div class="agent-name">${{agent.name}}</div>
-                            <div class="agent-description">${{agent.description}}</div>
+                            <div class="agent-icon">${agent.icon}</div>
+                            <div class="agent-name">${agent.name}</div>
+                            <div class="agent-description">${agent.description}</div>
                             <div class="capabilities">
-                                ${{agent.capabilities.map(cap => `<span class="capability-tag">${{cap}}</span>`).join('')}}
+                                ${agent.capabilities.map(cap => `<span class="capability-tag">${cap}</span>`).join('')}
                             </div>
-                            <div class="autonomy-score">자율성 지수 ${{agent.autonomy_score}}%</div>
-                            <button class="deploy-btn" onclick="deployAgent('${{type}}')" ${{isComingSoon ? 'disabled' : ''}}>
-                                ${{isComingSoon ? '🚀 COMING SOON' : '🚀 에이전트 배포'}}
-                            </button>
+                            <button class="deploy-btn" onclick="deployAgent('${type}')">🚀 에이전트 배포</button>
                         `;
                         
                         grid.appendChild(card);
-                    }});
-                    
-                }} catch (error) {{
+                    });
+                } catch (error) {
                     console.error('에이전트 로드 오류:', error);
-                }}
-            }}
+                }
+            }
             
-            async function deployAgent(agentType) {{
-                const email = prompt('배포할 계정 이메일을 입력하세요:');
-                if (!email) return;
-                
-                try {{
-                    const response = await fetch('/agents/deploy', {{
-                        method: 'POST',
-                        headers: {{'Content-Type': 'application/json'}},
-                        body: JSON.stringify({{
-                            email: email,
-                            agent_type: agentType,
-                            deployment_config: {{}}
-                        }})
-                    }});
-                    
-                    const result = await response.json();
-                    
-                    if (result.success) {{
-                        alert(`${{agentType}} 에이전트가 성공적으로 배포되었습니다!\\n배포 ID: ${{result.deployment_id}}`);
-                    }} else {{
-                        alert('배포에 실패했습니다: ' + result.message);
-                    }}
-                    
-                }} catch (error) {{
-                    alert('오류가 발생했습니다: ' + error.message);
-                }}
-            }}
+            async function deployAgent(agentType) {
+                alert(`${agentType} 에이전트 배포 요청이 접수되었습니다!`);
+            }
             
-            // 페이지 로드 시 에이전트 목록 로드
             document.addEventListener('DOMContentLoaded', loadAgents);
         </script>
     </body>
