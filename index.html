@@ -258,13 +258,41 @@
 
         // 관리자 정보 함수
         function showAdminInfo() {
-            const choice = confirm('🔒 관리자 대시보드\n\n현재 GitHub Pages 정적 호스팅 환경입니다.\n\n📊 구독자 정보를 확인하시겠습니까?\n\n확인: Google Sheets에서 구독자 정보 보기\n취소: 관리자 기능 정보만 보기');
+            const choice = confirm('🔒 관리자 대시보드\n\n📊 구독자 정보를 확인하시겠습니까?\n\n확인: 로컬 저장된 구독자 목록 보기\n취소: 관리자 기능 정보만 보기');
             
             if (choice) {
-                // Google Sheets로 구독자 정보 확인 (실제 URL로 교체 필요)
-                window.open('https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit', '_blank');
+                const subscribers = JSON.parse(localStorage.getItem('hyojin_subscribers') || '[]');
+                
+                if (subscribers.length === 0) {
+                    alert('📊 구독자 정보\n\n아직 구독 신청이 없습니다.\n\n💡 "구독하기" 버튼을 테스트해보세요!');
+                } else {
+                    let info = `📊 구독자 목록 (총 ${subscribers.length}명)\n\n`;
+                    
+                    subscribers.forEach((sub, i) => {
+                        const date = new Date(sub.date).toLocaleString('ko-KR');
+                        info += `${i + 1}. ${sub.name} (${sub.email})\n`;
+                        info += `   🏢 ${sub.company || '미입력'} | 💳 ${sub.plan}\n`;
+                        info += `   📅 ${date}\n\n`;
+                    });
+                    
+                    const planCounts = {};
+                    subscribers.forEach(sub => planCounts[sub.plan] = (planCounts[sub.plan] || 0) + 1);
+                    
+                    info += `📈 플랜별 통계:\n`;
+                    Object.keys(planCounts).forEach(plan => {
+                        info += `• ${plan}: ${planCounts[plan]}명\n`;
+                    });
+                    
+                    if (confirm(info + '\n📋 클립보드에 복사하시겠습니까?')) {
+                        navigator.clipboard.writeText(info).then(() => {
+                            alert('✅ 구독자 정보가 복사되었습니다!');
+                        }).catch(() => {
+                            alert('❌ 복사 실패. 수동으로 복사해주세요.');
+                        });
+                    }
+                }
             } else {
-                alert('🔒 관리자 기능 정보\n\n현재 정적 사이트 기능:\n• Google Forms 구독자 수집\n• Google Sheets 데이터 관리\n• 이메일 기반 구독 신청\n• GitHub Pages 호스팅\n\n📊 데모용 통계:\n� 구독 신청: 127명\n� 이메일 수집: 89개\n� 전환율: 15.8%\n🌟 도메인별 관심도: 의료AI(32%), 금융AI(28%), 교육AI(18%)');
+                alert('🔒 관리자 기능\n\n현재 기능:\n• 이메일 기반 구독자 수집\n• 로컬 스토리지 데이터 관리\n• Mailto 시스템 연동\n• 실시간 구독자 통계\n\n� GitHub Pages 정적 호스팅으로\n서버 없이도 구독자 정보를 수집합니다!');
             }
         }
 
@@ -278,7 +306,7 @@
         }
 
         function showSubscription() {
-            // Google Forms 기반 구독 신청
+            // 구독자 정보 수집
             const userEmail = prompt('📧 이메일 주소를 입력해주세요:');
             if (userEmail && userEmail.includes('@')) {
                 const userName = prompt('👤 성함을 입력해주세요:');
@@ -288,39 +316,38 @@
                 const plans = {'1': 'Startup', '2': 'Professional', '3': 'Business', '4': 'Enterprise'};
                 const selectedPlan = plans[userPlan] || 'Startup';
                 
-                // Google Forms 자동 제출 (실제 Google Forms URL로 교체 필요)
-                const googleFormUrl = `https://docs.google.com/forms/d/e/YOUR_FORM_ID/formResponse?entry.EMAIL=${encodeURIComponent(userEmail)}&entry.NAME=${encodeURIComponent(userName)}&entry.COMPANY=${encodeURIComponent(userCompany || '')}&entry.PLAN=${encodeURIComponent(selectedPlan)}`;
+                // 로컬 스토리지에 저장
+                const subscriptionData = {
+                    email: userEmail,
+                    name: userName,
+                    company: userCompany || '',
+                    plan: selectedPlan,
+                    date: new Date().toISOString(),
+                    url: window.location.href
+                };
                 
-                // 백그라운드로 Google Forms에 데이터 전송
-                fetch(googleFormUrl, {
-                    method: 'POST',
-                    mode: 'no-cors'
-                }).catch(() => {}); // no-cors이므로 에러는 무시
+                let subscribers = JSON.parse(localStorage.getItem('hyojin_subscribers') || '[]');
+                subscribers.push(subscriptionData);
+                localStorage.setItem('hyojin_subscribers', JSON.stringify(subscribers));
                 
-                // 이메일 백업 시스템 (mailto)
+                // 이메일로 전송
                 const emailSubject = `HYOJIN.AI 구독 신청 - ${selectedPlan} 플랜`;
-                const emailBody = `구독자 정보:
-                
+                const emailBody = `새로운 구독 신청이 접수되었습니다.
+
+구독자 정보:
 📧 이메일: ${userEmail}
 👤 이름: ${userName}
 🏢 회사: ${userCompany || '미입력'}
 💳 선택 플랜: ${selectedPlan}
-📅 신청일: ${new Date().toLocaleDateString('ko-KR')}
-🌐 신청 페이지: ${window.location.href}
+📅 신청일: ${new Date().toLocaleString('ko-KR')}
+🌐 페이지: ${window.location.href}
 
 ---
-HYOJIN.AI 구독 신청이 접수되었습니다.`;
+관리자 대시보드에서 전체 구독자 목록을 확인하세요.`;
 
-                const mailtoLink = `mailto:admin@hyojin.ai?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+                alert(`✅ 구독 신청이 완료되었습니다!\n\n📧 ${userEmail}\n👤 ${userName}\n💳 ${selectedPlan} 플랜\n\n📬 관리자에게 이메일을 전송합니다.`);
                 
-                // 사용자에게 선택권 제공
-                const sendEmail = confirm(`✅ 구독 신청이 완료되었습니다!\n\n📧 이메일: ${userEmail}\n👤 이름: ${userName}\n🏢 회사: ${userCompany || '미입력'}\n💳 플랜: ${selectedPlan}\n\n📬 이메일로도 신청 내용을 전송하시겠습니까?\n(확인 시 이메일 앱이 열립니다)`);
-                
-                if (sendEmail) {
-                    window.location.href = mailtoLink;
-                }
-                
-                alert('🎉 감사합니다! 곧 연락드리겠습니다.');
+                window.location.href = `mailto:contact@hyojin.ai?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
             } else {
                 alert('❌ 올바른 이메일 주소를 입력해주세요.');
             }
