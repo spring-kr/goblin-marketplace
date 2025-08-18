@@ -3408,12 +3408,16 @@ async def process_payment(payment_request: PaymentRequest):
         if result["success"]:
             await save_payment_to_manager_db(payment_request, result)
 
-        # 📧 가상 링크가 있다면 클라이언트에게 전달
-        if result.get("service_links"):
-            # 성공 페이지로 리다이렉트할 URL 생성
+        # 📧 결제 성공시 항상 성공 페이지로 리다이렉트 URL 생성
+        if result["success"]:
             redirect_url = f"/payment_success.html?subscription_id={result['subscription_id']}&amount={result['amount']}&method={payment_request.customer.paymentMethod}&status={result['status']}"
             result["redirect_url"] = redirect_url
-            result["links_count"] = len(result["service_links"])
+
+            # 가상 링크가 있다면 링크 개수도 포함
+            if result.get("service_links"):
+                result["links_count"] = len(result["service_links"])
+            else:
+                result["links_count"] = 0
 
         return result
 
