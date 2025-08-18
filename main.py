@@ -6,7 +6,8 @@
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import Dict, Any, List, Optional
 import datetime
@@ -31,6 +32,16 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# 정적 파일 서빙 설정
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
+# Favicon 엔드포인트
+@app.get("/favicon.ico")
+async def favicon():
+    """Favicon 반환"""
+    return FileResponse("static/favicon.svg", media_type="image/svg+xml")
 
 
 # 공통 요청/응답 모델
@@ -414,13 +425,169 @@ def generate_ai_prediction(domain: str, input_data: str, parameters: dict):
 # 기본 엔드포인트들
 @app.get("/")
 async def root():
-    """메인 페이지"""
-    return {
-        "message": "Hyojin AI MVP API",
-        "status": "running",
-        "domains": len(DOMAINS),
-        "version": "1.0.0",
-    }
+    """메인 인덱스 페이지"""
+    index_html = """
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>HYOJIN.AI - AI 플랫폼</title>
+        <link rel="icon" href="/favicon.ico" type="image/svg+xml">
+        <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { 
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                min-height: 100vh; 
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .container { 
+                text-align: center; 
+                max-width: 800px; 
+                padding: 40px 20px;
+            }
+            .logo { 
+                font-size: 4rem; 
+                font-weight: bold; 
+                margin-bottom: 20px; 
+                background: rgba(255,255,255,0.2); 
+                width: 120px; 
+                height: 120px; 
+                border-radius: 50%; 
+                display: flex; 
+                align-items: center; 
+                justify-content: center; 
+                margin: 0 auto 30px;
+                backdrop-filter: blur(10px);
+                border: 2px solid rgba(255,255,255,0.3);
+            }
+            h1 { 
+                font-size: 3rem; 
+                margin-bottom: 20px; 
+                font-weight: 700;
+            }
+            .subtitle { 
+                font-size: 1.3rem; 
+                margin-bottom: 40px; 
+                opacity: 0.9;
+                line-height: 1.6;
+            }
+            .features { 
+                display: grid; 
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+                gap: 20px; 
+                margin: 40px 0;
+            }
+            .feature { 
+                background: rgba(255,255,255,0.15); 
+                padding: 25px 20px; 
+                border-radius: 15px; 
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255,255,255,0.2);
+                transition: transform 0.3s ease;
+            }
+            .feature:hover { 
+                transform: translateY(-5px);
+                background: rgba(255,255,255,0.2);
+            }
+            .feature h3 { 
+                font-size: 1.1rem; 
+                margin-bottom: 10px; 
+                font-weight: 600;
+            }
+            .feature p { 
+                font-size: 0.9rem; 
+                opacity: 0.8;
+            }
+            .nav-buttons { 
+                display: flex; 
+                gap: 20px; 
+                justify-content: center; 
+                flex-wrap: wrap;
+                margin-top: 40px;
+            }
+            .nav-btn { 
+                background: rgba(255,255,255,0.2); 
+                color: white; 
+                text-decoration: none; 
+                padding: 15px 30px; 
+                border-radius: 30px; 
+                font-weight: 600; 
+                transition: all 0.3s ease;
+                border: 2px solid rgba(255,255,255,0.3);
+                backdrop-filter: blur(10px);
+            }
+            .nav-btn:hover { 
+                background: rgba(255,255,255,0.3); 
+                transform: translateY(-2px);
+                box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            }
+            .api-info { 
+                margin-top: 50px; 
+                padding: 20px; 
+                background: rgba(0,0,0,0.2); 
+                border-radius: 10px; 
+                font-size: 0.9rem;
+                backdrop-filter: blur(10px);
+            }
+            @media (max-width: 768px) {
+                h1 { font-size: 2.5rem; }
+                .subtitle { font-size: 1.1rem; }
+                .nav-buttons { flex-direction: column; align-items: center; }
+                .nav-btn { width: 80%; max-width: 300px; }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="logo">H</div>
+            <h1>HYOJIN.AI</h1>
+            <p class="subtitle">
+                박사급 전문가를 뛰어넘는 AI 플랫폼<br>
+                12개 도메인 + 15개 에이전트 + 엔터프라이즈 구독관리
+            </p>
+            
+            <div class="features">
+                <div class="feature">
+                    <h3>🤖 AI 에이전트</h3>
+                    <p>15개 전문 에이전트</p>
+                </div>
+                <div class="feature">
+                    <h3>🏢 구독관리</h3>
+                    <p>엔터프라이즈 시스템</p>
+                </div>
+                <div class="feature">
+                    <h3>🌐 12개 도메인</h3>
+                    <p>다양한 AI 솔루션</p>
+                </div>
+                <div class="feature">
+                    <h3>⚡ 실시간 API</h3>
+                    <p>고성능 처리</p>
+                </div>
+            </div>
+            
+            <div class="nav-buttons">
+                <a href="/agents/marketplace" class="nav-btn">🤖 AI 에이전트</a>
+                <a href="/landing-preview" class="nav-btn">🚀 에이전트 랜딩</a>
+                <a href="/admin/subscription-management" class="nav-btn">⚙️ 관리자</a>
+                <a href="/api/v1/domains" class="nav-btn">📊 API 문서</a>
+            </div>
+            
+            <div class="api-info">
+                <strong>API 상태:</strong> 정상 운영 중<br>
+                <strong>지원 도메인:</strong> 12개<br>
+                <strong>API 버전:</strong> v1.0.0<br>
+                <strong>최종 업데이트:</strong> 2025-08-18
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    return HTMLResponse(content=index_html)
 
 
 @app.get("/health")
@@ -1600,87 +1767,6 @@ async def get_available_agents():
     }
 
 
-@app.get("/agents/{agent_type}")
-async def get_agent_details(agent_type: str):
-    """특정 AI 에이전트의 상세 정보"""
-    if agent_type not in ai_agents:
-        raise HTTPException(status_code=404, detail="에이전트를 찾을 수 없습니다")
-
-    agent = ai_agents[agent_type]
-    return {
-        "success": True,
-        "agent": agent,
-        "usage_examples": get_agent_examples(agent_type),
-        "timestamp": datetime.datetime.now().isoformat(),
-    }
-
-
-@app.post("/agents/execute")
-async def execute_agent(request: AgentRequest):
-    """AI 에이전트 실행"""
-    start_time = datetime.datetime.now()
-
-    if request.agent_type not in ai_agents:
-        raise HTTPException(status_code=404, detail="에이전트를 찾을 수 없습니다")
-
-    agent_info = ai_agents[request.agent_type]
-
-    # 에이전트별 특화 처리
-    result = execute_specialized_agent(
-        request.agent_type, request.task_description, request.parameters
-    )
-
-    processing_time = (datetime.datetime.now() - start_time).total_seconds() * 1000
-    task_id = str(uuid.uuid4())
-
-    return AgentResponse(
-        agent_type=request.agent_type,
-        task_id=task_id,
-        result=result,
-        autonomy_score=agent_info["autonomy_score"],
-        execution_time_ms=int(processing_time),
-        timestamp=datetime.datetime.now().isoformat(),
-    )
-
-
-@app.post("/agents/deploy")
-async def deploy_agent(request: AgentDeployRequest):
-    """구독자용 AI 에이전트 배포"""
-    # 구독자 확인
-    subscriber = get_subscriber_by_email(request.email)
-    if not subscriber:
-        raise HTTPException(status_code=404, detail="구독자를 찾을 수 없습니다")
-
-    # 플랜별 에이전트 접근 권한 확인
-    allowed_agents = get_allowed_agents_by_plan(subscriber["plan"])
-    if request.agent_type not in allowed_agents:
-        raise HTTPException(
-            status_code=403, detail="플랜에서 지원하지 않는 에이전트입니다"
-        )
-
-    # 에이전트 배포
-    deployment_id = str(uuid.uuid4())
-
-    return {
-        "success": True,
-        "deployment_id": deployment_id,
-        "agent_type": request.agent_type,
-        "email": request.email,
-        "config": request.deployment_config,
-        "status": "deployed",
-        "timestamp": datetime.datetime.now().isoformat(),
-    }
-
-
-@app.get("/test-agents")
-async def test_agents():
-    """테스트용 에이전트 엔드포인트"""
-    return {
-        "message": "AI 에이전트 섹션이 정상적으로 로드되었습니다!",
-        "timestamp": datetime.datetime.now().isoformat(),
-    }
-
-
 @app.get("/agents/marketplace")
 async def get_agent_marketplace():
     """AI 에이전트 마켓플레이스 HTML 반환"""
@@ -1779,6 +1865,87 @@ async def get_agent_marketplace():
     return HTMLResponse(content=marketplace_html)
 
 
+@app.get("/agents/{agent_type}")
+async def get_agent_details(agent_type: str):
+    """특정 AI 에이전트의 상세 정보"""
+    if agent_type not in ai_agents:
+        raise HTTPException(status_code=404, detail="에이전트를 찾을 수 없습니다")
+
+    agent = ai_agents[agent_type]
+    return {
+        "success": True,
+        "agent": agent,
+        "usage_examples": get_agent_examples(agent_type),
+        "timestamp": datetime.datetime.now().isoformat(),
+    }
+
+
+@app.post("/agents/execute")
+async def execute_agent(request: AgentRequest):
+    """AI 에이전트 실행"""
+    start_time = datetime.datetime.now()
+
+    if request.agent_type not in ai_agents:
+        raise HTTPException(status_code=404, detail="에이전트를 찾을 수 없습니다")
+
+    agent_info = ai_agents[request.agent_type]
+
+    # 에이전트별 특화 처리
+    result = execute_specialized_agent(
+        request.agent_type, request.task_description, request.parameters
+    )
+
+    processing_time = (datetime.datetime.now() - start_time).total_seconds() * 1000
+    task_id = str(uuid.uuid4())
+
+    return AgentResponse(
+        agent_type=request.agent_type,
+        task_id=task_id,
+        result=result,
+        autonomy_score=agent_info["autonomy_score"],
+        execution_time_ms=int(processing_time),
+        timestamp=datetime.datetime.now().isoformat(),
+    )
+
+
+@app.post("/agents/deploy")
+async def deploy_agent(request: AgentDeployRequest):
+    """구독자용 AI 에이전트 배포"""
+    # 구독자 확인
+    subscriber = get_subscriber_by_email(request.email)
+    if not subscriber:
+        raise HTTPException(status_code=404, detail="구독자를 찾을 수 없습니다")
+
+    # 플랜별 에이전트 접근 권한 확인
+    allowed_agents = get_allowed_agents_by_plan(subscriber["plan"])
+    if request.agent_type not in allowed_agents:
+        raise HTTPException(
+            status_code=403, detail="플랜에서 지원하지 않는 에이전트입니다"
+        )
+
+    # 에이전트 배포
+    deployment_id = str(uuid.uuid4())
+
+    return {
+        "success": True,
+        "deployment_id": deployment_id,
+        "agent_type": request.agent_type,
+        "email": request.email,
+        "config": request.deployment_config,
+        "status": "deployed",
+        "timestamp": datetime.datetime.now().isoformat(),
+    }
+
+
+@app.get("/test-agents")
+async def test_agents():
+    """테스트용 에이전트 엔드포인트"""
+    return {
+        "message": "AI 에이전트 섹션이 정상적으로 로드되었습니다!",
+        "timestamp": datetime.datetime.now().isoformat(),
+    }
+
+
 # AI 에이전트 헬퍼 함수들
 def get_agent_examples(agent_type):
     """에이전트별 사용 예시"""
@@ -1851,6 +2018,420 @@ def execute_specialized_agent(agent_type, task_description, parameters):
         )
 
     return base_result
+
+
+@app.get("/landing-preview")
+async def get_agent_landing_preview():
+    """에이전트 랜딩페이지 미리보기"""
+    landing_html = """
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>HYOJIN.AI - 에이전트 랜딩페이지 미리보기</title>
+        <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { 
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; 
+                line-height: 1.6; 
+                color: #333; 
+                background: #fff;
+            }
+            
+            /* Hero Section */
+            .hero { 
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                color: white; 
+                padding: 80px 20px; 
+                text-align: center; 
+                position: relative;
+                overflow: hidden;
+            }
+            .hero::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+                pointer-events: none;
+            }
+            .hero-content { 
+                max-width: 1200px; 
+                margin: 0 auto; 
+                position: relative; 
+                z-index: 2;
+            }
+            .hero h1 { 
+                font-size: 3.5rem; 
+                margin-bottom: 20px; 
+                font-weight: 700;
+                letter-spacing: -0.5px;
+            }
+            .hero p { 
+                font-size: 1.25rem; 
+                margin-bottom: 30px; 
+                opacity: 0.95;
+                max-width: 600px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            .cta-button { 
+                display: inline-block;
+                background: rgba(255,255,255,0.2); 
+                color: white; 
+                padding: 15px 30px; 
+                border-radius: 50px; 
+                text-decoration: none; 
+                font-weight: 600;
+                font-size: 1.1rem;
+                transition: all 0.3s ease;
+                border: 2px solid rgba(255,255,255,0.3);
+                backdrop-filter: blur(10px);
+            }
+            .cta-button:hover { 
+                background: rgba(255,255,255,0.3);
+                transform: translateY(-2px);
+                box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            }
+            
+            /* Features Section */
+            .features { 
+                padding: 80px 20px; 
+                background: #f8f9fa;
+            }
+            .container { 
+                max-width: 1200px; 
+                margin: 0 auto; 
+            }
+            .section-title { 
+                text-align: center; 
+                font-size: 2.5rem; 
+                margin-bottom: 60px; 
+                color: #333;
+                font-weight: 700;
+            }
+            .features-grid { 
+                display: grid; 
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+                gap: 40px; 
+            }
+            .feature-card { 
+                background: white; 
+                padding: 40px 30px; 
+                border-radius: 20px; 
+                text-align: center; 
+                box-shadow: 0 5px 20px rgba(0,0,0,0.08); 
+                transition: all 0.3s ease;
+                border: 1px solid #eee;
+            }
+            .feature-card:hover { 
+                transform: translateY(-5px); 
+                box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            }
+            .feature-icon { 
+                font-size: 3rem; 
+                margin-bottom: 25px; 
+                display: block;
+            }
+            .feature-title { 
+                font-size: 1.3rem; 
+                margin-bottom: 15px; 
+                color: #333;
+                font-weight: 600;
+            }
+            .feature-description { 
+                color: #666; 
+                line-height: 1.6;
+            }
+            
+            /* Agents Section */
+            .agents-section { 
+                padding: 80px 20px; 
+                background: white;
+            }
+            .agents-grid { 
+                display: grid; 
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+                gap: 30px; 
+                margin-top: 50px;
+            }
+            .agent-card { 
+                background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); 
+                padding: 30px 25px; 
+                border-radius: 15px; 
+                text-align: center; 
+                transition: all 0.3s ease;
+                border: 2px solid transparent;
+            }
+            .agent-card:hover { 
+                transform: translateY(-3px); 
+                border-color: #667eea;
+                background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+            }
+            .agent-emoji { 
+                font-size: 2.5rem; 
+                margin-bottom: 20px; 
+                display: block;
+            }
+            .agent-name { 
+                font-size: 1.2rem; 
+                margin-bottom: 10px; 
+                color: #333;
+                font-weight: 600;
+            }
+            .agent-desc { 
+                color: #666; 
+                font-size: 0.9rem;
+                line-height: 1.5;
+            }
+            
+            /* Pricing Section */
+            .pricing { 
+                padding: 80px 20px; 
+                background: #f8f9fa;
+            }
+            .pricing-grid { 
+                display: grid; 
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+                gap: 30px; 
+                margin-top: 50px;
+            }
+            .pricing-card { 
+                background: white; 
+                padding: 40px 30px; 
+                border-radius: 20px; 
+                text-align: center; 
+                box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+                border: 2px solid #eee;
+                transition: all 0.3s ease;
+            }
+            .pricing-card:hover { 
+                transform: translateY(-5px); 
+                border-color: #667eea;
+            }
+            .pricing-card.featured { 
+                border-color: #667eea; 
+                transform: scale(1.05);
+                box-shadow: 0 15px 35px rgba(102, 126, 234, 0.2);
+            }
+            .plan-name { 
+                font-size: 1.3rem; 
+                margin-bottom: 10px; 
+                color: #333;
+                font-weight: 600;
+            }
+            .plan-price { 
+                font-size: 2.5rem; 
+                margin-bottom: 20px; 
+                color: #667eea;
+                font-weight: 700;
+            }
+            .plan-features { 
+                list-style: none; 
+                margin-bottom: 30px;
+            }
+            .plan-features li { 
+                padding: 8px 0; 
+                color: #666;
+            }
+            .plan-features li::before { 
+                content: '✓'; 
+                color: #28a745; 
+                font-weight: bold; 
+                margin-right: 8px;
+            }
+            .plan-button { 
+                background: #667eea; 
+                color: white; 
+                padding: 12px 30px; 
+                border: none; 
+                border-radius: 25px; 
+                cursor: pointer; 
+                font-weight: 600;
+                font-size: 1rem;
+                transition: all 0.3s ease;
+                text-decoration: none;
+                display: inline-block;
+            }
+            .plan-button:hover { 
+                background: #5a6fd8; 
+                transform: translateY(-2px);
+            }
+            
+            /* Footer */
+            .footer { 
+                background: #333; 
+                color: white; 
+                padding: 40px 20px; 
+                text-align: center;
+            }
+            
+            /* Admin Panel Link */
+            .admin-link { 
+                position: fixed; 
+                top: 20px; 
+                right: 20px; 
+                background: rgba(0,0,0,0.8); 
+                color: white; 
+                padding: 10px 15px; 
+                border-radius: 25px; 
+                text-decoration: none; 
+                font-size: 0.9rem;
+                backdrop-filter: blur(10px);
+                z-index: 1000;
+            }
+            .admin-link:hover { 
+                background: rgba(0,0,0,0.9);
+            }
+            
+            @media (max-width: 768px) {
+                .hero h1 { font-size: 2.5rem; }
+                .hero p { font-size: 1.1rem; }
+                .section-title { font-size: 2rem; }
+                .pricing-card.featured { transform: scale(1); }
+            }
+        </style>
+    </head>
+    <body>
+        <a href="/admin/subscription-management" class="admin-link">⚙️ 관리자</a>
+        
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <h1>🤖 AI 에이전트 플랫폼</h1>
+                <p>박사급 전문가를 뛰어넘는 15개 AI 에이전트로 비즈니스를 혁신하세요</p>
+                <a href="/agents/marketplace" class="cta-button">🚀 에이전트 체험하기</a>
+            </div>
+        </section>
+        
+        <!-- Features Section -->
+        <section class="features">
+            <div class="container">
+                <h2 class="section-title">🌟 핵심 기능</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <span class="feature-icon">⚡</span>
+                        <h3 class="feature-title">실시간 AI 처리</h3>
+                        <p class="feature-description">초고속 AI 엔진으로 실시간 분석과 인사이트를 제공합니다</p>
+                    </div>
+                    <div class="feature-card">
+                        <span class="feature-icon">🎯</span>
+                        <h3 class="feature-title">맞춤형 솔루션</h3>
+                        <p class="feature-description">업종과 규모에 맞춘 전문 에이전트를 선택할 수 있습니다</p>
+                    </div>
+                    <div class="feature-card">
+                        <span class="feature-icon">🔒</span>
+                        <h3 class="feature-title">엔터프라이즈 보안</h3>
+                        <p class="feature-description">은행급 보안으로 데이터를 안전하게 보호합니다</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Agents Section -->
+        <section class="agents-section">
+            <div class="container">
+                <h2 class="section-title">🤖 AI 에이전트 라인업</h2>
+                <div class="agents-grid" id="agents-grid">
+                    <!-- 동적으로 로드됨 -->
+                </div>
+            </div>
+        </section>
+        
+        <!-- Pricing Section -->
+        <section class="pricing">
+            <div class="container">
+                <h2 class="section-title">💰 요금제</h2>
+                <div class="pricing-grid">
+                    <div class="pricing-card">
+                        <h3 class="plan-name">Starter</h3>
+                        <div class="plan-price">₩29,000<span style="font-size: 1rem; color: #666;">/월</span></div>
+                        <ul class="plan-features">
+                            <li>기본 AI 에이전트 2개</li>
+                            <li>월 1,000회 API 호출</li>
+                            <li>이메일 지원</li>
+                            <li>기본 분석 리포트</li>
+                        </ul>
+                        <a href="#" class="plan-button">시작하기</a>
+                    </div>
+                    <div class="pricing-card featured">
+                        <h3 class="plan-name">Professional</h3>
+                        <div class="plan-price">₩99,000<span style="font-size: 1rem; color: #666;">/월</span></div>
+                        <ul class="plan-features">
+                            <li>모든 AI 에이전트 5개</li>
+                            <li>월 10,000회 API 호출</li>
+                            <li>24/7 채팅 지원</li>
+                            <li>고급 분석 대시보드</li>
+                            <li>커스텀 통합</li>
+                        </ul>
+                        <a href="#" class="plan-button">추천</a>
+                    </div>
+                    <div class="pricing-card">
+                        <h3 class="plan-name">Enterprise</h3>
+                        <div class="plan-price">₹299,000<span style="font-size: 1rem; color: #666;">/월</span></div>
+                        <ul class="plan-features">
+                            <li>모든 AI 에이전트 15개</li>
+                            <li>무제한 API 호출</li>
+                            <li>전담 계정 관리자</li>
+                            <li>맞춤형 에이전트 개발</li>
+                            <li>온프레미스 배포</li>
+                        </ul>
+                        <a href="#" class="plan-button">문의하기</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2025 HYOJIN.AI. 모든 권리 보유.</p>
+                <p>박사급 AI 에이전트로 비즈니스를 혁신하세요.</p>
+            </div>
+        </footer>
+        
+        <script>
+            // 에이전트 데이터 로드
+            async function loadAgents() {
+                try {
+                    const response = await fetch('/agents');
+                    if (!response.ok) {
+                        throw new Error('에이전트 데이터를 불러올 수 없습니다');
+                    }
+                    
+                    const data = await response.json();
+                    const grid = document.getElementById('agents-grid');
+                    grid.innerHTML = '';
+                    
+                    if (data.agents) {
+                        Object.entries(data.agents).forEach(([type, agent]) => {
+                            const card = document.createElement('div');
+                            card.className = 'agent-card';
+                            card.innerHTML = `
+                                <span class="agent-emoji">${agent.icon}</span>
+                                <h3 class="agent-name">${agent.name}</h3>
+                                <p class="agent-desc">${agent.description}</p>
+                            `;
+                            grid.appendChild(card);
+                        });
+                    }
+                } catch (error) {
+                    console.error('에이전트 로드 오류:', error);
+                    const grid = document.getElementById('agents-grid');
+                    grid.innerHTML = '<p style="text-align: center; color: #666;">에이전트 정보를 불러오는 중 오류가 발생했습니다.</p>';
+                }
+            }
+            
+            // 페이지 로드 시 에이전트 데이터 로드
+            document.addEventListener('DOMContentLoaded', loadAgents);
+        </script>
+    </body>
+    </html>
+    """
+    return HTMLResponse(content=landing_html)
 
 
 def get_allowed_agents_by_plan(plan):

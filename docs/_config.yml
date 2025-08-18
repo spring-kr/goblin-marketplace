@@ -1,0 +1,8 @@
+title: HYOJIN.AI - AI 플랫폼
+description: 박사급 전문가를 뛰어넘는 AI 플랫폼
+theme: jekyll-theme-primer
+markdown: kramdown
+highlighter: rouge
+plugins:
+  - jekyll-github-metadata
+  - jekyll-seo-tag
