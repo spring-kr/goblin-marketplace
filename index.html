@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HYOJIN.AI - 12개 AI 도메인 완전체</title>
+    <title>HYOJIN.AI - 12개 AI 도메인 완전체 + 보안</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
@@ -60,613 +60,126 @@
         .stat-item { text-align: center; }
         .stat-number { font-size: 2.5em; font-weight: bold; display: block; }
         .stat-label { font-size: 0.9em; opacity: 0.8; }
-        }
-        .hero .description {
-            font-size: 1.1rem;
-            margin-bottom: 40px;
-            opacity: 0.9;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        .cta-buttons {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        .cta-button { 
-            display: inline-block;
-            background: rgba(255,255,255,0.2); 
-            color: white; 
-            padding: 18px 35px; 
-            border-radius: 50px; 
-            text-decoration: none; 
-            font-weight: 600;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-            border: 2px solid rgba(255,255,255,0.3);
-            backdrop-filter: blur(15px);
-        }
-        .cta-button:hover { 
-            background: rgba(255,255,255,0.3);
-            transform: translateY(-3px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-        }
-        .cta-button.primary {
-            background: rgba(255,255,255,0.9);
-            color: #667eea;
-            border-color: white;
-        }
-        .cta-button.primary:hover {
-            background: white;
-            transform: translateY(-3px) scale(1.05);
-        }
-        
-        /* Stats Section */
-        .stats {
-            background: #f8f9fa;
-            padding: 80px 20px;
-        }
-        .stats-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            text-align: center;
-        }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 40px;
-            margin-top: 50px;
-        }
-        .stat-item {
-            padding: 20px;
-        }
-        .stat-number {
-            font-size: 3rem;
-            font-weight: 800;
-            color: #667eea;
-            margin-bottom: 10px;
-        }
-        .stat-label {
-            font-size: 1.1rem;
-            color: #666;
-            font-weight: 500;
-        }
-        
-        /* Domains Section */
-        .domains { 
-            padding: 100px 20px; 
-            background: white;
-        }
-        .container { 
-            max-width: 1400px; 
-            margin: 0 auto; 
-        }
-        .section-title { 
-            text-align: center; 
-            font-size: 3rem; 
-            margin-bottom: 20px; 
-            color: #333;
-            font-weight: 800;
-        }
-        .section-subtitle {
-            text-align: center;
-            font-size: 1.3rem;
-            color: #666;
-            margin-bottom: 70px;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        .domains-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); 
-            gap: 30px; 
-        }
-        .domain-card { 
-            background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%); 
-            padding: 40px 30px; 
-            border-radius: 20px; 
-            text-align: center; 
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1); 
-            transition: all 0.4s ease;
-            border: 2px solid #eee;
-            position: relative;
-            overflow: hidden;
-        }
-        .domain-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-        }
-        .domain-card:hover { 
-            transform: translateY(-8px); 
-            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.2);
-            border-color: #667eea;
-        }
-        .domain-icon { 
-            font-size: 3.5rem; 
-            margin-bottom: 25px; 
-            display: block;
-        }
-        .domain-title { 
-            font-size: 1.4rem; 
-            margin-bottom: 15px; 
-            color: #333;
-            font-weight: 700;
-        }
-        .domain-description { 
-            color: #666; 
-            line-height: 1.6;
-            margin-bottom: 25px;
-        }
-        .domain-features {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            justify-content: center;
-            margin-bottom: 25px;
-        }
-        .feature-tag {
-            background: rgba(102, 126, 234, 0.1);
-            color: #667eea;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
-        .domain-button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 600;
-            text-decoration: none;
-            display: inline-block;
-            transition: all 0.3s ease;
-        }
-        .domain-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
-        }
-        
-        /* Pricing Section */
-        .pricing { 
-            padding: 100px 20px; 
-            background: #f8f9fa;
-        }
-        .pricing-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
-            gap: 30px; 
-            margin-top: 60px;
-        }
-        .pricing-card { 
-            background: white; 
-            padding: 50px 35px; 
-            border-radius: 25px; 
-            text-align: center; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            border: 3px solid #eee;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-        .pricing-card:hover { 
-            transform: translateY(-5px); 
-            border-color: #667eea;
-            box-shadow: 0 20px 50px rgba(102, 126, 234, 0.15);
-        }
-        .pricing-card.featured { 
-            border-color: #667eea; 
-            transform: scale(1.05);
-            box-shadow: 0 25px 50px rgba(102, 126, 234, 0.2);
-        }
-        .pricing-card.featured::before {
-            content: '추천';
-            position: absolute;
-            top: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 8px 25px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-        .plan-name { 
-            font-size: 1.5rem; 
-            margin-bottom: 15px; 
-            color: #333;
-            font-weight: 700;
-        }
-        .plan-price { 
-            font-size: 3rem; 
-            margin-bottom: 25px; 
-            color: #667eea;
-            font-weight: 800;
-        }
-        .plan-features { 
-            list-style: none; 
-            margin-bottom: 35px;
-            text-align: left;
-        }
-        .plan-features li { 
-            padding: 10px 0; 
-            color: #666;
-            position: relative;
-            padding-left: 25px;
-        }
-        .plan-features li::before { 
-            content: '✓'; 
-            color: #28a745; 
-            font-weight: bold; 
-            position: absolute;
-            left: 0;
-        }
-        .plan-button { 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-            color: white; 
-            padding: 15px 35px; 
-            border: none; 
-            border-radius: 30px; 
-            cursor: pointer; 
-            font-weight: 600;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-            width: 100%;
-        }
-        .plan-button:hover { 
-            transform: translateY(-3px);
-            box-shadow: 0 12px 25px rgba(102, 126, 234, 0.3);
-        }
-        
-        /* Footer */
-        .footer { 
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); 
-            color: white; 
-            padding: 60px 20px 30px;
-        }
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 40px;
-        }
-        .footer-section h3 {
-            font-size: 1.3rem;
-            margin-bottom: 20px;
-            color: #ecf0f1;
-        }
-        .footer-section a {
-            color: #bdc3c7;
-            text-decoration: none;
-            display: block;
-            margin-bottom: 10px;
-            transition: color 0.3s ease;
-        }
-        .footer-section a:hover {
-            color: #667eea;
-        }
-        .footer-bottom {
-            text-align: center;
-            margin-top: 40px;
-            padding-top: 30px;
-            border-top: 1px solid #34495e;
-            color: #95a5a6;
-        }
-        
-        @media (max-width: 768px) {
-            .hero h1 { font-size: 3rem; }
-            .hero .subtitle { font-size: 1.3rem; }
-            .section-title { font-size: 2.5rem; }
-            .domains-grid { grid-template-columns: 1fr; }
-            .pricing-card.featured { transform: scale(1); }
-            .cta-buttons { flex-direction: column; align-items: center; }
-            .cta-button { width: 80%; max-width: 300px; }
-        }
     </style>
 </head>
 <body>
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content">
-            <h1>🚀 HYOJIN.AI</h1>
-            <p class="subtitle">12개 AI 도메인으로 비즈니스를 혁신하세요</p>
-            <p class="description">
-                의료부터 금융까지, 모든 산업 영역을 커버하는 완전한 AI 솔루션.<br>
-                토스, 쿠팡, 배달의민족 수준의 엔터프라이즈 AI를 바로 시작하세요.
-            </p>
-            <div class="cta-buttons">
-                <a href="https://hyojin-ai-mvp.onrender.com/agents/marketplace" class="cta-button primary">🎯 7일 무료 체험</a>
-                <a href="#domains" class="cta-button">📊 12개 도메인 보기</a>
-            </div>
+    <a href="/admin/links/dashboard" class="admin-link">🔒 관리자</a>
+    
+    <div class="container">
+        <div class="header">
+            <h1>🤖 HYOJIN.AI</h1>
+            <div class="version-badge">🚀 MVP v3.2.0 + Security</div>
+            <p>12개 AI 도메인을 한번에! 고급 보안으로 보호되는 차세대 AI 플랫폼</p>
         </div>
-    </section>
 
-    <!-- Stats Section -->
-    <section class="stats">
-        <div class="stats-container">
-            <h2>검증된 성과</h2>
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <div class="stat-number">12</div>
-                    <div class="stat-label">AI 비즈니스 도메인</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">99.9%</div>
-                    <div class="stat-label">시스템 가용성</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">500ms</div>
-                    <div class="stat-label">평균 응답 시간</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">24/7</div>
-                    <div class="stat-label">실시간 지원</div>
-                </div>
+        <div class="stats">
+            <div class="stat-item">
+                <span class="stat-number">12</span>
+                <span class="stat-label">AI 도메인</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">15</span>
+                <span class="stat-label">AI 에이전트</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">40+</span>
+                <span class="stat-label">가상 링크</span>
             </div>
         </div>
-    </section>
-    
-    <!-- Domains Section -->
-    <section class="domains" id="domains">
-        <div class="container">
-            <h2 class="section-title">🏢 12개 AI 비즈니스 도메인</h2>
-            <p class="section-subtitle">
-                각 도메인은 해당 분야 최고 기업들의 AI 시스템을 벤치마킹하여 개발되었습니다
-            </p>
-            <div class="domains-grid">
-                <div class="domain-card">
-                    <span class="domain-icon">🏥</span>
-                    <h3 class="domain-title">의료 예측 AI</h3>
-                    <p class="domain-description">질병 진단, 치료 예측, 의료 데이터 분석으로 환자 치료 최적화</p>
-                    <div class="domain-features">
-                        <span class="feature-tag">진단 보조</span>
-                        <span class="feature-tag">치료 계획</span>
-                        <span class="feature-tag">예후 예측</span>
-                    </div>
-                    <a href="https://hyojin-ai-mvp.onrender.com/medical" class="domain-button">체험하기</a>
-                </div>
-                
-                <div class="domain-card">
-                    <span class="domain-icon">💰</span>
-                    <h3 class="domain-title">금융 분석 AI</h3>
-                    <p class="domain-description">투자 리스크 분석, 포트폴리오 최적화, 금융 시장 예측</p>
-                    <div class="domain-features">
-                        <span class="feature-tag">리스크 관리</span>
-                        <span class="feature-tag">투자 분석</span>
-                        <span class="feature-tag">시장 예측</span>
-                    </div>
-                    <a href="https://hyojin-ai-mvp.onrender.com/finance" class="domain-button">체험하기</a>
-                </div>
-                
-                <div class="domain-card">
-                    <span class="domain-icon">🎓</span>
-                    <h3 class="domain-title">교육 최적화 AI</h3>
-                    <p class="domain-description">맞춤형 학습 경로, 성과 예측, 교육 콘텐츠 개인화</p>
-                    <div class="domain-features">
-                        <span class="feature-tag">개인화 학습</span>
-                        <span class="feature-tag">성과 분석</span>
-                        <span class="feature-tag">콘텐츠 추천</span>
-                    </div>
-                    <a href="https://hyojin-ai-mvp.onrender.com/education" class="domain-button">체험하기</a>
-                </div>
-                
-                <div class="domain-card">
-                    <span class="domain-icon">🏭</span>
-                    <h3 class="domain-title">제조업 최적화 AI</h3>
-                    <p class="domain-description">생산 효율성, 품질 관리, 예측 정비로 제조 프로세스 혁신</p>
-                    <div class="domain-features">
-                        <span class="feature-tag">품질 관리</span>
-                        <span class="feature-tag">예측 정비</span>
-                        <span class="feature-tag">효율 최적화</span>
-                    </div>
-                    <a href="https://hyojin-ai-mvp.onrender.com/manufacturing" class="domain-button">체험하기</a>
-                </div>
-                
-                <div class="domain-card">
-                    <span class="domain-icon">🛒</span>
-                    <h3 class="domain-title">리테일 인사이트 AI</h3>
-                    <p class="domain-description">고객 행동 분석, 재고 최적화, 매출 예측으로 매장 운영 개선</p>
-                    <div class="domain-features">
-                        <span class="feature-tag">고객 분석</span>
-                        <span class="feature-tag">재고 관리</span>
-                        <span class="feature-tag">매출 예측</span>
-                    </div>
-                    <a href="https://hyojin-ai-mvp.onrender.com/retail" class="domain-button">체험하기</a>
-                </div>
-                
-                <div class="domain-card">
-                    <span class="domain-icon">🚚</span>
-                    <h3 class="domain-title">물류 최적화 AI</h3>
-                    <p class="domain-description">배송 경로 최적화, 창고 관리, 수요 예측으로 물류 효율성 극대화</p>
-                    <div class="domain-features">
-                        <span class="feature-tag">경로 최적화</span>
-                        <span class="feature-tag">창고 관리</span>
-                        <span class="feature-tag">수요 예측</span>
-                    </div>
-                    <a href="https://hyojin-ai-mvp.onrender.com/logistics" class="domain-button">체험하기</a>
-                </div>
-                
-                <div class="domain-card">
-                    <span class="domain-icon">⚡</span>
-                    <h3 class="domain-title">에너지 관리 AI</h3>
-                    <p class="domain-description">스마트 그리드, 에너지 효율성, 재생 에너지 최적화</p>
-                    <div class="domain-features">
-                        <span class="feature-tag">스마트 그리드</span>
-                        <span class="feature-tag">효율성 분석</span>
-                        <span class="feature-tag">에너지 절약</span>
-                    </div>
-                    <a href="https://hyojin-ai-mvp.onrender.com/energy" class="domain-button">체험하기</a>
-                </div>
-                
-                <div class="domain-card">
-                    <span class="domain-icon">🌾</span>
-                    <h3 class="domain-title">농업 스마트팜 AI</h3>
-                    <p class="domain-description">작물 성장 예측, 최적 환경 제어, 수확량 최적화</p>
-                    <div class="domain-features">
-                        <span class="feature-tag">작물 예측</span>
-                        <span class="feature-tag">환경 제어</span>
-                        <span class="feature-tag">수확 최적화</span>
-                    </div>
-                    <a href="https://hyojin-ai-mvp.onrender.com/agriculture" class="domain-button">체험하기</a>
-                </div>
-                
-                <div class="domain-card">
-                    <span class="domain-icon">🏠</span>
-                    <h3 class="domain-title">부동산 가격 AI</h3>
-                    <p class="domain-description">시장 분석, 가격 예측, 투자 기회 발굴로 부동산 의사결정 지원</p>
-                    <div class="domain-features">
-                        <span class="feature-tag">가격 예측</span>
-                        <span class="feature-tag">시장 분석</span>
-                        <span class="feature-tag">투자 분석</span>
-                    </div>
-                    <a href="https://hyojin-ai-mvp.onrender.com/realestate" class="domain-button">체험하기</a>
-                </div>
-                
-                <div class="domain-card">
-                    <span class="domain-icon">🎬</span>
-                    <h3 class="domain-title">엔터테인먼트 AI</h3>
-                    <p class="domain-description">콘텐츠 추천, 트렌드 분석, 개인화 서비스로 사용자 경험 향상</p>
-                    <div class="domain-features">
-                        <span class="feature-tag">콘텐츠 추천</span>
-                        <span class="feature-tag">트렌드 분석</span>
-                        <span class="feature-tag">개인화</span>
-                    </div>
-                    <a href="https://hyojin-ai-mvp.onrender.com/entertainment" class="domain-button">체험하기</a>
-                </div>
-                
-                <div class="domain-card">
-                    <span class="domain-icon">🔒</span>
-                    <h3 class="domain-title">사이버보안 AI</h3>
-                    <p class="domain-description">위협 탐지, 침입 방어, 보안 사고 예방으로 시스템 보호</p>
-                    <div class="domain-features">
-                        <span class="feature-tag">위협 탐지</span>
-                        <span class="feature-tag">침입 방어</span>
-                        <span class="feature-tag">사고 예방</span>
-                    </div>
-                    <a href="https://hyojin-ai-mvp.onrender.com/cybersecurity" class="domain-button">체험하기</a>
-                </div>
-                
-                <div class="domain-card">
-                    <span class="domain-icon">🏙️</span>
-                    <h3 class="domain-title">스마트시티 AI</h3>
-                    <p class="domain-description">도시 인프라 최적화, 교통 관리, 환경 모니터링으로 스마트 도시 구현</p>
-                    <div class="domain-features">
-                        <span class="feature-tag">인프라 최적화</span>
-                        <span class="feature-tag">교통 관리</span>
-                        <span class="feature-tag">환경 모니터링</span>
-                    </div>
-                    <a href="https://hyojin-ai-mvp.onrender.com/smartcity" class="domain-button">체험하기</a>
-                </div>
+
+        <div class="features">
+            <div class="feature-card" onclick="location.href='/domains/healthcare'">
+                <h3>🏥 의료 AI</h3>
+                <p>진단 보조, 의료 영상 분석, 건강 모니터링 시스템</p>
+            </div>
+            <div class="feature-card" onclick="location.href='/domains/paymentapp'">
+                <h3>💰 금융 AI</h3>
+                <p>결제 시스템, 리스크 분석, 투자 추천, 사기 탐지</p>
+            </div>
+            <div class="feature-card" onclick="location.href='/domains/education'">
+                <h3>🎓 교육 AI</h3>
+                <p>개인화 학습, 콘텐츠 생성, 평가 시스템</p>
+            </div>
+            <div class="feature-card" onclick="location.href='/domains/manufacturing'">
+                <h3>🏭 제조 AI</h3>
+                <p>품질 관리, 예측 유지보수, 공급망 최적화</p>
+            </div>
+            <div class="feature-card" onclick="location.href='/domains/mobility'">
+                <h3>🚗 모빌리티 AI</h3>
+                <p>자율주행, 교통 최적화, 안전 시스템</p>
+            </div>
+            <div class="feature-card" onclick="location.href='/domains/entertainment'">
+                <h3>🎮 엔터테인먼트 AI</h3>
+                <p>게임 AI, 콘텐츠 추천, 개인화 경험</p>
+            </div>
+            <div class="feature-card" onclick="location.href='/domains/retail'">
+                <h3>🏪 리테일 AI</h3>
+                <p>수요 예측, 재고 관리, 고객 분석</p>
+            </div>
+            <div class="feature-card" onclick="location.href='/domains/energy'">
+                <h3>⚡ 에너지 AI</h3>
+                <p>스마트 그리드, 에너지 최적화, 신재생 관리</p>
+            </div>
+            <div class="feature-card" onclick="location.href='/domains/agriculture'">
+                <h3>🌾 농업 AI</h3>
+                <p>스마트 농업, 작물 모니터링, 수확량 예측</p>
+            </div>
+            <div class="feature-card" onclick="location.href='/domains/realestate'">
+                <h3>🏢 부동산 AI</h3>
+                <p>가격 예측, 투자 분석, 매물 추천</p>
+            </div>
+            <div class="feature-card" onclick="location.href='/domains/customerservice'">
+                <h3>📞 고객서비스 AI</h3>
+                <p>챗봇, 감정 분석, 자동 응답 시스템</p>
+            </div>
+            <div class="feature-card" onclick="location.href='/domains/saas'">
+                <h3>☁️ SaaS AI</h3>
+                <p>클라우드 서비스, API 관리, 자동화 솔루션</p>
             </div>
         </div>
-    </section>
-    
-    <!-- Pricing Section -->
-    <section class="pricing">
-        <div class="container">
-            <h2 class="section-title">💰 투자 수준별 AI 도입</h2>
-            <p class="section-subtitle">
-                스타트업부터 대기업까지, 기업 규모에 맞는 검증된 AI 솔루션
-            </p>
-            <div class="pricing-grid">
-                <div class="pricing-card">
-                    <h3 class="plan-name">Startup</h3>
-                    <div class="plan-price">₩299K<span style="font-size: 1rem; color: #666;">/월</span></div>
-                    <ul class="plan-features">
-                        <li>AI 도메인 4개 선택</li>
-                        <li>월 1,000회 API 호출</li>
-                        <li>기본 분석 대시보드</li>
-                        <li>이메일 지원</li>
-                        <li>7일 무료 체험</li>
-                    </ul>
-                    <a href="https://hyojin-ai-mvp.onrender.com/agents/marketplace" class="plan-button">시작하기</a>
-                </div>
-                
-                <div class="pricing-card featured">
-                    <h3 class="plan-name">Professional</h3>
-                    <div class="plan-price">₩899K<span style="font-size: 1rem; color: #666;">/월</span></div>
-                    <ul class="plan-features">
-                        <li>전체 12개 AI 도메인</li>
-                        <li>월 10,000회 API 호출</li>
-                        <li>고급 분석 및 인사이트</li>
-                        <li>24/7 우선 지원</li>
-                        <li>커스텀 통합 지원</li>
-                        <li>전담 계정 관리자</li>
-                    </ul>
-                    <a href="https://hyojin-ai-mvp.onrender.com/agents/marketplace" class="plan-button">추천 플랜</a>
-                </div>
-                
-                <div class="pricing-card">
-                    <h3 class="plan-name">Enterprise</h3>
-                    <div class="plan-price">₩2.9M<span style="font-size: 1rem; color: #666;">/월</span></div>
-                    <ul class="plan-features">
-                        <li>무제한 AI 도메인 액세스</li>
-                        <li>무제한 API 호출</li>
-                        <li>온프레미스 배포 옵션</li>
-                        <li>24/7 전담 엔지니어</li>
-                        <li>맞춤형 AI 모델 개발</li>
-                        <li>SLA 99.99% 보장</li>
-                    </ul>
-                    <a href="mailto:support@hyojin.ai?subject=Enterprise 플랜 상담 문의" class="plan-button">상담 문의</a>
-                </div>
-            </div>
+
+        <div class="cta-section">
+            <h2>지금 시작하세요!</h2>
+            <p>7일 무료 체험으로 모든 기능을 경험해보세요</p>
+            <a href="/domains" class="cta-button">🚀 도메인 탐색</a>
+            <a href="/agents/marketplace" class="cta-button">🤖 AI 에이전트</a>
+            <a href="/subscribe-page" class="cta-button">💳 구독하기</a>
+            <a href="/l/demo" class="cta-button">🔗 데모 체험</a>
         </div>
-    </section>
-    
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>🚀 HYOJIN.AI</h3>
-                <p style="color: #bdc3c7; line-height: 1.6;">
-                    12개 AI 도메인으로 비즈니스를 혁신하는<br>
-                    차세대 AI 플랫폼
-                </p>
-            </div>
-            
-            <div class="footer-section">
-                <h3>🏢 AI 도메인</h3>
-                <a href="#domains">의료 예측 AI</a>
-                <a href="#domains">금융 분석 AI</a>
-                <a href="#domains">교육 최적화 AI</a>
-                <a href="#domains">제조업 최적화 AI</a>
-                <a href="#domains">+ 8개 더보기</a>
-            </div>
-            
-            <div class="footer-section">
-                <h3>🔗 바로가기</h3>
-                <a href="https://hyojin-ai-mvp.onrender.com/">라이브 데모</a>
-                <a href="https://hyojin-ai-mvp.onrender.com/agents/marketplace">AI 에이전트</a>
-                <a href="https://hyojin-ai-mvp.onrender.com/medical">의료 AI 체험</a>
-                <a href="https://hyojin-ai-mvp.onrender.com/finance">금융 AI 체험</a>
-            </div>
-            
-            <div class="footer-section">
-                <h3>📞 지원</h3>
-                <a href="mailto:support@hyojin.ai">support@hyojin.ai</a>
-                <a href="tel:1588-0000">1588-0000</a>
-                <a href="#">24/7 실시간 채팅</a>
-                <a href="#">온라인 가이드</a>
-            </div>
-        </div>
-        
-        <div class="footer-bottom">
-            <p>&copy; 2025 HYOJIN.AI. 모든 권리 보유. | 개인정보처리방침 | 이용약관</p>
-            <p style="margin-top: 10px;">🏆 대한민국 대표 AI 플랫폼 | 99.9% 가용성 보장 | ISO 27001 인증</p>
-        </div>
-    </footer>
+    </div>
+
+    <script>
+        // 클릭 효과 추가
+        document.querySelectorAll('.feature-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px) scale(1.02)';
+            });
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+
+        // 통계 카운터 애니메이션
+        function animateCounter(element, target) {
+            let current = 0;
+            const increment = target / 50;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                element.textContent = Math.floor(current);
+            }, 20);
+        }
+
+        // 페이지 로드 시 애니메이션 실행
+        window.addEventListener('load', () => {
+            const statNumbers = document.querySelectorAll('.stat-number');
+            animateCounter(statNumbers[0], 12);
+            animateCounter(statNumbers[1], 15);
+            statNumbers[2].textContent = '40+';
+        });
+    </script>
 </body>
 </html>
