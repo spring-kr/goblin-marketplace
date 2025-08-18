@@ -1,6 +1,7 @@
 """
 🚀 HYOJIN.AI MVP - 12개 도메인 완전체 + 구독관리회사시스템 통합
 한방에 모든 AI 도메인 구현 + 엔터프라이즈 구독관리!
+버전: v3.1.1 - 에이전트 마켓플레이스 수정
 """
 
 from fastapi import FastAPI, HTTPException, Request
@@ -1724,30 +1725,45 @@ async def get_agent_marketplace():
         <script>
             async function loadAgents() {
                 try {
+                    console.log('에이전트 로딩 시작...');
                     const response = await fetch('/agents');
+                    console.log('응답 상태:', response.status);
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP 오류! 상태: ${response.status}`);
+                    }
+                    
                     const data = await response.json();
+                    console.log('에이전트 데이터:', data);
                     
                     const grid = document.getElementById('agents-grid');
                     grid.innerHTML = '';
                     
-                    Object.entries(data.agents).forEach(([type, agent]) => {
-                        const card = document.createElement('div');
-                        card.className = 'agent-card';
-                        
-                        card.innerHTML = `
-                            <div class="agent-icon">${agent.icon}</div>
-                            <div class="agent-name">${agent.name}</div>
-                            <div class="agent-description">${agent.description}</div>
-                            <div class="capabilities">
-                                ${agent.capabilities.map(cap => `<span class="capability-tag">${cap}</span>`).join('')}
-                            </div>
-                            <button class="deploy-btn" onclick="deployAgent('${type}')">🚀 에이전트 배포</button>
-                        `;
-                        
-                        grid.appendChild(card);
-                    });
+                    if (data.agents) {
+                        Object.entries(data.agents).forEach(([type, agent]) => {
+                            const card = document.createElement('div');
+                            card.className = 'agent-card';
+                            
+                            card.innerHTML = `
+                                <div class="agent-icon">${agent.icon}</div>
+                                <div class="agent-name">${agent.name}</div>
+                                <div class="agent-description">${agent.description}</div>
+                                <div class="capabilities">
+                                    ${agent.capabilities.map(cap => `<span class="capability-tag">${cap}</span>`).join('')}
+                                </div>
+                                <button class="deploy-btn" onclick="deployAgent('${type}')">🚀 에이전트 배포</button>
+                            `;
+                            
+                            grid.appendChild(card);
+                        });
+                        console.log('에이전트 카드 생성 완료');
+                    } else {
+                        grid.innerHTML = '<p style="color: white; text-align: center;">에이전트 데이터를 불러올 수 없습니다.</p>';
+                    }
                 } catch (error) {
                     console.error('에이전트 로드 오류:', error);
+                    const grid = document.getElementById('agents-grid');
+                    grid.innerHTML = `<p style="color: white; text-align: center;">오류: ${error.message}</p>`;
                 }
             }
             
