@@ -258,7 +258,14 @@
 
         // 관리자 정보 함수
         function showAdminInfo() {
-            alert('🔒 관리자 대시보드\n\n현재 GitHub Pages 정적 호스팅 환경입니다.\n\n관리자 기능:\n• 가상링크 클릭 추적\n• 도메인 성과 분석\n• 사용자 행동 패턴\n• 실시간 통계\n\n실제 관리자 기능은 서버 배포 시 제공됩니다.\n\n데모용 통계:\n📊 방문자: 1,247명\n🔗 링크 클릭: 3,891회\n🚀 전환율: 12.3%');
+            const choice = confirm('🔒 관리자 대시보드\n\n현재 GitHub Pages 정적 호스팅 환경입니다.\n\n📊 구독자 정보를 확인하시겠습니까?\n\n확인: Google Sheets에서 구독자 정보 보기\n취소: 관리자 기능 정보만 보기');
+            
+            if (choice) {
+                // Google Sheets로 구독자 정보 확인 (실제 URL로 교체 필요)
+                window.open('https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit', '_blank');
+            } else {
+                alert('🔒 관리자 기능 정보\n\n현재 정적 사이트 기능:\n• Google Forms 구독자 수집\n• Google Sheets 데이터 관리\n• 이메일 기반 구독 신청\n• GitHub Pages 호스팅\n\n📊 데모용 통계:\n� 구독 신청: 127명\n� 이메일 수집: 89개\n� 전환율: 15.8%\n🌟 도메인별 관심도: 의료AI(32%), 금융AI(28%), 교육AI(18%)');
+            }
         }
 
         // CTA 버튼 함수들
@@ -271,7 +278,52 @@
         }
 
         function showSubscription() {
-            alert('💳 구독 플랜\n\n🆓 무료 체험: 7일, 3회 호출\n💼 Startup: $29/월, 50회 호출\n🚀 Professional: $99/월, 300회 호출\n🏢 Business: $299/월, 1,000회 호출\n⭐ Enterprise: $999/월, 무제한 호출\n\n각 플랜은 모든 12개 도메인과 15개 AI 에이전트에 접근 가능합니다!\n\n곧 결제 시스템이 오픈됩니다.');
+            // Google Forms 기반 구독 신청
+            const userEmail = prompt('📧 이메일 주소를 입력해주세요:');
+            if (userEmail && userEmail.includes('@')) {
+                const userName = prompt('👤 성함을 입력해주세요:');
+                const userCompany = prompt('🏢 회사명을 입력해주세요 (선택사항):');
+                const userPlan = prompt('💳 관심 플랜을 선택해주세요:\n1. Startup ($29/월)\n2. Professional ($99/월)\n3. Business ($299/월)\n4. Enterprise ($999/월)\n\n번호를 입력하세요 (1-4):');
+                
+                const plans = {'1': 'Startup', '2': 'Professional', '3': 'Business', '4': 'Enterprise'};
+                const selectedPlan = plans[userPlan] || 'Startup';
+                
+                // Google Forms 자동 제출 (실제 Google Forms URL로 교체 필요)
+                const googleFormUrl = `https://docs.google.com/forms/d/e/YOUR_FORM_ID/formResponse?entry.EMAIL=${encodeURIComponent(userEmail)}&entry.NAME=${encodeURIComponent(userName)}&entry.COMPANY=${encodeURIComponent(userCompany || '')}&entry.PLAN=${encodeURIComponent(selectedPlan)}`;
+                
+                // 백그라운드로 Google Forms에 데이터 전송
+                fetch(googleFormUrl, {
+                    method: 'POST',
+                    mode: 'no-cors'
+                }).catch(() => {}); // no-cors이므로 에러는 무시
+                
+                // 이메일 백업 시스템 (mailto)
+                const emailSubject = `HYOJIN.AI 구독 신청 - ${selectedPlan} 플랜`;
+                const emailBody = `구독자 정보:
+                
+📧 이메일: ${userEmail}
+👤 이름: ${userName}
+🏢 회사: ${userCompany || '미입력'}
+💳 선택 플랜: ${selectedPlan}
+📅 신청일: ${new Date().toLocaleDateString('ko-KR')}
+🌐 신청 페이지: ${window.location.href}
+
+---
+HYOJIN.AI 구독 신청이 접수되었습니다.`;
+
+                const mailtoLink = `mailto:admin@hyojin.ai?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+                
+                // 사용자에게 선택권 제공
+                const sendEmail = confirm(`✅ 구독 신청이 완료되었습니다!\n\n📧 이메일: ${userEmail}\n👤 이름: ${userName}\n🏢 회사: ${userCompany || '미입력'}\n💳 플랜: ${selectedPlan}\n\n📬 이메일로도 신청 내용을 전송하시겠습니까?\n(확인 시 이메일 앱이 열립니다)`);
+                
+                if (sendEmail) {
+                    window.location.href = mailtoLink;
+                }
+                
+                alert('🎉 감사합니다! 곧 연락드리겠습니다.');
+            } else {
+                alert('❌ 올바른 이메일 주소를 입력해주세요.');
+            }
         }
 
         function showDemo() {
