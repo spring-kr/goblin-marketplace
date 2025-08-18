@@ -551,48 +551,103 @@ class AgentDeployRequest(BaseModel):
 # 구독자 데이터 저장소 (실제로는 데이터베이스 사용)
 subscribers = []
 
-# AI 에이전트 저장소 데이터
+# AI 에이전트 저장소 데이터 - 15명의 도깨비 에이전트들
 ai_agents = {
-    "strategy": {
-        "name": "Strategy Agent",
-        "description": "McKinsey 컨설턴트 수준의 전략 기획, 시장 분석, 비즈니스 모델 설계",
-        "capabilities": ["전략기획", "시장분석", "경쟁분석"],
+    "village-chief-dokkaebi": {
+        "name": "🏘️ 촌장 도깨비",
+        "description": "도깨비 마을의 촌장, 모든 도깨비들을 총괄하고 마을 운영 전반을 관리하는 리더",
+        "capabilities": ['마을관리', '도깨비총괄', '리더십', '종합관리'],
+        "autonomy_score": 99,
+        "tier": "premium",
+        "icon": "🏘️",
+    },
+    "math-dokkaebi": {
+        "name": "📐 수학 도깨비",
+        "description": "수학 문제 해결, 통계 분석, 수치 계산, 알고리즘 최적화 전문가 (75.78% 성과)",
+        "capabilities": ['수학문제해결', '통계분석', '수치계산', '알고리즘최적화'],
+        "autonomy_score": 98,
+        "tier": "premium",
+        "icon": "📐",
+    },
+    "physics-dokkaebi": {
+        "name": "⚡ 물리 도깨비",
+        "description": "물리학 법칙 분석, 시뮬레이션, 실험 설계, 과학적 모델링 전문가 (100% 성과)",
+        "capabilities": ['물리학분석', '시뮬레이션', '실험설계', '과학적모델링'],
+        "autonomy_score": 100,
+        "tier": "premium",
+        "icon": "⚡",
+    },
+    "chemistry-dokkaebi": {
+        "name": "🧪 화학 도깨비",
+        "description": "화학 반응 분석, 분자 구조 예측, 실험 결과 해석, 화학공정 최적화 전문가 (90% 성과)",
+        "capabilities": ['화학반응분석', '분자구조예측', '실험결과해석', '화학공정최적화'],
+        "autonomy_score": 90,
+        "tier": "premium",
+        "icon": "🧪",
+    },
+    "engineering-dokkaebi": {
+        "name": "🔧 공학 도깨비",
+        "description": "공학 설계, 시스템 분석, 기술 최적화, 엔지니어링 솔루션 전문가 (95% 성과)",
+        "capabilities": ['공학설계', '시스템분석', '기술최적화', '엔지니어링솔루션'],
         "autonomy_score": 95,
         "tier": "premium",
-        "icon": "🔬",
+        "icon": "🔧",
     },
-    "datascience": {
-        "name": "DataScience Agent",
-        "description": "Google AI 연구원 수준의 데이터 분석, ML 모델링, 예측 알고리즘 개발",
-        "capabilities": ["데이터분석", "ML모델링", "예측분석"],
-        "autonomy_score": 92,
+    "biology-dokkaebi": {
+        "name": "🧬 생물학 도깨비",
+        "description": "생물학적 데이터 분석, 유전자 연구, 생태계 모델링, 바이오 기술 전문가 (88% 성과)",
+        "capabilities": ['생물학데이터분석', '유전자연구', '생태계모델링', '바이오기술'],
+        "autonomy_score": 88,
         "tier": "premium",
-        "icon": "💻",
+        "icon": "🧬",
     },
-    "developer": {
-        "name": "Developer Agent",
-        "description": "Meta, Google 시니어 개발자 수준의 풀스택 개발, 아키텍처 설계",
-        "capabilities": ["풀스택개발", "아키텍처", "코드리뷰"],
+    "business-strategy-dokkaebi": {
+        "name": "📈 비즈니스 전략 도깨비",
+        "description": "경영 전략 수립, 시장 분석, 비즈니스 모델 개발, 전략적 의사결정 전문가",
+        "capabilities": ['경영전략수립', '시장분석', '비즈니스모델개발', '전략적의사결정'],
+        "autonomy_score": 95,
+        "tier": "enterprise",
+        "icon": "📈",
+    },
+    "communication-dokkaebi": {
+        "name": "💬 커뮤니케이션 도깨비",
+        "description": "소통 전략, 대화 분석, 커뮤니케이션 최적화, 관계 관리 전문가",
+        "capabilities": ['소통전략', '대화분석', '커뮤니케이션최적화', '관계관리'],
         "autonomy_score": 89,
         "tier": "standard",
-        "icon": "🎯",
+        "icon": "💬",
     },
-    "marketing": {
-        "name": "Marketing Agent",
-        "description": "Netflix, Apple CMO 수준의 브랜딩, 캠페인 기획, 성과 최적화",
-        "capabilities": ["브랜딩", "캠페인기획", "성과최적화"],
-        "autonomy_score": 87,
-        "tier": "standard",
+    "financial-management-dokkaebi": {
+        "name": "💰 재무 관리 도깨비",
+        "description": "재무 계획, 투자 분석, 리스크 관리, 포트폴리오 최적화 전문가",
+        "capabilities": ['재무계획', '투자분석', '리스크관리', '포트폴리오최적화'],
+        "autonomy_score": 96,
+        "tier": "enterprise",
         "icon": "💰",
     },
-    "finance": {
-        "name": "Finance Agent",
-        "description": "Goldman Sachs 애널리스트 수준의 투자 분석, 리스크 관리, 포트폴리오 최적화",
-        "capabilities": ["투자분석", "리스크관리", "포트폴리오"],
+    "innovation-creation-dokkaebi": {
+        "name": "🚀 혁신 창조 도깨비",
+        "description": "혁신 아이디어 창출, 창의적 문제 해결, 신기술 개발, 미래 예측 전문가",
+        "capabilities": ['혁신아이디어창출', '창의적문제해결', '신기술개발', '미래예측'],
+        "autonomy_score": 93,
+        "tier": "premium",
+        "icon": "🚀",
+    },
+    "technology-management-dokkaebi": {
+        "name": "🔧 기술 관리 도깨비",
+        "description": "기술 시스템 관리, IT 인프라 최적화, 기술 전략 수립, 디지털 혁신 전문가",
+        "capabilities": ['기술시스템관리', 'IT인프라최적화', '기술전략수립', '디지털혁신'],
         "autonomy_score": 94,
-        "tier": "enterprise",
-        "icon": "✨",
-        "status": "coming_soon",
+        "tier": "premium",
+        "icon": "🔧",
+    },
+    "user-management-dokkaebi": {
+        "name": "👥 사용자 관리 도깨비",
+        "description": "사용자 경험 최적화, 고객 관리, 서비스 개선, 사용자 행동 분석 전문가",
+        "capabilities": ['사용자경험최적화', '고객관리', '서비스개선', '사용자행동분석'],
+        "autonomy_score": 87,
+        "tier": "standard",
+        "icon": "👥",
     },
 }
 
@@ -3743,9 +3798,7 @@ async def authenticate_service_access(request: Request):
             raise HTTPException(status_code=401, detail=auth_result["message"])
 
         # 접근 로그 기록
-        auth_system.log_access(
-            auth_result["user_id"], service_id, token, "unknown", ""
-        )
+        auth_system.log_access(auth_result["user_id"], service_id, token, "unknown", "")
 
         return {
             "success": True,
@@ -3809,10 +3862,11 @@ async def revoke_access_token(request: Request):
 @app.get("/service/{service_id}")
 async def access_service_with_token(service_id: str, token: Optional[str] = None):
     """토큰으로 서비스 접근 - 토큰이 없으면 입력창 표시"""
-    
+
     # 토큰이 없으면 토큰 입력 페이지 표시
     if not token:
-        return HTMLResponse(f"""
+        return HTMLResponse(
+            f"""
         <!DOCTYPE html>
         <html>
         <head>
@@ -4108,8 +4162,9 @@ async def access_service_with_token(service_id: str, token: Optional[str] = None
             </script>
         </body>
         </html>
-        """)
-    
+        """
+        )
+
     try:
         # 토큰 검증
         auth_result = auth_system.validate_token(token, service_id)
@@ -4181,13 +4236,11 @@ async def access_service_with_token(service_id: str, token: Optional[str] = None
             </body>
             </html>
             """
-        )
-        
+            )
+
         # 접근 로그 기록
-        auth_system.log_access(
-            auth_result["user_id"], service_id, token, "unknown", ""
-        )
-        
+        auth_system.log_access(auth_result["user_id"], service_id, token, "unknown", "")
+
         # 서비스별 페이지 반환
         service_page = get_service_page(service_id, auth_result)
         return HTMLResponse(service_page)

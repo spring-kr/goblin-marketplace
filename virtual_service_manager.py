@@ -17,83 +17,97 @@ class VirtualServiceManager:
     def __init__(self):
         self.init_database()
 
-        # AI 서비스별 가상 링크 템플릿
+        # AI 서비스별 가상 링크 템플릿 - 15명의 도깨비 에이전트들
         self.service_templates = {
-            # AI 도메인들
-            "medical-ai": {
-                "name": "의료 AI 도메인",
-                "base_url": "https://medical.hyojin.ai",
-                "features": [
-                    "진단 보조",
-                    "의료 영상 분석",
-                    "환자 데이터 관리",
-                    "치료 계획",
-                ],
-                "demo_data": "medical_demo.json",
+            "medical-dokkaebi": {
+                "name": "⚕️ 의료 도깨비",
+                "base_url": "https://agents.hyojin.ai/medical-dokkaebi",
+                "features": ["76기능 의료 분석", "3000질병 예측", "진단 보조", "치료 계획"],
+                "demo_data": "medical_dokkaebi_demo.json",
             },
-            "finance-ai": {
-                "name": "금융 AI 도메인",
-                "base_url": "https://finance.hyojin.ai",
-                "features": ["투자 분석", "리스크 관리", "사기 탐지", "신용 평가"],
-                "demo_data": "finance_demo.json",
+            "analyst-dokkaebi": {
+                "name": "📊 애널리스트 도깨비",
+                "base_url": "https://agents.hyojin.ai/analyst-dokkaebi",
+                "features": ["데이터 분석", "비즈니스 인텔리전스", "시장 조사", "예측 모델링"],
+                "demo_data": "analyst_dokkaebi_demo.json",
             },
-            "education-ai": {
-                "name": "교육 AI 도메인",
-                "base_url": "https://education.hyojin.ai",
-                "features": ["맞춤형 학습", "자동 채점", "콘텐츠 생성", "학습 분석"],
-                "demo_data": "education_demo.json",
+            "writer-dokkaebi": {
+                "name": "📚 작가 도깨비",
+                "base_url": "https://agents.hyojin.ai/writer-dokkaebi",
+                "features": ["창작 스토리 작성", "소설 플롯 구성", "캐릭터 개발", "콘텐츠 기획"],
+                "demo_data": "writer_dokkaebi_demo.json",
             },
-            # AI 에이전트들
-            "medical-doctor-ai": {
-                "name": "닥터 김 AI",
-                "base_url": "https://agents.hyojin.ai/doctor-kim",
-                "features": ["증상 분석", "진단 보조", "치료 추천", "의료 상담"],
-                "demo_data": "doctor_kim_demo.json",
+            "design-dokkaebi": {
+                "name": "🎨 디자인 도깨비",
+                "base_url": "https://agents.hyojin.ai/design-dokkaebi",
+                "features": ["UI/UX 디자인", "브랜딩", "그래픽 디자인", "프로토타이핑"],
+                "demo_data": "design_dokkaebi_demo.json",
             },
-            "finance-analyst-ai": {
-                "name": "애널리스트 박 AI",
-                "base_url": "https://agents.hyojin.ai/analyst-park",
-                "features": [
-                    "투자 분석",
-                    "포트폴리오 관리",
-                    "리스크 평가",
-                    "시장 예측",
-                ],
-                "demo_data": "analyst_park_demo.json",
+            "developer-dokkaebi": {
+                "name": "💻 개발자 도깨비",
+                "base_url": "https://agents.hyojin.ai/developer-dokkaebi",
+                "features": ["풀스택 개발", "AI 모델 구현", "시스템 아키텍처", "코드 리뷰"],
+                "demo_data": "developer_dokkaebi_demo.json",
             },
-            # 번들 패키지들
-            "starter-bundle": {
-                "name": "스타터 번들",
-                "base_url": "https://suite.hyojin.ai/starter",
-                "features": [
-                    "의료+금융+교육 AI",
-                    "핵심 에이전트 5명",
-                    "24/7 지원",
-                    "월간 리포트",
-                ],
-                "demo_data": "starter_bundle_demo.json",
+            "finance-dokkaebi": {
+                "name": "💰 금융 도깨비",
+                "base_url": "https://agents.hyojin.ai/finance-dokkaebi",
+                "features": ["투자 분석", "리스크 관리", "재무 계획", "포트폴리오 최적화"],
+                "demo_data": "finance_dokkaebi_demo.json",
             },
-            "business-bundle": {
-                "name": "비즈니스 번들",
-                "base_url": "https://suite.hyojin.ai/business",
-                "features": [
-                    "주요 AI 도메인 8개",
-                    "전문 에이전트 10명",
-                    "우선 지원",
-                    "커스텀 기능",
-                ],
-                "demo_data": "business_bundle_demo.json",
+            "marketing-dokkaebi": {
+                "name": "📢 마케팅 도깨비",
+                "base_url": "https://agents.hyojin.ai/marketing-dokkaebi",
+                "features": ["디지털 마케팅", "SNS 전략", "브랜드 관리", "광고 캠페인"],
+                "demo_data": "marketing_dokkaebi_demo.json",
             },
-            "enterprise-bundle": {
-                "name": "엔터프라이즈 번들",
-                "base_url": "https://suite.hyojin.ai/enterprise",
-                "features": [
-                    "전체 AI 도메인",
-                    "모든 에이전트",
-                    "전담 지원",
-                    "무제한 커스터마이징",
-                ],
-                "demo_data": "enterprise_bundle_demo.json",
+            "education-dokkaebi": {
+                "name": "🎓 교육 도깨비",
+                "base_url": "https://agents.hyojin.ai/education-dokkaebi",
+                "features": ["맞춤형 학습", "교육 콘텐츠 제작", "학습 평가", "진로 상담"],
+                "demo_data": "education_dokkaebi_demo.json",
+            },
+            "legal-dokkaebi": {
+                "name": "⚖️ 법무 도깨비",
+                "base_url": "https://agents.hyojin.ai/legal-dokkaebi",
+                "features": ["법률 자문", "계약서 검토", "규정 준수", "소송 지원"],
+                "demo_data": "legal_dokkaebi_demo.json",
+            },
+            "hr-dokkaebi": {
+                "name": "� 인사 도깨비",
+                "base_url": "https://agents.hyojin.ai/hr-dokkaebi",
+                "features": ["인재 채용", "성과 관리", "교육 프로그램", "조직 문화"],
+                "demo_data": "hr_dokkaebi_demo.json",
+            },
+            "sales-dokkaebi": {
+                "name": "🤝 영업 도깨비",
+                "base_url": "https://agents.hyojin.ai/sales-dokkaebi",
+                "features": ["영업 전략", "고객 관리", "제안서 작성", "협상 지원"],
+                "demo_data": "sales_dokkaebi_demo.json",
+            },
+            "research-dokkaebi": {
+                "name": "� 연구 도깨비",
+                "base_url": "https://agents.hyojin.ai/research-dokkaebi",
+                "features": ["학술 연구", "논문 분석", "실험 설계", "연구 방법론"],
+                "demo_data": "research_dokkaebi_demo.json",
+            },
+            "translator-dokkaebi": {
+                "name": "🌍 번역 도깨비",
+                "base_url": "https://agents.hyojin.ai/translator-dokkaebi",
+                "features": ["다국어 번역", "문서 현지화", "언어 교정", "문화적 적응"],
+                "demo_data": "translator_dokkaebi_demo.json",
+            },
+            "consultant-dokkaebi": {
+                "name": "💡 컨설턴트 도깨비",
+                "base_url": "https://agents.hyojin.ai/consultant-dokkaebi",
+                "features": ["경영 컨설팅", "전략 기획", "프로세스 개선", "변화 관리"],
+                "demo_data": "consultant_dokkaebi_demo.json",
+            },
+            "creative-dokkaebi": {
+                "name": "🎭 크리에이티브 도깨비",
+                "base_url": "https://agents.hyojin.ai/creative-dokkaebi",
+                "features": ["아이디어 발굴", "콘텐츠 기획", "크리에이티브 전략", "브레인스토밍"],
+                "demo_data": "creative_dokkaebi_demo.json",
             },
         }
 

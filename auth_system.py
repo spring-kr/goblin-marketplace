@@ -13,7 +13,7 @@ import os
 
 
 class AuthenticationSystem:
-    def __init__(self, db_path: str = "payment_manager.db"):
+    def __init__(self, db_path: str = "hyojin_payments.db"):
         self.db_path = db_path
         self.secret_key = "hyojin-ai-secret-key-2024"  # 실제 운영에서는 환경변수로 관리
         self.init_auth_tables()
@@ -62,6 +62,8 @@ class AuthenticationSystem:
         """
         토큰 유효성 검증 및 서비스 접근 권한 확인
         """
+        print(f"🔍 토큰 검증 시작: token={token[:30]}..., service_id={service_id}")
+
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 
@@ -77,8 +79,16 @@ class AuthenticationSystem:
             )
 
             result = cursor.fetchone()
+            print(f"🔍 DB 조회 결과: {result}")
 
             if not result:
+                # 디버깅: 모든 토큰 확인
+                cursor.execute(
+                    "SELECT access_token, service_id FROM service_links ORDER BY created_at DESC LIMIT 5"
+                )
+                all_tokens = cursor.fetchall()
+                print(f"🔍 최근 토큰들: {all_tokens}")
+
                 return {
                     "valid": False,
                     "error": "invalid_token",
