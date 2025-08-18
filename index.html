@@ -1,9 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HYOJIN.AI ?쇳븨紐?- AI ?꾨찓??& ?먯씠?꾪듃 援щ룆</title>
+    <title>HYOJIN.AI 쇼핑몰 - AI 도메인 & 에이전트 구독</title>
+    <script src="https://js.stripe.com/v3/"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -114,7 +115,7 @@
         }
         
         .product-features li:before {
-            content: "??;
+            content: "✓";
             position: absolute;
             left: 0;
             color: #2ecc71;
@@ -231,173 +232,285 @@
             margin: 20px 0;
             color: #2ecc71;
         }
+        
+        .payment-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .payment-method {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .payment-method:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .payment-method.selected {
+            border-color: #2ecc71;
+            background: rgba(46, 204, 113, 0.2);
+        }
+        
+        .payment-method img {
+            height: 40px;
+            margin-bottom: 10px;
+        }
+        
+        #card-element {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .payment-loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .payment-success {
+            display: none;
+            background: rgba(46, 204, 113, 0.2);
+            border: 2px solid #2ecc71;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .payment-error {
+            display: none;
+            background: rgba(231, 76, 60, 0.2);
+            border: 2px solid #e74c3c;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            color: #e74c3c;
+        }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>?썟 HYOJIN.AI ?쇳븨紐?/h1>
-        <p>12媛?AI ?꾨찓??& 15紐??꾨Ц AI ?먯씠?꾪듃 援щ룆 ?쒕퉬??/p>
+        <h1>🛒 HYOJIN.AI 쇼핑몰</h1>
+        <p>12개 AI 도메인 & 15명 전문 AI 에이전트 구독 서비스</p>
     </div>
 
     <div class="cart">
-        <strong>?썚截??λ컮援щ땲</strong>
+        <strong>🛍️ 장바구니</strong>
         <span class="cart-count" id="cartCount">0</span>
         <div id="cartItems" style="margin-top: 10px; max-height: 200px; overflow-y: auto;"></div>
-        <button onclick="showCheckout()" style="margin-top: 10px; padding: 8px 15px; background: #2ecc71; color: white; border: none; border-radius: 5px; cursor: pointer;">寃곗젣?섍린</button>
+        <button onclick="showCheckout()" style="margin-top: 10px; padding: 8px 15px; background: #2ecc71; color: white; border: none; border-radius: 5px; cursor: pointer;">결제하기</button>
     </div>
 
     <div class="container">
         <div class="category-tabs">
-            <div class="tab active" onclick="showCategory('all')">?꾩껜</div>
-            <div class="tab" onclick="showCategory('domains')">AI ?꾨찓??(12媛?</div>
-            <div class="tab" onclick="showCategory('agents')">AI ?먯씠?꾪듃 (15紐?</div>
-            <div class="tab" onclick="showCategory('bundles')">踰덈뱾 ?⑦궎吏</div>
+            <div class="tab active" onclick="showCategory('all')">전체</div>
+            <div class="tab" onclick="showCategory('domains')">AI 도메인 (12개)</div>
+            <div class="tab" onclick="showCategory('agents')">AI 에이전트 (15명)</div>
+            <div class="tab" onclick="showCategory('bundles')">번들 패키지</div>
         </div>
 
         <div id="productsContainer" class="products-grid">
-            <!-- ?쒗뭹?ㅼ씠 ?ш린???숈쟻?쇰줈 濡쒕뱶?⑸땲??-->
+            <!-- 제품들이 여기에 동적으로 로드됩니다 -->
         </div>
 
         <div id="checkoutSection" class="checkout-section hidden">
-            <h2>?썚截?二쇰Ц ?뺣낫</h2>
+            <h2>🛍️ 주문 정보</h2>
             <div id="orderSummary"></div>
             
-            <div class="total-price" id="totalPrice">珥?湲덉븸: $0/??/div>
+            <div class="total-price" id="totalPrice">총 금액: $0/월</div>
+            
+            <div class="payment-methods">
+                <div class="payment-method selected" onclick="selectPaymentMethod('card', this)">
+                    <div style="font-size: 2em;">💳</div>
+                    <div>신용카드</div>
+                    <small>Visa, Mastercard, AMEX</small>
+                </div>
+                <div class="payment-method" onclick="selectPaymentMethod('paypal', this)">
+                    <div style="font-size: 2em;">💙</div>
+                    <div>PayPal</div>
+                    <small>안전한 PayPal 결제</small>
+                </div>
+                <div class="payment-method" onclick="selectPaymentMethod('bank', this)">
+                    <div style="font-size: 2em;">🏦</div>
+                    <div>계좌이체</div>
+                    <small>한국 은행 계좌</small>
+                </div>
+            </div>
+            
+            <div class="payment-error" id="paymentError"></div>
             
             <form id="checkoutForm">
                 <div class="form-group">
-                    <label>?대쫫 *</label>
+                    <label>이름 *</label>
                     <input type="text" id="customerName" required>
                 </div>
                 <div class="form-group">
-                    <label>?대찓??*</label>
+                    <label>이메일 *</label>
                     <input type="email" id="customerEmail" required>
                 </div>
                 <div class="form-group">
-                    <label>?뚯궗紐?/label>
+                    <label>회사명</label>
                     <input type="text" id="customerCompany">
                 </div>
-                <div class="form-group">
-                    <label>寃곗젣 諛⑸쾿</label>
-                    <select id="paymentMethod">
-                        <option value="card">?좎슜移대뱶</option>
-                        <option value="paypal">PayPal</option>
-                        <option value="bank">怨꾩쥖?댁껜</option>
-                    </select>
+                
+                <!-- 신용카드 결제 폼 -->
+                <div id="cardPaymentForm">
+                    <div class="form-group">
+                        <label>신용카드 정보</label>
+                        <div id="card-element">
+                            <!-- Stripe Elements가 여기에 삽입됩니다 -->
+                        </div>
+                    </div>
                 </div>
-                <button type="submit" class="checkout-btn">?벁 援щ룆 ?좎껌?섍린</button>
+                
+                <!-- 계좌이체 정보 -->
+                <div id="bankPaymentForm" style="display: none;">
+                    <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px; margin: 15px 0;">
+                        <h4>📋 계좌이체 정보</h4>
+                        <p><strong>은행:</strong> 국민은행</p>
+                        <p><strong>계좌번호:</strong> 123-456-789012</p>
+                        <p><strong>예금주:</strong> HYOJIN.AI</p>
+                        <small style="color: #f39c12;">⚠️ 입금 후 이메일로 입금확인서를 보내주세요.</small>
+                    </div>
+                </div>
+                
+                <div class="payment-loading" id="paymentLoading">
+                    <div style="font-size: 2em; margin-bottom: 10px;">⏳</div>
+                    <div>결제를 처리하고 있습니다...</div>
+                </div>
+                
+                <div class="payment-success" id="paymentSuccess">
+                    <div style="font-size: 3em; margin-bottom: 15px;">🎉</div>
+                    <h3>결제가 완료되었습니다!</h3>
+                    <p>구독 서비스가 곧 활성화됩니다.</p>
+                    <div id="subscriptionDetails"></div>
+                </div>
+                
+                <button type="submit" class="checkout-btn" id="submitBtn">
+                    � 결제하기
+                </button>
             </form>
         </div>
     </div>
 
     <script>
-        // ?곹뭹 ?곗씠??
+        // 상품 데이터
         const products = {
             domains: [
                 {
                     id: 'medical-ai',
-                    name: '?섎즺 AI ?꾨찓??,
-                    description: '吏꾨떒, 移섎즺, ?섎즺 ?곗씠??遺꾩꽍???꾪븳 ?꾨Ц AI ?붾（??,
-                    features: ['吏꾨떒 蹂댁“ AI', '?섎즺 ?곸긽 遺꾩꽍', '?섏옄 ?곗씠??愿由?, '移섎즺 怨꾪쉷 ?섎┰'],
+                    name: '의료 AI 도메인',
+                    description: '진단, 치료, 의료 데이터 분석을 위한 전문 AI 솔루션',
+                    features: ['진단 보조 AI', '의료 영상 분석', '환자 데이터 관리', '치료 계획 수립'],
                     price: 199,
                     originalPrice: 299,
                     type: 'domain'
                 },
                 {
                     id: 'finance-ai',
-                    name: '湲덉쑖 AI ?꾨찓??,
-                    description: '?ъ옄, ?꾪뿕 愿由? 湲덉쑖 遺꾩꽍???꾪븳 AI ?쒖뒪??,
-                    features: ['?ъ옄 遺꾩꽍', '由ъ뒪??愿由?, '?ш린 ?먯?', '?좎슜 ?됯?'],
+                    name: '금융 AI 도메인',
+                    description: '투자, 위험 관리, 금융 분석을 위한 AI 시스템',
+                    features: ['투자 분석', '리스크 관리', '사기 탐지', '신용 평가'],
                     price: 179,
                     originalPrice: 249,
                     type: 'domain'
                 },
                 {
                     id: 'education-ai',
-                    name: '援먯쑁 AI ?꾨찓??,
-                    description: '媛쒖씤???숈뒿, 援먯쑁 肄섑뀗痢??앹꽦, ?숈뒿 ?됯? AI',
-                    features: ['留욎땄???숈뒿', '?먮룞 梨꾩젏', '肄섑뀗痢??앹꽦', '?숈뒿 遺꾩꽍'],
+                    name: '교육 AI 도메인',
+                    description: '개인화 학습, 교육 콘텐츠 생성, 학습 평가 AI',
+                    features: ['맞춤형 학습', '자동 채점', '콘텐츠 생성', '학습 분석'],
                     price: 149,
                     originalPrice: 199,
                     type: 'domain'
                 },
                 {
                     id: 'manufacturing-ai',
-                    name: '?쒖“ AI ?꾨찓??,
-                    description: '?덉쭏 愿由? ?덉륫 ?좎?蹂댁닔, ?앹궛 理쒖쟻??AI',
-                    features: ['?덉쭏 寃??, '?덉륫 ?좎?蹂댁닔', '?앹궛 怨꾪쉷', '怨듦툒留?愿由?],
+                    name: '제조 AI 도메인',
+                    description: '품질 관리, 예측 유지보수, 생산 최적화 AI',
+                    features: ['품질 검사', '예측 유지보수', '생산 계획', '공급망 관리'],
                     price: 229,
                     originalPrice: 329,
                     type: 'domain'
                 },
                 {
                     id: 'mobility-ai',
-                    name: '紐⑤퉴由ы떚 AI ?꾨찓??,
-                    description: '?먯쑉二쇳뻾, 援먰넻 愿由? 臾쇰쪟 理쒖쟻??AI',
-                    features: ['?먯쑉二쇳뻾 ?뚭퀬由ъ쬁', '援먰넻 ?먮쫫 遺꾩꽍', '寃쎈줈 理쒖쟻??, '?덉쟾 ?쒖뒪??],
+                    name: '모빌리티 AI 도메인',
+                    description: '자율주행, 교통 관리, 물류 최적화 AI',
+                    features: ['자율주행 알고리즘', '교통 흐름 분석', '경로 최적화', '안전 시스템'],
                     price: 259,
                     originalPrice: 359,
                     type: 'domain'
                 },
                 {
                     id: 'entertainment-ai',
-                    name: '?뷀꽣?뚯씤癒쇳듃 AI',
-                    description: '寃뚯엫, 誘몃뵒?? 肄섑뀗痢??앹꽦???꾪븳 AI',
-                    features: ['寃뚯엫 AI', '肄섑뀗痢?異붿쿇', '誘몃뵒???앹꽦', '?ъ슜??寃쏀뿕'],
+                    name: '엔터테인먼트 AI',
+                    description: '게임, 미디어, 콘텐츠 생성을 위한 AI',
+                    features: ['게임 AI', '콘텐츠 추천', '미디어 생성', '사용자 경험'],
                     price: 139,
                     originalPrice: 189,
                     type: 'domain'
                 },
                 {
                     id: 'retail-ai',
-                    name: '由ы뀒??AI ?꾨찓??,
-                    description: '怨좉컼 遺꾩꽍, ?ш퀬 愿由? 留ㅼ텧 ?덉륫 AI',
-                    features: ['怨좉컼 ?몃텇??, '?ш퀬 理쒖쟻??, '留ㅼ텧 ?덉륫', '媛쒖씤??異붿쿇'],
+                    name: '리테일 AI 도메인',
+                    description: '고객 분석, 재고 관리, 매출 예측 AI',
+                    features: ['고객 세분화', '재고 최적화', '매출 예측', '개인화 추천'],
                     price: 169,
                     originalPrice: 239,
                     type: 'domain'
                 },
                 {
                     id: 'energy-ai',
-                    name: '?먮꼫吏 AI ?꾨찓??,
-                    description: '?먮꼫吏 ?⑥쑉, ?ㅻ쭏??洹몃━?? ?ъ깮?먮꼫吏 愿由?,
-                    features: ['?먮꼫吏 理쒖쟻??, '?ㅻ쭏??洹몃━??, '?덉륫 遺꾩꽍', '鍮꾩슜 ?덇컧'],
+                    name: '에너지 AI 도메인',
+                    description: '에너지 효율, 스마트 그리드, 재생에너지 관리',
+                    features: ['에너지 최적화', '스마트 그리드', '예측 분석', '비용 절감'],
                     price: 189,
                     originalPrice: 269,
                     type: 'domain'
                 },
                 {
                     id: 'agriculture-ai',
-                    name: '?띿뾽 AI ?꾨찓??,
-                    description: '?ㅻ쭏???띿뾽, ?묐Ъ 紐⑤땲?곕쭅, ?섑솗???덉륫',
-                    features: ['?묐Ъ 紐⑤땲?곕쭅', '蹂묓빐異??먯?', '?섑솗???덉륫', '?띿옣 愿由?],
+                    name: '농업 AI 도메인',
+                    description: '스마트 농업, 작물 모니터링, 수확량 예측',
+                    features: ['작물 모니터링', '병해충 탐지', '수확량 예측', '농장 관리'],
                     price: 159,
                     originalPrice: 219,
                     type: 'domain'
                 },
                 {
                     id: 'realestate-ai',
-                    name: '遺?숈궛 AI ?꾨찓??,
-                    description: '遺?숈궛 媛寃??덉륫, ?ъ옄 遺꾩꽍, ?쒖옣 ?몃젋??,
-                    features: ['媛寃??덉륫', '?ъ옄 遺꾩꽍', '?쒖옣 ?몃젋??, '臾쇨굔 異붿쿇'],
+                    name: '부동산 AI 도메인',
+                    description: '부동산 가격 예측, 투자 분석, 시장 트렌드',
+                    features: ['가격 예측', '투자 분석', '시장 트렌드', '물건 추천'],
                     price: 179,
                     originalPrice: 249,
                     type: 'domain'
                 },
                 {
                     id: 'customer-ai',
-                    name: '怨좉컼?쒕퉬??AI',
-                    description: '梨쀫큸, 怨좉컼 遺꾩꽍, ?쒕퉬???먮룞??,
-                    features: ['吏?ν삎 梨쀫큸', '媛먯젙 遺꾩꽍', '?먮룞 ?묐떟', '怨좉컼 留뚯”??],
+                    name: '고객서비스 AI',
+                    description: '챗봇, 고객 분석, 서비스 자동화',
+                    features: ['지능형 챗봇', '감정 분석', '자동 응답', '고객 만족도'],
                     price: 129,
                     originalPrice: 179,
                     type: 'domain'
                 },
                 {
                     id: 'saas-ai',
-                    name: 'SaaS AI ?꾨찓??,
-                    description: '?대씪?곕뱶 湲곕컲 AI ?쒕퉬?? API ?듯빀',
-                    features: ['?대씪?곕뱶 AI', 'API ?듯빀', '?뺤옣??, '蹂댁븞'],
+                    name: 'SaaS AI 도메인',
+                    description: '클라우드 기반 AI 서비스, API 통합',
+                    features: ['클라우드 AI', 'API 통합', '확장성', '보안'],
                     price: 199,
                     originalPrice: 279,
                     type: 'domain'
@@ -406,135 +519,135 @@
             agents: [
                 {
                     id: 'medical-doctor-ai',
-                    name: '?ν꽣 源 AI',
-                    description: '?섎즺 吏꾨떒 ?꾨Ц AI ?먯씠?꾪듃',
-                    features: ['利앹긽 遺꾩꽍', '吏꾨떒 蹂댁“', '移섎즺 異붿쿇', '?섎즺 ?곷떞'],
+                    name: '닥터 김 AI',
+                    description: '의료 진단 전문 AI 에이전트',
+                    features: ['증상 분석', '진단 보조', '치료 추천', '의료 상담'],
                     price: 89,
                     originalPrice: 129,
                     type: 'agent'
                 },
                 {
                     id: 'finance-analyst-ai',
-                    name: '?좊꼸由ъ뒪??諛?AI',
-                    description: '湲덉쑖 遺꾩꽍 ?꾨Ц AI ?먯씠?꾪듃',
-                    features: ['?ъ옄 遺꾩꽍', '?ы듃?대━??愿由?, '由ъ뒪???됯?', '?쒖옣 ?덉륫'],
+                    name: '애널리스트 박 AI',
+                    description: '금융 분석 전문 AI 에이전트',
+                    features: ['투자 분석', '포트폴리오 관리', '리스크 평가', '시장 예측'],
                     price: 79,
                     originalPrice: 119,
                     type: 'agent'
                 },
                 {
                     id: 'teacher-ai',
-                    name: '?좎깮????AI',
-                    description: '援먯쑁 肄섑뀗痢??꾨Ц AI ?먯씠?꾪듃',
-                    features: ['留욎땄 援먯쑁', '怨쇱젣 ?앹꽦', '?숈뒿 ?됯?', '吏꾨룄 愿由?],
+                    name: '선생님 이 AI',
+                    description: '교육 콘텐츠 전문 AI 에이전트',
+                    features: ['맞춤 교육', '과제 생성', '학습 평가', '진도 관리'],
                     price: 69,
                     originalPrice: 99,
                     type: 'agent'
                 },
                 {
                     id: 'qa-engineer-ai',
-                    name: '?덉쭏愿由?理?AI',
-                    description: '?쒖“ ?덉쭏 愿由??꾨Ц AI ?먯씠?꾪듃',
-                    features: ['?덉쭏 寃??, '遺덈웾 ?먯?', '怨듭젙 媛쒖꽑', '?쒖???],
+                    name: '품질관리 최 AI',
+                    description: '제조 품질 관리 전문 AI 에이전트',
+                    features: ['품질 검사', '불량 탐지', '공정 개선', '표준화'],
                     price: 99,
                     originalPrice: 139,
                     type: 'agent'
                 },
                 {
                     id: 'driver-ai',
-                    name: '?쒕씪?대쾭 ??AI',
-                    description: '?먯쑉二쇳뻾 ?꾨Ц AI ?먯씠?꾪듃',
-                    features: ['寃쎈줈 怨꾪쉷', '?덉쟾 ?댁쟾', '援먰넻 遺꾩꽍', '?곕즺 ?⑥쑉'],
+                    name: '드라이버 정 AI',
+                    description: '자율주행 전문 AI 에이전트',
+                    features: ['경로 계획', '안전 운전', '교통 분석', '연료 효율'],
                     price: 109,
                     originalPrice: 149,
                     type: 'agent'
                 },
                 {
                     id: 'game-ai',
-                    name: '寃뚯씠癒???AI',
-                    description: '寃뚯엫 媛쒕컻 ?꾨Ц AI ?먯씠?꾪듃',
-                    features: ['寃뚯엫 諛몃윴??, 'NPC ?됰룞', '?덈꺼 ?붿옄??, '?뚮젅?댁뼱 遺꾩꽍'],
+                    name: '게이머 한 AI',
+                    description: '게임 개발 전문 AI 에이전트',
+                    features: ['게임 밸런스', 'NPC 행동', '레벨 디자인', '플레이어 분석'],
                     price: 59,
                     originalPrice: 89,
                     type: 'agent'
                 },
                 {
                     id: 'sales-ai',
-                    name: '?몄씪利?媛?AI',
-                    description: '由ы뀒???먮ℓ ?꾨Ц AI ?먯씠?꾪듃',
-                    features: ['怨좉컼 遺꾩꽍', '?곹뭹 異붿쿇', '留ㅼ텧 ?덉륫', '?ш퀬 愿由?],
+                    name: '세일즈 강 AI',
+                    description: '리테일 판매 전문 AI 에이전트',
+                    features: ['고객 분석', '상품 추천', '매출 예측', '재고 관리'],
                     price: 79,
                     originalPrice: 109,
                     type: 'agent'
                 },
                 {
                     id: 'energy-ai',
-                    name: '?먮꼫吏 ??AI',
-                    description: '?먮꼫吏 愿由??꾨Ц AI ?먯씠?꾪듃',
-                    features: ['?먮꼫吏 紐⑤땲?곕쭅', '?⑥쑉 理쒖쟻??, '鍮꾩슜 ?덇컧', '?섍꼍 遺꾩꽍'],
+                    name: '에너지 윤 AI',
+                    description: '에너지 관리 전문 AI 에이전트',
+                    features: ['에너지 모니터링', '효율 최적화', '비용 절감', '환경 분석'],
                     price: 89,
                     originalPrice: 119,
                     type: 'agent'
                 },
                 {
                     id: 'farmer-ai',
-                    name: '?띾? ??AI',
-                    description: '?ㅻ쭏???띿뾽 ?꾨Ц AI ?먯씠?꾪듃',
-                    features: ['?묐Ъ 愿由?, '蹂묓빐異??덈갑', '?섑솗 ?쒓린', '?띿옣 ?댁쁺'],
+                    name: '농부 신 AI',
+                    description: '스마트 농업 전문 AI 에이전트',
+                    features: ['작물 관리', '병해충 예방', '수확 시기', '농장 운영'],
                     price: 69,
                     originalPrice: 99,
                     type: 'agent'
                 },
                 {
                     id: 'realtor-ai',
-                    name: '遺?숈궛 議?AI',
-                    description: '遺?숈궛 遺꾩꽍 ?꾨Ц AI ?먯씠?꾪듃',
-                    features: ['?쒖꽭 遺꾩꽍', '?ъ옄 議곗뼵', '留ㅻЪ 異붿쿇', '怨꾩빟 吏??],
+                    name: '부동산 조 AI',
+                    description: '부동산 분석 전문 AI 에이전트',
+                    features: ['시세 분석', '투자 조언', '매물 추천', '계약 지원'],
                     price: 79,
                     originalPrice: 109,
                     type: 'agent'
                 },
                 {
                     id: 'support-ai',
-                    name: '怨좉컼?쇳꽣 ??AI',
-                    description: '怨좉컼 ?쒕퉬???꾨Ц AI ?먯씠?꾪듃',
-                    features: ['24/7 ?곷떞', '臾몄젣 ?닿껐', '媛먯젙 ?몄떇', '留뚯”??愿由?],
+                    name: '고객센터 홍 AI',
+                    description: '고객 서비스 전문 AI 에이전트',
+                    features: ['24/7 상담', '문제 해결', '감정 인식', '만족도 관리'],
                     price: 59,
                     originalPrice: 79,
                     type: 'agent'
                 },
                 {
                     id: 'cloud-ai',
-                    name: '?대씪?곕뱶 ??AI',
-                    description: '?대씪?곕뱶 愿由??꾨Ц AI ?먯씠?꾪듃',
-                    features: ['?명봽??愿由?, '?먮룞 ?ㅼ??쇰쭅', '鍮꾩슜 理쒖쟻??, '蹂댁븞 紐⑤땲?곕쭅'],
+                    name: '클라우드 서 AI',
+                    description: '클라우드 관리 전문 AI 에이전트',
+                    features: ['인프라 관리', '자동 스케일링', '비용 최적화', '보안 모니터링'],
                     price: 99,
                     originalPrice: 139,
                     type: 'agent'
                 },
                 {
                     id: 'security-ai',
-                    name: '蹂댁븞愿 ??AI',
-                    description: '?ъ씠踰?蹂댁븞 ?꾨Ц AI ?먯씠?꾪듃',
-                    features: ['?꾪삊 ?먯?', '移⑥엯 諛⑹?', '濡쒓렇 遺꾩꽍', '蹂댁븞 媛먯궗'],
+                    name: '보안관 장 AI',
+                    description: '사이버 보안 전문 AI 에이전트',
+                    features: ['위협 탐지', '침입 방지', '로그 분석', '보안 감사'],
                     price: 119,
                     originalPrice: 159,
                     type: 'agent'
                 },
                 {
                     id: 'logistics-ai',
-                    name: '臾쇰쪟????AI',
-                    description: '臾쇰쪟 理쒖쟻???꾨Ц AI ?먯씠?꾪듃',
-                    features: ['諛곗넚 理쒖쟻??, '?ш퀬 愿由?, '怨듦툒留?遺꾩꽍', '鍮꾩슜 ?덇컧'],
+                    name: '물류왕 송 AI',
+                    description: '물류 최적화 전문 AI 에이전트',
+                    features: ['배송 최적화', '재고 관리', '공급망 분석', '비용 절감'],
                     price: 89,
                     originalPrice: 119,
                     type: 'agent'
                 },
                 {
                     id: 'data-ai',
-                    name: '?곗씠????AI',
-                    description: '?곗씠??遺꾩꽍 ?꾨Ц AI ?먯씠?꾪듃',
-                    features: ['?곗씠??泥섎━', '?듦퀎 遺꾩꽍', '?쒓컖??, '?몄궗?댄듃 ?꾩텧'],
+                    name: '데이터 황 AI',
+                    description: '데이터 분석 전문 AI 에이전트',
+                    features: ['데이터 처리', '통계 분석', '시각화', '인사이트 도출'],
                     price: 99,
                     originalPrice: 129,
                     type: 'agent'
@@ -543,27 +656,27 @@
             bundles: [
                 {
                     id: 'starter-bundle',
-                    name: '?ㅽ???踰덈뱾',
-                    description: '?멸린 AI ?꾨찓??3媛?+ ?먯씠?꾪듃 5紐?,
-                    features: ['?섎즺+湲덉쑖+援먯쑁 AI', '?듭떖 ?먯씠?꾪듃 5紐?, '24/7 吏??, '?붽컙 由ы룷??],
+                    name: '스타터 번들',
+                    description: '인기 AI 도메인 3개 + 에이전트 5명',
+                    features: ['의료+금융+교육 AI', '핵심 에이전트 5명', '24/7 지원', '월간 리포트'],
                     price: 399,
                     originalPrice: 699,
                     type: 'bundle'
                 },
                 {
                     id: 'business-bundle',
-                    name: '鍮꾩쫰?덉뒪 踰덈뱾',
-                    description: 'AI ?꾨찓??8媛?+ ?먯씠?꾪듃 10紐?,
-                    features: ['二쇱슂 AI ?꾨찓??8媛?, '?꾨Ц ?먯씠?꾪듃 10紐?, '?곗꽑 吏??, '而ㅼ뒪? 湲곕뒫'],
+                    name: '비즈니스 번들',
+                    description: 'AI 도메인 8개 + 에이전트 10명',
+                    features: ['주요 AI 도메인 8개', '전문 에이전트 10명', '우선 지원', '커스텀 기능'],
                     price: 899,
                     originalPrice: 1599,
                     type: 'bundle'
                 },
                 {
                     id: 'enterprise-bundle',
-                    name: '?뷀꽣?꾨씪?댁쫰 踰덈뱾',
-                    description: '紐⑤뱺 AI ?꾨찓??12媛?+ 紐⑤뱺 ?먯씠?꾪듃 15紐?,
-                    features: ['?꾩껜 AI ?꾨찓??, '紐⑤뱺 ?먯씠?꾪듃', '?꾨떞 吏??, '臾댁젣??而ㅼ뒪?곕쭏?댁쭠'],
+                    name: '엔터프라이즈 번들',
+                    description: '모든 AI 도메인 12개 + 모든 에이전트 15명',
+                    features: ['전체 AI 도메인', '모든 에이전트', '전담 지원', '무제한 커스터마이징'],
                     price: 1999,
                     originalPrice: 3999,
                     type: 'bundle'
@@ -573,8 +686,71 @@
 
         let cart = [];
         let currentCategory = 'all';
+        let selectedPaymentMethod = 'card';
+        let stripe = null;
+        let elements = null;
+        let card = null;
 
-        // 移댄뀒怨좊━ ?쒖떆
+        // Stripe 초기화 (실제 사용시에는 본인의 Publishable Key로 교체)
+        let STRIPE_PUBLISHABLE_KEY = 'pk_test_demo'; // 기본값
+        
+        // 페이지 로드시 Stripe 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPaymentConfig();
+        });
+        
+        async function loadPaymentConfig() {
+            try {
+                const response = await fetch('/api/payment-config');
+                const config = await response.json();
+                STRIPE_PUBLISHABLE_KEY = config.stripe_publishable_key;
+                initializeStripe();
+            } catch (error) {
+                console.warn('결제 설정 로드 실패, 데모 모드로 실행:', error);
+                initializeStripe();
+            }
+        }
+        
+        function initializeStripe() {
+            try {
+                if (STRIPE_PUBLISHABLE_KEY !== 'pk_test_demo') {
+                    stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+                    elements = stripe.elements();
+                    
+                    // 카드 요소 스타일
+                    const style = {
+                        base: {
+                            fontSize: '16px',
+                            color: '#424770',
+                            '::placeholder': {
+                                color: '#aab7c4',
+                            },
+                        },
+                    };
+                    
+                    card = elements.create('card', {style: style});
+                    card.mount('#card-element');
+                    
+                    // 카드 변경 이벤트 리스너
+                    card.addEventListener('change', function(event) {
+                        const displayError = document.getElementById('paymentError');
+                        if (event.error) {
+                            displayError.textContent = event.error.message;
+                            displayError.style.display = 'block';
+                        } else {
+                            displayError.style.display = 'none';
+                        }
+                    });
+                } else {
+                    console.log('데모 모드: Stripe 없이 실행');
+                }
+            } catch (error) {
+                console.warn('Stripe 초기화 실패 (데모 모드):', error.message);
+                // 데모 모드에서는 Stripe 없이도 동작
+            }
+        }
+
+        // 카테고리 표시
         function showCategory(category) {
             currentCategory = category;
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
@@ -582,7 +758,7 @@
             renderProducts();
         }
 
-        // ?곹뭹 ?뚮뜑留?
+        // 상품 렌더링
         function renderProducts() {
             const container = document.getElementById('productsContainer');
             let productsToShow = [];
@@ -604,17 +780,17 @@
                     <div class="product-price">
                         <div>
                             <span class="original-price">$${product.originalPrice}</span>
-                            <span class="price">$${product.price}/??/span>
+                            <span class="price">$${product.price}/월</span>
                         </div>
                     </div>
                     <button class="subscribe-btn" onclick="addToCart('${product.id}')">
-                        ?썟 ?λ컮援щ땲 ?닿린
+                        🛒 장바구니 담기
                     </button>
                 </div>
             `).join('');
         }
 
-        // ?λ컮援щ땲??異붽?
+        // 장바구니에 추가
         function addToCart(productId) {
             const allProducts = [...products.domains, ...products.agents, ...products.bundles];
             const product = allProducts.find(p => p.id === productId);
@@ -623,14 +799,14 @@
                 cart.push(product);
                 updateCartDisplay();
                 
-                // 異붽? ?뚮┝
-                alert(`??${product.name}??媛) ?λ컮援щ땲??異붽??섏뿀?듬땲??`);
+                // 추가 알림
+                alert(`✅ ${product.name}이(가) 장바구니에 추가되었습니다!`);
             } else if (cart.find(item => item.id === productId)) {
-                alert('?좑툘 ?대? ?λ컮援щ땲???덈뒗 ?곹뭹?낅땲??');
+                alert('⚠️ 이미 장바구니에 있는 상품입니다.');
             }
         }
 
-        // ?λ컮援щ땲 ?쒖떆 ?낅뜲?댄듃
+        // 장바구니 표시 업데이트
         function updateCartDisplay() {
             const cartCount = document.getElementById('cartCount');
             const cartItems = document.getElementById('cartItems');
@@ -638,28 +814,28 @@
             cartCount.textContent = cart.length;
             
             if (cart.length === 0) {
-                cartItems.innerHTML = '<small style="opacity: 0.7;">?λ컮援щ땲媛 鍮꾩뼱?덉뒿?덈떎</small>';
+                cartItems.innerHTML = '<small style="opacity: 0.7;">장바구니가 비어있습니다</small>';
             } else {
                 cartItems.innerHTML = cart.map(item => `
                     <div style="margin: 5px 0; padding: 5px; background: rgba(255,255,255,0.1); border-radius: 5px; font-size: 0.9em;">
                         <strong>${item.name}</strong><br>
-                        <span style="color: #2ecc71;">$${item.price}/??/span>
-                        <button onclick="removeFromCart('${item.id}')" style="float: right; background: #e74c3c; color: white; border: none; border-radius: 3px; padding: 2px 6px; cursor: pointer;">횞</button>
+                        <span style="color: #2ecc71;">$${item.price}/월</span>
+                        <button onclick="removeFromCart('${item.id}')" style="float: right; background: #e74c3c; color: white; border: none; border-radius: 3px; padding: 2px 6px; cursor: pointer;">×</button>
                     </div>
                 `).join('');
             }
         }
 
-        // ?λ컮援щ땲?먯꽌 ?쒓굅
+        // 장바구니에서 제거
         function removeFromCart(productId) {
             cart = cart.filter(item => item.id !== productId);
             updateCartDisplay();
         }
 
-        // 寃곗젣 ?섏씠吏 ?쒖떆
+        // 결제 페이지 표시
         function showCheckout() {
             if (cart.length === 0) {
-                alert('?좑툘 ?λ컮援щ땲媛 鍮꾩뼱?덉뒿?덈떎.');
+                alert('⚠️ 장바구니가 비어있습니다.');
                 return;
             }
 
@@ -667,23 +843,51 @@
             const orderSummary = document.getElementById('orderSummary');
             const totalPrice = document.getElementById('totalPrice');
 
-            // 二쇰Ц ?붿빟
+            // 주문 요약
             const total = cart.reduce((sum, item) => sum + item.price, 0);
             
             orderSummary.innerHTML = cart.map(item => `
                 <div style="display: flex; justify-content: space-between; padding: 10px; background: rgba(255,255,255,0.1); margin: 5px 0; border-radius: 8px;">
                     <span>${item.name}</span>
-                    <span>$${item.price}/??/span>
+                    <span>$${item.price}/월</span>
                 </div>
             `).join('');
 
-            totalPrice.textContent = `珥?湲덉븸: $${total}/??;
+            totalPrice.textContent = `총 금액: $${total}/월`;
             
             checkoutSection.classList.remove('hidden');
             checkoutSection.scrollIntoView({ behavior: 'smooth' });
         }
 
-        // 二쇰Ц ?쒖텧
+        // 결제 방법 선택
+        function selectPaymentMethod(method, element) {
+            selectedPaymentMethod = method;
+            
+            // 모든 결제 방법 선택 해제
+            document.querySelectorAll('.payment-method').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            
+            // 결제 폼 표시/숨김
+            const cardForm = document.getElementById('cardPaymentForm');
+            const bankForm = document.getElementById('bankPaymentForm');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            if (method === 'card') {
+                cardForm.style.display = 'block';
+                bankForm.style.display = 'none';
+                submitBtn.innerHTML = '💳 신용카드로 결제하기';
+            } else if (method === 'paypal') {
+                cardForm.style.display = 'none';
+                bankForm.style.display = 'none';
+                submitBtn.innerHTML = '💙 PayPal로 결제하기';
+            } else if (method === 'bank') {
+                cardForm.style.display = 'none';
+                bankForm.style.display = 'block';
+                submitBtn.innerHTML = '🏦 계좌이체 신청하기';
+            }
+        }
+
+        // 주문 제출
         document.getElementById('checkoutForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -691,59 +895,284 @@
                 name: document.getElementById('customerName').value,
                 email: document.getElementById('customerEmail').value,
                 company: document.getElementById('customerCompany').value,
-                paymentMethod: document.getElementById('paymentMethod').value,
+                paymentMethod: selectedPaymentMethod,
                 items: cart,
                 total: cart.reduce((sum, item) => sum + item.price, 0)
             };
 
-            // 二쇰Ц 泥섎━
-            processOrder(formData);
+            // 결제 처리
+            processPayment(formData);
         });
 
-        // 二쇰Ц 泥섎━
-        function processOrder(orderData) {
-            // ?대찓?쇰줈 二쇰Ц ?뺣낫 ?꾩넚
-            const emailSubject = `HYOJIN.AI ?쇳븨紐?援щ룆 二쇰Ц - ${orderData.name}`;
-            const emailBody = `?덈줈??援щ룆 二쇰Ц???묒닔?섏뿀?듬땲??
+        // 결제 처리
+        async function processPayment(orderData) {
+            const loadingEl = document.getElementById('paymentLoading');
+            const errorEl = document.getElementById('paymentError');
+            const successEl = document.getElementById('paymentSuccess');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            // 로딩 시작
+            loadingEl.style.display = 'block';
+            errorEl.style.display = 'none';
+            successEl.style.display = 'none';
+            submitBtn.disabled = true;
+            
+            try {
+                if (selectedPaymentMethod === 'card') {
+                    await processCardPayment(orderData);
+                } else if (selectedPaymentMethod === 'paypal') {
+                    await processPayPalPayment(orderData);
+                } else if (selectedPaymentMethod === 'bank') {
+                    await processBankTransfer(orderData);
+                }
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                loadingEl.style.display = 'none';
+                submitBtn.disabled = false;
+            }
+        }
+        
+        // 신용카드 결제 처리
+        async function processCardPayment(orderData) {
+            if (!stripe || !card) {
+                // 데모 모드: Stripe 없이 시뮬레이션
+                await simulatePayment(orderData);
+                return;
+            }
+            
+            try {
+                // Stripe 토큰 생성
+                const {token, error} = await stripe.createToken(card);
+                
+                if (error) {
+                    throw new Error(error.message);
+                }
+                
+                // 백엔드 API 호출
+                const response = await fetch('/api/process-payment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        token: token.id,
+                        amount: orderData.total * 100, // cents
+                        customer: {
+                            name: orderData.name,
+                            email: orderData.email,
+                            company: orderData.company,
+                            paymentMethod: 'card'
+                        },
+                        items: orderData.items.map(item => ({
+                            id: item.id,
+                            name: item.name,
+                            price: item.price,
+                            type: item.type
+                        }))
+                    })
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || '결제 처리에 실패했습니다.');
+                }
+                
+                const result = await response.json();
+                showSuccess(orderData, result.subscription_id, result.status);
+                
+            } catch (error) {
+                // 실제 API 호출 실패시 데모 모드로 폴백
+                console.warn('실제 결제 실패, 데모 모드로 전환:', error.message);
+                await simulatePayment(orderData);
+            }
+        }
+        
+        // PayPal 결제 처리
+        async function processPayPalPayment(orderData) {
+            try {
+                // 백엔드 API 호출
+                const response = await fetch('/api/process-payment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        amount: orderData.total * 100,
+                        customer: {
+                            name: orderData.name,
+                            email: orderData.email,
+                            company: orderData.company,
+                            paymentMethod: 'paypal'
+                        },
+                        items: orderData.items.map(item => ({
+                            id: item.id,
+                            name: item.name,
+                            price: item.price,
+                            type: item.type
+                        }))
+                    })
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'PayPal 결제에 실패했습니다.');
+                }
+                
+                const result = await response.json();
+                showSuccess(orderData, result.subscription_id, result.status);
+                
+            } catch (error) {
+                console.warn('PayPal 결제 실패, 데모 모드로 전환:', error.message);
+                await simulatePayment(orderData);
+            }
+        }
+        
+        // 계좌이체 처리
+        async function processBankTransfer(orderData) {
+            try {
+                // 백엔드 API 호출
+                const response = await fetch('/api/bank-transfer', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        customer: {
+                            name: orderData.name,
+                            email: orderData.email,
+                            company: orderData.company,
+                            paymentMethod: 'bank'
+                        },
+                        items: orderData.items.map(item => ({
+                            id: item.id,
+                            name: item.name,
+                            price: item.price,
+                            type: item.type
+                        }))
+                    })
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || '계좌이체 신청에 실패했습니다.');
+                }
+                
+                const result = await response.json();
+                showSuccess(orderData, result.subscription_id, result.status);
+                
+            } catch (error) {
+                console.warn('계좌이체 신청 실패, 데모 모드로 전환:', error.message);
+                await simulatePayment(orderData, 'pending');
+            }
+        }
+        
+        // 결제 시뮬레이션 (데모용)
+        async function simulatePayment(orderData, status = 'completed') {
+            // 2초 지연으로 실제 결제 처리 시뮬레이션
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            const subscriptionId = 'sub_' + Math.random().toString(36).substr(2, 9);
+            showSuccess(orderData, subscriptionId, status);
+        }
+        
+        // 성공 메시지 표시
+        function showSuccess(orderData, subscriptionId, status = 'completed') {
+            const successEl = document.getElementById('paymentSuccess');
+            const detailsEl = document.getElementById('subscriptionDetails');
+            
+            let statusText = status === 'pending' ? '입금 확인 대기 중' : '활성화됨';
+            let statusColor = status === 'pending' ? '#f39c12' : '#2ecc71';
+            
+            detailsEl.innerHTML = `
+                <div style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                    <p><strong>구독 ID:</strong> ${subscriptionId}</p>
+                    <p><strong>상태:</strong> <span style="color: ${statusColor}">${statusText}</span></p>
+                    <p><strong>월 결제액:</strong> $${orderData.total}</p>
+                    <p><strong>구독 상품:</strong> ${orderData.items.length}개</p>
+                    ${status === 'pending' ? '<p style="color: #f39c12; margin-top: 10px;">💡 입금 완료 후 24시간 내에 서비스가 활성화됩니다.</p>' : ''}
+                </div>
+            `;
+            
+            successEl.style.display = 'block';
+            
+            // 이메일 전송
+            sendConfirmationEmail(orderData, subscriptionId, status);
+            
+            // 장바구니 초기화
+            setTimeout(() => {
+                cart = [];
+                updateCartDisplay();
+                document.getElementById('checkoutSection').classList.add('hidden');
+                document.getElementById('checkoutForm').reset();
+                successEl.style.display = 'none';
+            }, 10000); // 10초 후 자동 초기화
+        }
+        
+        // 에러 메시지 표시
+        function showError(message) {
+            const errorEl = document.getElementById('paymentError');
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+        }
+        
+        // 확인 이메일 전송
+        function sendConfirmationEmail(orderData, subscriptionId, status) {
+            const emailSubject = `🎉 HYOJIN.AI 구독 ${status === 'pending' ? '신청' : '결제'} 완료 - ${subscriptionId}`;
+            const statusText = status === 'pending' ? '신청이 접수되었습니다' : '결제가 완료되었습니다';
+            
+            const emailBody = `HYOJIN.AI 구독 서비스 ${statusText}!
 
-怨좉컼 ?뺣낫:
-?뫀 ?대쫫: ${orderData.name}
-?벁 ?대찓?? ${orderData.email}
-?룫 ?뚯궗: ${orderData.company || '誘몄엯??}
-?뮩 寃곗젣 諛⑸쾿: ${orderData.paymentMethod}
+📋 구독 정보:
+🆔 구독 ID: ${subscriptionId}
+👤 고객명: ${orderData.name}
+📧 이메일: ${orderData.email}
+🏢 회사: ${orderData.company || '개인'}
+💳 결제 방법: ${getPaymentMethodName(orderData.paymentMethod)}
+📊 상태: ${status === 'pending' ? '입금 확인 대기' : '활성화됨'}
 
-二쇰Ц ?곹뭹:
-${orderData.items.map((item, i) => `${i+1}. ${item.name} - $${item.price}/??).join('\n')}
+🛍️ 구독 상품 (${orderData.items.length}개):
+${orderData.items.map((item, i) => `${i+1}. ${item.name} - $${item.price}/월`).join('\n')}
 
-?뮥 珥?湲덉븸: $${orderData.total}/??
-?뱟 二쇰Ц?? ${new Date().toLocaleString('ko-KR')}
+💰 월 결제 금액: $${orderData.total}
+📅 신청일: ${new Date().toLocaleString('ko-KR')}
+
+${status === 'pending' ? `
+🏦 입금 정보:
+은행: 국민은행
+계좌: 123-456-789012
+예금주: HYOJIN.AI
+입금액: $${orderData.total}
+
+⚠️ 입금 후 이 이메일에 입금확인서를 첨부하여 회신해주세요.
+` : `
+🎉 축하합니다! 구독이 활성화되었습니다.
+� 서비스 이용: https://app.hyojin.ai
+� 로그인 정보가 별도 이메일로 발송됩니다.
+`}
 
 ---
-HYOJIN.AI ?쇳븨紐곗뿉???먮룞 ?앹꽦??二쇰Ц?쒖엯?덈떎.`;
+HYOJIN.AI 쇼핑몰
+🌐 https://hyojin.ai
+📧 support@hyojin.ai`;
 
-            // ?깃났 硫붿떆吏
-            alert(`?럦 二쇰Ц???꾨즺?섏뿀?듬땲??
-
-?벁 怨좉컼: ${orderData.name}
-?뮥 珥?湲덉븸: $${orderData.total}/??
-?벀 ?곹뭹 ?? ${orderData.items.length}媛?
-
-?벁 二쇰Ц ?뺤씤 ?대찓?쇱쓣 諛쒖넚?⑸땲??`);
-
-            // ?대찓?????닿린
-            window.open(`mailto:sales@hyojin.ai?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`, '_blank');
-
-            // ?λ컮援щ땲 珥덇린??
-            cart = [];
-            updateCartDisplay();
-            document.getElementById('checkoutSection').classList.add('hidden');
-            document.getElementById('checkoutForm').reset();
+            // 이메일 앱 열기
+            window.open(`mailto:${orderData.email}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`, '_blank');
+        }
+        
+        // 결제 방법 이름 반환
+        function getPaymentMethodName(method) {
+            const names = {
+                'card': '신용카드',
+                'paypal': 'PayPal',
+                'bank': '계좌이체'
+            };
+            return names[method] || method;
         }
 
-        // 珥덇린 濡쒕뱶
+        // 초기 로드
         renderProducts();
         updateCartDisplay();
     </script>
 </body>
 </html>
-

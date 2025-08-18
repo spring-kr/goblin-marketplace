@@ -1,7 +1,7 @@
 """
-🚀 HYOJIN.AI MVP - 12개 도메인 완전체 + 고급 보안 시스템
-한방에 모든 AI 도메인 구현 + 엔터프라이즈 보안!
-버전: v3.2.0 - 고급 보안 시스템 적용
+🚀 HYOJIN.AI MVP - 12개 도메인 완전체 + 고급 보안 시스템 + 실제 결제
+한방에 모든 AI 도메인 구현 + 엔터프라이즈 보안 + Stripe 결제!
+버전: v3.3.0 - 실제 결제 시스템 추가
 """
 
 from fastapi import FastAPI, HTTPException, Request, Depends, status
@@ -21,11 +21,17 @@ import secrets
 import re
 from pathlib import Path
 
+# 결제 서비스 임포트
+from payment_service import (
+    PaymentProcessor, PaymentRequest, CustomerData, PaymentItem,
+    payment_processor, email_service
+)
+
 # FastAPI 앱 생성
 app = FastAPI(
-    title="Hyojin AI MVP + Advanced Security",
-    description="12개 AI 비즈니스 도메인 + 고급 보안 시스템",
-    version="3.2.0",
+    title="Hyojin AI MVP + Advanced Security + Payment",
+    description="12개 AI 비즈니스 도메인 + 고급 보안 시스템 + 실제 결제",
+    version="3.3.0",
 )
 
 
@@ -3379,6 +3385,132 @@ def get_allowed_agents_by_plan(plan):
         "enterprise": list(ai_agents.keys()),
     }
     return plan_agents.get(plan, [])
+
+
+# 🔥 결제 API 엔드포인트들
+@app.post("/api/process-payment")
+async def process_payment(payment_request: PaymentRequest):
+    """실제 결제 처리 API"""
+    try:
+        # 입력 데이터 살균
+        payment_request.customer.name = sanitize_input(payment_request.customer.name)
+        payment_request.customer.email = sanitize_input(payment_request.customer.email)
+        payment_request.customer.company = sanitize_input(payment_request.customer.company)
+        
+        # 결제 방법에 따른 처리
+        if payment_request.customer.paymentMethod == "card":
+            result = await payment_processor.process_card_payment(payment_request)
+        elif payment_request.customer.paymentMethod == "paypal":
+            result = await payment_processor.process_paypal_payment(payment_request)
+        else:
+            raise HTTPException(status_code=400, detail="지원하지 않는 결제 방법입니다.")
+        
+        # 성공시 확인 이메일 발송
+        if result["success"]:
+            subscription_data = {
+                "id": result["subscription_id"],
+                "customer": payment_request.customer.dict(),
+                "items": [item.dict() for item in payment_request.items],
+                "status": result["status"],
+                "total_amount": result["amount"],
+                "payment_method": payment_request.customer.paymentMethod,
+                "created_at": datetime.datetime.now().isoformat(),
+                "next_billing_date": (datetime.datetime.now() + datetime.timedelta(days=30)).isoformat()
+            }
+            
+            await email_service.send_subscription_confirmation(subscription_data)
+        
+        return result
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"결제 처리 중 오류가 발생했습니다: {str(e)}")
+
+
+@app.post("/api/bank-transfer")
+async def bank_transfer_request(customer: CustomerData, items: List[PaymentItem]):
+    """계좌이체 신청 API"""
+    try:
+        # 입력 데이터 살균
+        customer.name = sanitize_input(customer.name)
+        customer.email = sanitize_input(customer.email)
+        customer.company = sanitize_input(customer.company)
+        
+        result = await payment_processor.process_bank_transfer(customer, items)
+        
+        # 계좌이체 신청 확인 이메일 발송
+        if result["success"]:
+            subscription_data = {
+                "id": result["subscription_id"],
+                "customer": customer.dict(),
+                "items": [item.dict() for item in items],
+                "status": result["status"],
+                "total_amount": result["amount"],
+                "payment_method": "bank",
+                "created_at": datetime.datetime.now().isoformat(),
+                "bank_info": result["bank_info"]
+            }
+            
+            await email_service.send_subscription_confirmation(subscription_data)
+        
+        return result
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"계좌이체 신청 중 오류가 발생했습니다: {str(e)}")
+
+
+@app.get("/api/subscription/{subscription_id}")
+async def get_subscription_status(subscription_id: str):
+    """구독 상태 조회 API"""
+    try:
+        # 구독 데이터 조회 (실제로는 데이터베이스에서)
+        subscription = payment_processor.subscription_service.subscriptions_db.get(subscription_id)
+        
+        if not subscription:
+            raise HTTPException(status_code=404, detail="구독을 찾을 수 없습니다.")
+        
+        return {
+            "subscription_id": subscription["id"],
+            "status": subscription["status"],
+            "customer": subscription["customer"],
+            "items": subscription["items"],
+            "total_amount": subscription["total_amount"],
+            "next_billing_date": subscription["next_billing_date"],
+            "created_at": subscription["created_at"]
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"구독 조회 중 오류가 발생했습니다: {str(e)}")
+
+
+@app.post("/api/webhook/stripe")
+async def stripe_webhook(request: Request):
+    """Stripe 웹훅 처리"""
+    try:
+        payload = await request.body()
+        sig_header = request.headers.get('stripe-signature')
+        
+        # Stripe 웹훅 검증 및 처리
+        # 실제 구현시 Stripe webhook secret 필요
+        
+        return {"received": True}
+        
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"웹훅 처리 실패: {str(e)}")
+
+
+@app.get("/api/payment-config")
+async def get_payment_config():
+    """결제 설정 정보 API"""
+    return {
+        "stripe_publishable_key": os.getenv('STRIPE_PUBLISHABLE_KEY', 'pk_test_demo'),
+        "supported_payment_methods": ["card", "paypal", "bank"],
+        "currencies": ["USD"],
+        "bank_info": {
+            "bank_name": "국민은행",
+            "account_number": "123-456-789012", 
+            "account_holder": "HYOJIN.AI"
+        }
+    }
 
 
 if __name__ == "__main__":
