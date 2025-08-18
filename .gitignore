@@ -69,6 +69,16 @@ test_*.py
 # TECHNICAL_SPECS.md
 # VIRTUAL_LINKS.md
 
+# Internal/Sensitive Documentation (DO NOT COMMIT)
+DEVELOPMENT_PROGRESS.md
+ROADMAP.md
+TECHNICAL_SPECS.md
+VIRTUAL_LINKS.md
+*_INTERNAL.md
+*_PRIVATE.md
+docs/internal/
+docs/private/
+
 # Temporary files
 temp/
 tmp/
