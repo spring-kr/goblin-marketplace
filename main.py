@@ -1396,72 +1396,101 @@ async def predict_simple(domain: str, text: Optional[str] = None):
             "healthcare": {
                 "name": "의료 AI",
                 "description": "진단 보조, 의료 영상 분석, 건강 모니터링 시스템",
-                "features": ["진단 보조", "의료 영상 분석", "건강 모니터링", "환자 데이터 분석"]
+                "features": [
+                    "진단 보조",
+                    "의료 영상 분석",
+                    "건강 모니터링",
+                    "환자 데이터 분석",
+                ],
             },
             "paymentapp": {
                 "name": "금융 AI",
                 "description": "결제 시스템, 리스크 분석, 투자 추천, 사기 탐지",
-                "features": ["결제 시스템", "리스크 분석", "투자 추천", "사기 탐지"]
+                "features": ["결제 시스템", "리스크 분석", "투자 추천", "사기 탐지"],
             },
             "education": {
                 "name": "교육 AI",
                 "description": "개인화 학습, 콘텐츠 생성, 평가 시스템",
-                "features": ["개인화 학습", "콘텐츠 생성", "평가 시스템", "학습 분석"]
+                "features": ["개인화 학습", "콘텐츠 생성", "평가 시스템", "학습 분석"],
             },
             "manufacturing": {
                 "name": "제조 AI",
                 "description": "품질 관리, 예측 유지보수, 공급망 최적화",
-                "features": ["품질 관리", "예측 유지보수", "공급망 최적화", "생산 계획"]
+                "features": [
+                    "품질 관리",
+                    "예측 유지보수",
+                    "공급망 최적화",
+                    "생산 계획",
+                ],
             },
             "mobility": {
                 "name": "모빌리티 AI",
                 "description": "자율주행, 교통 최적화, 안전 시스템",
-                "features": ["자율주행", "교통 최적화", "안전 시스템", "경로 최적화"]
+                "features": ["자율주행", "교통 최적화", "안전 시스템", "경로 최적화"],
             },
             "entertainment": {
                 "name": "엔터테인먼트 AI",
                 "description": "게임 AI, 콘텐츠 추천, 개인화 경험",
-                "features": ["게임 AI", "콘텐츠 추천", "개인화 경험", "미디어 분석"]
+                "features": ["게임 AI", "콘텐츠 추천", "개인화 경험", "미디어 분석"],
             },
             "retail": {
                 "name": "리테일 AI",
                 "description": "수요 예측, 재고 관리, 고객 분석",
-                "features": ["수요 예측", "재고 관리", "고객 분석", "가격 최적화"]
+                "features": ["수요 예측", "재고 관리", "고객 분석", "가격 최적화"],
             },
             "energy": {
                 "name": "에너지 AI",
                 "description": "스마트 그리드, 에너지 최적화, 신재생 관리",
-                "features": ["스마트 그리드", "에너지 최적화", "신재생 관리", "소비 예측"]
+                "features": [
+                    "스마트 그리드",
+                    "에너지 최적화",
+                    "신재생 관리",
+                    "소비 예측",
+                ],
             },
             "agriculture": {
                 "name": "농업 AI",
                 "description": "스마트 농업, 작물 모니터링, 수확량 예측",
-                "features": ["스마트 농업", "작물 모니터링", "수확량 예측", "토양 분석"]
+                "features": [
+                    "스마트 농업",
+                    "작물 모니터링",
+                    "수확량 예측",
+                    "토양 분석",
+                ],
             },
             "realestate": {
                 "name": "부동산 AI",
                 "description": "가격 예측, 투자 분석, 매물 추천",
-                "features": ["가격 예측", "투자 분석", "매물 추천", "시장 분석"]
+                "features": ["가격 예측", "투자 분석", "매물 추천", "시장 분석"],
             },
             "customerservice": {
                 "name": "고객서비스 AI",
                 "description": "챗봇, 감정 분석, 자동 응답 시스템",
-                "features": ["챗봇", "감정 분석", "자동 응답", "고객 분석"]
+                "features": ["챗봇", "감정 분석", "자동 응답", "고객 분석"],
             },
             "saas": {
                 "name": "SaaS AI",
                 "description": "클라우드 서비스, API 관리, 자동화 솔루션",
-                "features": ["클라우드 서비스", "API 관리", "자동화 솔루션", "시스템 최적화"]
-            }
+                "features": [
+                    "클라우드 서비스",
+                    "API 관리",
+                    "자동화 솔루션",
+                    "시스템 최적화",
+                ],
+            },
         }
-        
-        info = domain_info.get(domain, {
-            "name": "AI 도메인",
-            "description": "전문 AI 서비스",
-            "features": ["AI 분석", "데이터 처리", "예측 모델", "자동화"]
-        })
-        
-        return HTMLResponse(f"""
+
+        info = domain_info.get(
+            domain,
+            {
+                "name": "AI 도메인",
+                "description": "전문 AI 서비스",
+                "features": ["AI 분석", "데이터 처리", "예측 모델", "자동화"],
+            },
+        )
+
+        return HTMLResponse(
+            f"""
         <!DOCTYPE html>
         <html lang="ko">
         <head>
@@ -1541,7 +1570,8 @@ async def predict_simple(domain: str, text: Optional[str] = None):
             </div>
         </body>
         </html>
-        """)
+        """
+        )
 
     # 데모용은 간단한 응답만 제공
     demo_results = {

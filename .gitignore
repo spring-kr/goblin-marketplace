@@ -48,6 +48,27 @@ Thumbs.db
 # Railway
 .railway/
 
+# Backup files
+*_backup.py
+*_backup.html
+*_old.py
+*_old.html
+main_security.py
+
+# Temporary/Development files
+index_new.html
+index_updated.html
+admin-login.html
+link-dashboard.html
+temp_*.py
+test_*.py
+
+# Documentation (optional - comment out if you want to track them)
+# DEVELOPMENT_PROGRESS.md
+# ROADMAP.md
+# TECHNICAL_SPECS.md
+# VIRTUAL_LINKS.md
+
 # Temporary files
 temp/
 tmp/
