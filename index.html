@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HYOJIN.AI 쇼핑몰 - AI 도메인 & 에이전트 구독</title>
+    <title>도깨비마을장터 - AI 도메인 & 에이전트 구독</title>
     <script src="https://js.stripe.com/v3/"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -78,18 +78,236 @@
         
         .product-badge {
             position: absolute;
-            top: 15px;
-            right: 15px;
+            top: 35px; /* 할인/프리미엄 배지 아래로 이동 */
+            right: 10px;
             background: #e74c3c;
             color: white;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.8em;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.7em;
             font-weight: bold;
+            z-index: 2;
         }
         
         .product-badge.domain { background: #3498db; }
         .product-badge.agent { background: #f39c12; }
+        
+        /* 🏆 프리미엄 도메인 스타일 */
+        .product-card.premium {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 140, 0, 0.1));
+            border: 2px solid rgba(255, 215, 0, 0.5);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .product-card.premium::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            animation: premium-shine 3s infinite;
+        }
+        
+        @keyframes premium-shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            50% { transform: translateX(0%) translateY(0%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+        
+        .product-card.premium .product-title {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.4em;
+        }
+        
+        .product-card.premium .price {
+            font-size: 1.6em;
+            background: linear-gradient(45deg, #2ecc71, #27ae60);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .product-card.premium .subscribe-btn {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #000;
+            font-weight: bold;
+            text-shadow: none;
+        }
+        
+        .product-card.premium .subscribe-btn:hover {
+            background: linear-gradient(45deg, #FFA500, #FFD700);
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.5);
+        }
+        
+        /* 🎯 Coming Soon 스타일 */
+        .product-card.coming-soon {
+            opacity: 0.7;
+            position: relative;
+        }
+        
+        .product-card.coming-soon::after {
+            content: '개발예정';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        
+        .product-card.coming-soon .subscribe-btn {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+        
+        /* 🏆 프리미엄 도메인 스타일링 */
+        .product-card.premium {
+            background: linear-gradient(135deg, 
+                rgba(255, 215, 0, 0.15) 0%,
+                rgba(255, 165, 0, 0.15) 50%,
+                rgba(255, 215, 0, 0.15) 100%);
+            border: 2px solid #FFD700;
+            box-shadow: 
+                0 0 30px rgba(255, 215, 0, 0.4),
+                0 4px 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+            transform: scale(1.02);
+        }
+        
+        .product-card.premium::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 30%,
+                rgba(255, 215, 0, 0.2) 50%,
+                transparent 70%
+            );
+            animation: premiumShine 4s infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .product-card.premium .product-title {
+            color: #FFD700;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+            font-weight: bold;
+            position: relative;
+            z-index: 2;
+            margin-top: 15px; /* 프리미엄 배지와 간격 확보 */
+        }
+        
+        .product-card.premium .price {
+            color: #FFD700;
+            font-size: 1.4em;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+            font-weight: bold;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .product-card.premium .subscribe-btn {
+            background: linear-gradient(45deg, #FFD700, #FF8C00, #FFD700);
+            background-size: 200% 200%;
+            color: #000;
+            font-weight: bold;
+            text-shadow: none;
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 2;
+            animation: goldGlow 3s infinite;
+        }
+        
+        .product-card.premium .subscribe-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.7);
+            background-position: 100% 100%;
+        }
+        
+        /* 프리미엄 전용 컨텐츠 영역 패딩 */
+        .product-card.premium .product-content {
+            padding-top: 50px; /* 프리미엄은 더 큰 패딩 */
+        }
+        
+        @keyframes premiumShine {
+            0% { transform: translateX(-120%) translateY(-120%) rotate(45deg); }
+            100% { transform: translateX(120%) translateY(120%) rotate(45deg); }
+        }
+        
+        @keyframes goldGlow {
+            0%, 100% { background-position: 0% 0%; }
+            50% { background-position: 100% 100%; }
+        }
+        
+        /* 🎯 프리미엄 카드 컨텐츠 영역 조정 */
+        .product-card.premium .product-content {
+            padding-top: 45px !important; /* 프리미엄 배지 제거로 일반과 동일 */
+        }
+        
+        /* 일반 카드 컨텐츠 영역 조정 */
+        .product-card .product-content {
+            padding-top: 45px; /* 일반 배지들을 위한 공간 */
+        }
+        
+        /* 할인 배지 위치 조정 */
+        .discount-badge {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 0.6em;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(231, 76, 60, 0.4);
+            z-index: 3;
+            animation: discountPulse 2s infinite;
+        }
+        
+        /* 프리미엄 배지 위치 조정 */
+        .premium-badge {
+            position: absolute;
+            top: 3px;
+            right: 3px;
+            background: linear-gradient(45deg, #FFD700, #FF8C00);
+            color: #000;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 0.6em;
+            font-weight: bold;
+            z-index: 4; /* 가장 위에 표시 */
+            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.5);
+        }
+        
+        /* 제품 카드 내용 영역 조정 */
+        .product-card .product-content {
+            padding-top: 40px; /* 배지들을 위한 공간 확보 */
+        }
+        
+        @keyframes discountPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
         
         .product-title {
             font-size: 1.3em;
@@ -300,8 +518,7 @@
 </head>
 <body>
     <div class="header">
-        <h1>🛒 HYOJIN.AI 쇼핑몰</h1>
-        <p>12개 AI 도메인 & 15명 전문 AI 에이전트 구독 서비스</p>
+        <h1>🏮 도깨비마을장터</h1>
     </div>
 
     <div class="cart">
@@ -313,10 +530,15 @@
 
     <div class="container">
         <div class="category-tabs">
-            <div class="tab active" onclick="showCategory('all')">전체</div>
-            <div class="tab" onclick="showCategory('domains')">AI 도메인 (12개)</div>
-            <div class="tab" onclick="showCategory('agents')">AI 에이전트 (12명)</div>
-            <div class="tab" onclick="showCategory('bundles')">번들 패키지</div>
+            <div class="tab active" data-category="all" onclick="switchCategory('all', this)">🌟 전체</div>
+            <div class="tab" data-category="domains" onclick="switchCategory('domains', this)">🤖 AI 도메인</div>
+            <div class="tab" data-category="agents" onclick="switchCategory('agents', this)">👨‍💼 AI 에이전트</div>
+            <div class="tab" data-category="premium" onclick="switchCategory('premium', this)">🏆 프리미엄</div>
+        </div>
+        
+        <div class="products-grid" id="productsGrid">
+            <!-- 제품들이 JavaScript로 동적 생성됩니다 -->
+        </div>
         </div>
 
         <div id="productsContainer" class="products-grid">
@@ -404,98 +626,109 @@
     </div>
 
     <script>
-        // 상품 데이터
+        // 상품 데이터 - 프리미엄 도메인 가격 적용
         const products = {
             domains: [
+                // 🏆 프리미엄 도메인 (최고가)
+                {
+                    id: 'interdisciplinary-ai',
+                    name: '🔬 학제간 융복합 AI 도메인',
+                    description: '세계 최초 진정한 학제간 융복합 AI 시스템 - 다모달 데이터 처리, 양자 컴퓨팅 통합',
+                    features: ['다모달 데이터 처리', '학제간 패턴 분석', '도메인간 지식 융합', '자동 논문 생성', '연구 협업 엔진', '양자 컴퓨팅 통합'],
+                    price: 999,
+                    originalPrice: 199,
+                    type: 'domain',
+                    premium: true
+                },
                 {
                     id: 'medical-ai',
-                    name: '의료 AI 도메인',
-                    description: '진단, 치료, 의료 데이터 분석을 위한 전문 AI 솔루션',
-                    features: ['진단 보조 AI', '의료 영상 분석', '환자 데이터 관리', '치료 계획 수립'],
+                    name: '🏥 의료 AI 도메인',
+                    description: 'HIPAA 준수 의료진단 AI - 생명과 직결되는 critical 의료 시스템',
+                    features: ['HIPAA 준수', '의료진단 AI', '환자 데이터 분석', '치료 계획 수립', '약물 상호작용 분석', '의료영상 분석'],
+                    price: 599,
+                    originalPrice: 199,
+                    type: 'domain',
+                    premium: true
+                },
+                
+                // 🏷️ 일반 도메인 (표준가)
+                {
+                    id: 'finance-ai',
+                    name: '💰 금융 AI 도메인',
+                    description: 'SOX 준수, 투자 위험 관리, 금융 분석을 위한 AI 시스템',
+                    features: ['SOX 준수', '위험 평가', '투자 전략', '사기 탐지', '신용 평가'],
                     price: 199,
                     originalPrice: 299,
                     type: 'domain'
                 },
                 {
-                    id: 'finance-ai',
-                    name: '금융 AI 도메인',
-                    description: '투자, 위험 관리, 금융 분석을 위한 AI 시스템',
-                    features: ['투자 분석', '리스크 관리', '사기 탐지', '신용 평가'],
-                    price: 179,
-                    originalPrice: 249,
-                    type: 'domain'
-                },
-                {
-                    id: 'education-ai',
-                    name: '교육 AI 도메인',
-                    description: '개인화 학습, 교육 콘텐츠 생성, 학습 평가 AI',
-                    features: ['맞춤형 학습', '자동 채점', '콘텐츠 생성', '학습 분석'],
-                    price: 149,
-                    originalPrice: 199,
-                    type: 'domain'
-                },
-                {
-                    id: 'manufacturing-ai',
-                    name: '제조 AI 도메인',
-                    description: '품질 관리, 예측 유지보수, 생산 최적화 AI',
-                    features: ['품질 검사', '예측 유지보수', '생산 계획', '공급망 관리'],
-                    price: 229,
-                    originalPrice: 329,
-                    type: 'domain'
-                },
-                {
-                    id: 'mobility-ai',
-                    name: '모빌리티 AI 도메인',
-                    description: '자율주행, 교통 관리, 물류 최적화 AI',
-                    features: ['자율주행 알고리즘', '교통 흐름 분석', '경로 최적화', '안전 시스템'],
-                    price: 259,
-                    originalPrice: 359,
-                    type: 'domain'
-                },
-                {
-                    id: 'entertainment-ai',
-                    name: '엔터테인먼트 AI',
-                    description: '게임, 미디어, 콘텐츠 생성을 위한 AI',
-                    features: ['게임 AI', '콘텐츠 추천', '미디어 생성', '사용자 경험'],
-                    price: 139,
-                    originalPrice: 189,
-                    type: 'domain'
-                },
-                {
-                    id: 'retail-ai',
-                    name: '리테일 AI 도메인',
-                    description: '고객 분석, 재고 관리, 매출 예측 AI',
-                    features: ['고객 세분화', '재고 최적화', '매출 예측', '개인화 추천'],
-                    price: 169,
-                    originalPrice: 239,
+                    id: 'agriculture-ai',
+                    name: '🌾 농업 AI 도메인',
+                    description: '스마트 농업, 작물 모니터링, 수확량 예측 AI',
+                    features: ['작물 모니터링', '수확량 예측', '토양 분석', '병해충 탐지', '농장 관리'],
+                    price: 199,
+                    originalPrice: 279,
                     type: 'domain'
                 },
                 {
                     id: 'energy-ai',
-                    name: '에너지 AI 도메인',
-                    description: '에너지 효율, 스마트 그리드, 재생에너지 관리',
-                    features: ['에너지 최적화', '스마트 그리드', '예측 분석', '비용 절감'],
-                    price: 189,
+                    name: '⚡ 에너지 AI 도메인',
+                    description: '에너지 효율, 스마트 그리드, 예측 분석 AI',
+                    features: ['에너지 효율', '그리드 최적화', '예측 분석', '비용 절감'],
+                    price: 199,
                     originalPrice: 269,
                     type: 'domain'
                 },
                 {
-                    id: 'agriculture-ai',
-                    name: '농업 AI 도메인',
-                    description: '스마트 농업, 작물 모니터링, 수확량 예측',
-                    features: ['작물 모니터링', '병해충 탐지', '수확량 예측', '농장 관리'],
-                    price: 159,
-                    originalPrice: 219,
+                    id: 'retail-ai',
+                    name: '🛒 리테일 AI 도메인',
+                    description: '고객 분석, 재고 관리, 매출 예측 AI',
+                    features: ['재고 관리', '매출 예측', '고객 분석', 'PCI 보안 기준'],
+                    price: 199,
+                    originalPrice: 239,
                     type: 'domain'
                 },
                 {
-                    id: 'realestate-ai',
-                    name: '부동산 AI 도메인',
-                    description: '부동산 가격 예측, 투자 분석, 시장 트렌드',
-                    features: ['가격 예측', '투자 분석', '시장 트렌드', '물건 추천'],
-                    price: 179,
+                    id: 'entertainment-ai',
+                    name: '🎮 엔터테인먼트 AI',
+                    description: '게임, 미디어, 콘텐츠 생성을 위한 AI',
+                    features: ['콘텐츠 분석', '시청률 예측', '추천 시스템', '콘텐츠 등급 기준'],
+                    price: 199,
                     originalPrice: 249,
                     type: 'domain'
+                },
+                {
+                    id: 'logistics-ai',
+                    name: '🚛 물류 AI 도메인',
+                    description: '배송 최적화, 경로 계획, 실시간 추적 AI',
+                    features: ['배송 최적화', '경로 계획', '실시간 추적', '운송 안전 기준'],
+                    price: 199,
+                    originalPrice: 279,
+                    type: 'domain'
+                },
+                
+                // 🎯 특별 도메인 (개발예정)
+                {
+                    id: 'quantum-medical-ai',
+                    name: '⚛️ 양자 의료 AI 도메인',
+                    description: '미래급 양자 의료진단, 양자 약물 설계 (개발예정)',
+                    features: ['양자 의료진단', '양자 약물 설계', '양자 유전체 분석'],
+                    price: 1499,
+                    originalPrice: 1999,
+                    type: 'domain',
+                    badge: '🌟 미래급',
+                    comingSoon: true
+                },
+                {
+                    id: 'ai-fusion-research',
+                    name: '🤖 AI 융합 연구 도메인',
+                    description: '혁명급 AI-AI 융합, 메타 연구 시스템 (구상중)',
+                    features: ['AI-AI 융합', '메타 연구', '자율 연구 시스템'],
+                    price: 1999,
+                    originalPrice: 2499,
+                    type: 'domain',
+                    badge: '🔥 혁명급',
+                    comingSoon: true
                 },
                 {
                     id: 'customer-ai',
@@ -1264,7 +1497,7 @@ ${status === 'pending' ? `
 `}
 
 ---
-HYOJIN.AI 쇼핑몰
+도깨비마을장터
 🌐 https://hyojin.ai
 📧 support@hyojin.ai`;
 
@@ -1282,9 +1515,159 @@ HYOJIN.AI 쇼핑몰
             return names[method] || method;
         }
 
+        // 제품 렌더링 함수
+        function renderProducts() {
+            console.log('제품 렌더링 시작...');
+            const container = document.getElementById('productsGrid') || document.querySelector('.products-grid');
+            if (!container) {
+                console.error('제품 그리드 컨테이너를 찾을 수 없습니다.');
+                return;
+            }
+            
+            const currentCategory = document.querySelector('.tab.active')?.dataset?.category || 'all';
+            let productsToShow = [];
+            
+            if (currentCategory === 'all') {
+                productsToShow = [...products.domains, ...products.agents];
+            } else if (currentCategory === 'domains') {
+                productsToShow = [...products.domains];
+            } else if (currentCategory === 'agents') {
+                productsToShow = [...products.agents];
+            } else if (currentCategory === 'premium') {
+                // 프리미엄 도메인만 필터링
+                productsToShow = products.domains.filter(product => product.premium || product.comingSoon);
+            }
+            
+            console.log(`현재 카테고리: ${currentCategory}, 표시할 제품: ${productsToShow.length}개`);
+            
+            container.innerHTML = productsToShow.map(product => {
+                const premiumClass = product.premium ? 'premium' : '';
+                const comingSoonClass = product.comingSoon ? 'coming-soon' : '';
+                const badgeText = product.type === 'domain' ? 'Domain' : 'Agent';
+                const badgeClass = product.type === 'domain' ? 'domain' : 'agent';
+                const discount = product.originalPrice > product.price ? 
+                    Math.round((1 - product.price / product.originalPrice) * 100) : 0;
+                
+                return `
+                    <div class="product-card ${premiumClass} ${comingSoonClass}">
+                        <!-- 상단 배지들 -->
+                        ${discount > 0 ? `<div class="discount-badge">${discount}% OFF</div>` : ''}
+                        
+                        <!-- 제품 내용 -->
+                        <div class="product-content">
+                            <div class="product-badge ${badgeClass}">${badgeText}</div>
+                            <div class="product-title">${product.name}</div>
+                            <div class="product-description">${product.description}</div>
+                            <ul class="product-features">
+                                ${product.features.slice(0, 4).map(feature => `<li>${feature}</li>`).join('')}
+                                ${product.features.length > 4 ? `<li style="opacity: 0.7; font-style: italic;">+${product.features.length - 4}개 더</li>` : ''}
+                            </ul>
+                            <div class="product-price">
+                                <div>
+                                    ${product.originalPrice > product.price ? `<span class="original-price">$${product.originalPrice}</span>` : ''}
+                                    <span class="price">$${product.price}/월</span>
+                                </div>
+                            </div>
+                            <button class="subscribe-btn" 
+                                    onclick="${product.comingSoon ? 'alertComingSoon()' : `addToCart('${product.id}')`}"
+                                    ${product.comingSoon ? 'disabled' : ''}>
+                                ${product.comingSoon ? '🔄 개발예정' : (product.premium ? '👑 프리미엄 구독' : '📦 구독하기')}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            console.log('제품 렌더링 완료');
+        }
+        
+        // Coming Soon 알림
+        function alertComingSoon() {
+            alert('🚀 이 도메인은 현재 개발 중입니다.\n곧 출시될 예정이니 기대해 주세요!');
+        }
+        
+        // 쇼핑카트에 상품 추가
+        function addToCart(productId) {
+            // 모든 제품에서 찾기
+            const allProducts = [...products.domains, ...products.agents];
+            const product = allProducts.find(p => p.id === productId);
+            
+            if (!product) {
+                alert('⚠️ 제품을 찾을 수 없습니다.');
+                return;
+            }
+            
+            // 이미 카트에 있는지 확인
+            const existingItem = cart.find(item => item.id === productId);
+            if (existingItem) {
+                alert('📦 이미 카트에 추가된 상품입니다!');
+                return;
+            }
+            
+            // 카트에 추가
+            cart.push({
+                id: productId,
+                name: product.name,
+                price: product.price,
+                originalPrice: product.originalPrice || product.price,
+                type: product.type,
+                features: product.features.slice(0, 3) // 주요 기능 3개만
+            });
+            
+            // 성공 메시지
+            const cartTotal = cart.reduce((sum, item) => sum + item.price, 0);
+            const discountTotal = cart.reduce((sum, item) => sum + (item.originalPrice - item.price), 0);
+            
+            let message = `✅ "${product.name}"이(가) 카트에 추가되었습니다!\n\n`;
+            message += `📊 현재 카트: ${cart.length}개 상품\n`;
+            message += `💰 월 결제금액: $${cartTotal}\n`;
+            if (discountTotal > 0) {
+                message += `🎉 총 할인: $${discountTotal}/월\n`;
+            }
+            message += `\n🛒 결제하시려면 아래로 스크롤하세요!`;
+            
+            alert(message);
+            
+            // 카트 표시 업데이트
+            updateCartDisplay();
+            
+            console.log('카트에 추가됨:', product.name, '| 현재 카트:', cart);
+        }
+        
+        // 카트 표시 업데이트
+        function updateCartDisplay() {
+            // 카트 아이템 수 표시 (헤더에 있다면)
+            const cartCountElement = document.getElementById('cartCount');
+            if (cartCountElement) {
+                cartCountElement.textContent = cart.length;
+            }
+            
+            // 총 금액 업데이트
+            const totalElement = document.getElementById('orderTotal');
+            if (totalElement && cart.length > 0) {
+                const total = cart.reduce((sum, item) => sum + item.price, 0);
+                totalElement.textContent = `$${total}`;
+            }
+        }
+        
+        // 카테고리 탭 전환
+        function switchCategory(category, element) {
+            currentCategory = category;
+            // 모든 탭에서 active 클래스 제거
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            // 클릭된 탭에 active 클래스 추가
+            element.classList.add('active');
+            // 제품 다시 렌더링
+            renderProducts();
+        }
         // 초기 로드
-        renderProducts();
-        updateCartDisplay();
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('페이지 로드 완료, 초기화 시작...');
+            renderProducts();
+            updateCartDisplay();
+            loadAgentsFromAPI();
+            loadPaymentConfig();
+        });
     </script>
 </body>
 </html>
