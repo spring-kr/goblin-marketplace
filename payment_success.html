@@ -104,23 +104,26 @@
         
         .links-grid {
             display: grid;
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            padding: 20px 0;
         }
         
         .link-card {
-            background: #fff;
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
             border: 2px solid #e9ecef;
-            border-radius: 15px;
-            padding: 25px;
-            transition: all 0.3s ease;
+            border-radius: 20px;
+            padding: 30px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
             overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
         }
         
         .link-card:hover {
             border-color: #4CAF50;
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(76, 175, 80, 0.2);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(76, 175, 80, 0.3);
         }
         
         .link-card::before {
@@ -129,113 +132,257 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 4px;
-            background: linear-gradient(45deg, #4CAF50, #45a049);
+            height: 5px;
+            background: linear-gradient(45deg, #4CAF50, #45a049, #2196F3, #9C27B0);
+            background-size: 300% 300%;
+            animation: gradientMove 3s ease infinite;
+        }
+        
+        @keyframes gradientMove {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
         }
         
         .service-name {
-            font-size: 1.3em;
+            font-size: 1.5em;
             font-weight: bold;
-            color: #333;
-            margin-bottom: 10px;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
         .service-features {
-            margin: 15px 0;
-            font-size: 0.9em;
-            color: #666;
-        }
-        
-        .access-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-        
-        .access-btn {
-            background: linear-gradient(45deg, #2196F3, #21CBF3);
-            color: white;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 25px;
-            text-decoration: none;
-            font-size: 0.9em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-block;
-        }
-        
-        .access-btn:hover {
-            background: linear-gradient(45deg, #1976D2, #1BA8D3);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
-        }
-        
-        .demo-btn {
-            background: linear-gradient(45deg, #FF9800, #F57C00);
-            color: white;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 25px;
-            text-decoration: none;
-            font-size: 0.9em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-block;
-        }
-        
-        .demo-btn:hover {
-            background: linear-gradient(45deg, #F57C00, #E65100);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 152, 0, 0.4);
+            margin: 20px 0;
+            font-size: 0.95em;
+            color: #555;
+            line-height: 1.6;
+            background: rgba(76, 175, 80, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #4CAF50;
         }
         
         .token-display {
             background: #f8f9fa;
-            padding: 10px;
-            border-radius: 5px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 15px 0;
             font-family: 'Courier New', monospace;
-            font-size: 0.8em;
-            margin: 10px 0;
-            border: 1px solid #e9ecef;
+            font-size: 0.85em;
+            color: #495057;
             word-break: break-all;
+            position: relative;
+        }
+        
+        .token-display::before {
+            content: '🔐';
+            position: absolute;
+            top: -8px;
+            left: 10px;
+            background: white;
+            padding: 0 5px;
+            font-size: 0.9em;
+        }
+        
+        .access-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 25px;
+            justify-content: center;
+        }
+        
+        .demo-btn, .access-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-decoration: none;
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .demo-btn {
+            background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+            color: white;
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+        }
+        
+        .demo-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 30px rgba(255, 107, 107, 0.7);
+        }
+        
+        .access-btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+        
+        .access-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 30px rgba(76, 175, 80, 0.7);
+        }
+        
+        .access-btn.copy-btn {
+            background: linear-gradient(45deg, #2196F3, #1976D2);
+            box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
+        }
+        
+        .access-btn.copy-btn:hover {
+            box-shadow: 0 12px 30px rgba(33, 150, 243, 0.7);
+        }
+        
+        .access-btn.start-btn {
+            background: linear-gradient(45deg, #9C27B0, #7B1FA2);
+            box-shadow: 0 6px 20px rgba(156, 39, 176, 0.4);
+        }
+        
+        .access-btn.start-btn:hover {
+            box-shadow: 0 12px 30px rgba(156, 39, 176, 0.7);
+        }
+        
+        .demo-btn::before, .access-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+        
+        .demo-btn:hover::before, .access-btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn-ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+        }
+        
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+        
+        .service-status {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 700;
+            box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
+        }
+        
+        .validity-info {
+            background: linear-gradient(145deg, rgba(255, 193, 7, 0.1), rgba(255, 193, 7, 0.05));
+            border: 2px solid #ffc107;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 20px 0;
+            color: #856404;
+            font-size: 0.9em;
+            text-align: center;
+            font-weight: 600;
+            position: relative;
+        }
+        
+        .validity-info::before {
+            content: '⏰';
+            position: absolute;
+            top: -10px;
+            left: 15px;
+            background: white;
+            padding: 0 8px;
+            font-size: 1.2em;
         }
         
         .footer {
-            background: #333;
+            background: linear-gradient(45deg, #333, #444);
             color: white;
-            padding: 30px;
+            padding: 40px;
             text-align: center;
         }
         
         .footer h3 {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            font-size: 1.5em;
         }
         
         .support-info {
-            font-size: 0.9em;
-            opacity: 0.8;
+            font-size: 1em;
+            opacity: 0.9;
+            line-height: 1.6;
         }
         
         .loading {
             text-align: center;
-            padding: 40px;
+            padding: 60px;
         }
         
         .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #4CAF50;
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #4CAF50;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 60px;
+            height: 60px;
             animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
+            margin: 0 auto 30px;
         }
         
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+        
+        .button-icon {
+            font-size: 1.1em;
+        }
+        
+        @media (max-width: 768px) {
+            .success-container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .links-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .access-buttons {
+                flex-direction: column;
+            }
+            
+            .demo-btn, .access-btn {
+                min-width: 100%;
+            }
         }
     </style>
 </head>
@@ -354,22 +501,33 @@
                 linkCard.className = 'link-card';
                 
                 linkCard.innerHTML = `
-                    <div class="service-name">🤖 ${link.service_name}</div>
+                    <div class="service-status">활성</div>
+                    <div class="service-name">
+                        <span class="button-icon">🤖</span>
+                        ${link.service_name}
+                    </div>
                     <div class="service-features">
-                        ${link.features.map(feature => `✨ ${feature}`).join('<br>')}
+                        ${link.features.map(feature => `<div>✨ ${feature}</div>`).join('')}
                     </div>
                     <div class="token-display">
-                        🔐 접속 토큰: ${link.access_token}
+                        접속 토큰: ${link.access_token}
+                    </div>
+                    <div class="validity-info">
+                        <span class="button-icon">⏰</span>
+                        토큰 유효기간: ${new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('ko-KR')}까지
                     </div>
                     <div class="access-buttons">
-                        <a href="${link.demo_url}" target="_blank" class="demo-btn">
-                            🎬 데모 체험
+                        <a href="${link.demo_url}" target="_blank" class="demo-btn" onclick="addRippleEffect(event)">
+                            <span class="button-icon">🎬</span>
+                            데모 체험
                         </a>
-                        <button class="access-btn" onclick="copyToken('${link.access_token}')">
-                            📋 토큰 복사
+                        <button class="access-btn copy-btn" onclick="copyToken('${link.access_token}'); addRippleEffect(event)">
+                            <span class="button-icon">📋</span>
+                            토큰 복사
                         </button>
-                        <button class="access-btn" onclick="openService('${link.service_id}', '${link.access_token}')">
-                            🚀 서비스 시작
+                        <button class="access-btn start-btn" onclick="openService('${link.service_id}', '${link.access_token}'); addRippleEffect(event)">
+                            <span class="button-icon">🚀</span>
+                            서비스 시작
                         </button>
                     </div>
                 `;
@@ -387,9 +545,14 @@
             
             loading.style.display = 'none';
             container.innerHTML = `
-                <div style="text-align: center; padding: 40px; color: #666;">
-                    <h3>서비스 링크가 아직 생성되지 않았습니다</h3>
-                    <p>잠시 후 다시 확인해주세요</p>
+                <div style="text-align: center; padding: 60px; color: #666; background: white; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                    <div style="font-size: 3em; margin-bottom: 20px;">⏳</div>
+                    <h3 style="margin-bottom: 15px; color: #333;">서비스 링크가 아직 생성되지 않았습니다</h3>
+                    <p style="margin-bottom: 20px;">잠시 후 다시 확인해주세요</p>
+                    <button onclick="loadServiceLinks(); addRippleEffect(event)" 
+                            style="padding: 12px 24px; background: linear-gradient(45deg, #4CAF50, #45a049); color: white; border: none; border-radius: 25px; cursor: pointer; font-weight: 600;">
+                        🔄 새로고침
+                    </button>
                 </div>
             `;
             container.style.display = 'block';
@@ -401,12 +564,18 @@
             
             loading.style.display = 'none';
             container.innerHTML = `
-                <div style="text-align: center; padding: 40px; color: #f44336;">
-                    <h3>서비스 링크 로드 중 오류가 발생했습니다</h3>
-                    <p>고객지원팀으로 문의해주세요</p>
-                    <button onclick="loadServiceLinks()" style="margin-top: 20px; padding: 10px 20px; background: #2196F3; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                        다시 시도
+                <div style="text-align: center; padding: 60px; color: #f44336; background: white; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                    <div style="font-size: 3em; margin-bottom: 20px;">❌</div>
+                    <h3 style="margin-bottom: 15px; color: #333;">서비스 링크 로드 중 오류가 발생했습니다</h3>
+                    <p style="margin-bottom: 20px; color: #666;">고객지원팀으로 문의해주세요</p>
+                    <button onclick="loadServiceLinks(); addRippleEffect(event)" 
+                            style="padding: 12px 24px; background: linear-gradient(45deg, #2196F3, #1976D2); color: white; border: none; border-radius: 25px; cursor: pointer; font-weight: 600; margin-right: 10px;">
+                        🔄 다시 시도
                     </button>
+                    <a href="mailto:support@hyojin.ai" 
+                       style="padding: 12px 24px; background: linear-gradient(45deg, #FF6B6B, #FF8E53); color: white; text-decoration: none; border-radius: 25px; font-weight: 600;">
+                        📧 고객지원
+                    </a>
                 </div>
             `;
             container.style.display = 'block';
@@ -414,16 +583,116 @@
         
         function copyToken(token) {
             navigator.clipboard.writeText(token).then(() => {
-                alert('✅ 토큰이 클립보드에 복사되었습니다!');
+                showNotification('✅ 토큰이 클립보드에 복사되었습니다!', 'success');
             }).catch(() => {
-                alert('❌ 토큰 복사에 실패했습니다. 수동으로 복사해주세요.');
+                showNotification('❌ 토큰 복사에 실패했습니다. 수동으로 복사해주세요.', 'error');
             });
         }
         
         function openService(serviceId, token) {
-            const serviceUrl = `/access/${serviceId}?token=${token}`;
+            // 새 탭에서 서비스 열기
+            const serviceUrl = `https://service.hyojin.ai/${serviceId}?token=${token}`;
             window.open(serviceUrl, '_blank');
+            showNotification('🚀 서비스가 새 탭에서 열렸습니다!', 'info');
         }
+        
+        function addRippleEffect(event) {
+            const button = event.currentTarget;
+            const rect = button.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = event.clientX - rect.left - size / 2;
+            const y = event.clientY - rect.top - size / 2;
+            
+            const ripple = document.createElement('span');
+            ripple.className = 'btn-ripple';
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            
+            button.appendChild(ripple);
+            
+            setTimeout(() => {
+                if (ripple.parentNode) {
+                    ripple.parentNode.removeChild(ripple);
+                }
+            }, 600);
+        }
+        
+        function showNotification(message, type = 'info') {
+            // 기존 알림 제거
+            const existingNotification = document.querySelector('.notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+            
+            // 새 알림 생성
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            
+            // 타입별 스타일
+            const colors = {
+                'success': '#4CAF50',
+                'error': '#f44336',
+                'info': '#2196F3',
+                'warning': '#ff9800'
+            };
+            
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${colors[type] || colors.info};
+                color: white;
+                padding: 15px 25px;
+                border-radius: 25px;
+                font-weight: 600;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                z-index: 1000;
+                animation: slideInNotification 0.3s ease-out;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // 3초 후 자동 제거
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.style.animation = 'slideOutNotification 0.3s ease-in';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.remove();
+                        }
+                    }, 300);
+                }
+            }, 3000);
+        }
+        
+        // 알림 애니메이션 CSS 추가
+        const notificationStyles = document.createElement('style');
+        notificationStyles.textContent = `
+            @keyframes slideInNotification {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            
+            @keyframes slideOutNotification {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(notificationStyles);
     </script>
 </body>
 </html>
