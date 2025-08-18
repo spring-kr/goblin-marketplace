@@ -20,12 +20,21 @@ import hashlib
 import secrets
 import re
 from pathlib import Path
+import sqlite3
+import asyncio
 
 # 결제 서비스 임포트
-from payment_service import (
-    PaymentProcessor, PaymentRequest, CustomerData, PaymentItem,
-    payment_processor, email_service
+from payment_service_simple import (
+    PaymentProcessor,
+    PaymentRequest,
+    CustomerData,
+    PaymentItem,
+    payment_processor,
+    email_service,
 )
+
+# 가상 서비스 매니저 임포트
+from virtual_service_manager import virtual_service_manager
 
 # FastAPI 앱 생성
 app = FastAPI(
@@ -87,6 +96,138 @@ def log_security_event(event_type: str, user_id: str, details: Dict[str, Any]):
 def get_client_ip(request: Request) -> str:
     """클라이언트 IP 주소 가져오기"""
     return getattr(request.client, "host", "unknown") if request.client else "unknown"
+
+
+# 🔥 결제 관리 데이터베이스 함수들
+async def save_payment_to_manager_db(
+    payment_request: PaymentRequest, result: Dict[str, Any]
+):
+    """결제 정보를 관리용 데이터베이스에 저장"""
+    try:
+
+        def save_to_db():
+            conn = sqlite3.connect("hyojin_payments.db")
+            cursor = conn.cursor()
+
+            # 결제 테이블 생성 (존재하지 않는 경우)
+            cursor.execute(
+                """
+                CREATE TABLE IF NOT EXISTS payments (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    subscription_id TEXT UNIQUE NOT NULL,
+                    customer_name TEXT NOT NULL,
+                    customer_email TEXT NOT NULL,
+                    customer_company TEXT,
+                    payment_method TEXT NOT NULL,
+                    total_amount REAL NOT NULL,
+                    status TEXT NOT NULL,
+                    items TEXT NOT NULL,
+                    created_at TIMESTAMP NOT NULL,
+                    updated_at TIMESTAMP NOT NULL,
+                    notes TEXT
+                )
+            """
+            )
+
+            now = datetime.datetime.now().isoformat()
+            items_json = json.dumps([item.dict() for item in payment_request.items])
+
+            cursor.execute(
+                """
+                INSERT INTO payments 
+                (subscription_id, customer_name, customer_email, customer_company, 
+                 payment_method, total_amount, status, items, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+                (
+                    result["subscription_id"],
+                    payment_request.customer.name,
+                    payment_request.customer.email,
+                    payment_request.customer.company or "",
+                    payment_request.customer.paymentMethod,
+                    result["amount"] / 100,  # cents to dollars
+                    result["status"],
+                    items_json,
+                    now,
+                    now,
+                ),
+            )
+
+            conn.commit()
+            conn.close()
+
+        # 비동기로 실행
+        await asyncio.get_event_loop().run_in_executor(None, save_to_db)
+        print(f"💾 결제 데이터 저장 완료: {result['subscription_id']}")
+
+    except Exception as e:
+        print(f"❌ 결제 데이터 저장 실패: {e}")
+
+
+async def save_bank_transfer_to_manager_db(
+    customer: CustomerData, items: List[PaymentItem], result: Dict[str, Any]
+):
+    """계좌이체 정보를 관리용 데이터베이스에 저장"""
+    try:
+
+        def save_to_db():
+            conn = sqlite3.connect("hyojin_payments.db")
+            cursor = conn.cursor()
+
+            # 결제 테이블 생성 (존재하지 않는 경우)
+            cursor.execute(
+                """
+                CREATE TABLE IF NOT EXISTS payments (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    subscription_id TEXT UNIQUE NOT NULL,
+                    customer_name TEXT NOT NULL,
+                    customer_email TEXT NOT NULL,
+                    customer_company TEXT,
+                    payment_method TEXT NOT NULL,
+                    total_amount REAL NOT NULL,
+                    status TEXT NOT NULL,
+                    items TEXT NOT NULL,
+                    created_at TIMESTAMP NOT NULL,
+                    updated_at TIMESTAMP NOT NULL,
+                    notes TEXT
+                )
+            """
+            )
+
+            now = datetime.datetime.now().isoformat()
+            items_json = json.dumps([item.dict() for item in items])
+            total_amount = sum(item.price for item in items)
+
+            cursor.execute(
+                """
+                INSERT INTO payments 
+                (subscription_id, customer_name, customer_email, customer_company, 
+                 payment_method, total_amount, status, items, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+                (
+                    result["subscription_id"],
+                    customer.name,
+                    customer.email,
+                    customer.company or "",
+                    "bank",
+                    total_amount,
+                    result["status"],
+                    items_json,
+                    now,
+                    now,
+                ),
+            )
+
+            conn.commit()
+            conn.close()
+
+        # 비동기로 실행
+        await asyncio.get_event_loop().run_in_executor(None, save_to_db)
+        print(f"💾 계좌이체 데이터 저장 완료: {result['subscription_id']}")
+
+    except Exception as e:
+        print(f"❌ 계좌이체 데이터 저장 실패: {e}")
 
 
 # CORS 설정 (보안 강화)
@@ -3395,16 +3536,20 @@ async def process_payment(payment_request: PaymentRequest):
         # 입력 데이터 살균
         payment_request.customer.name = sanitize_input(payment_request.customer.name)
         payment_request.customer.email = sanitize_input(payment_request.customer.email)
-        payment_request.customer.company = sanitize_input(payment_request.customer.company)
-        
+        payment_request.customer.company = sanitize_input(
+            payment_request.customer.company
+        )
+
         # 결제 방법에 따른 처리
         if payment_request.customer.paymentMethod == "card":
             result = await payment_processor.process_card_payment(payment_request)
         elif payment_request.customer.paymentMethod == "paypal":
             result = await payment_processor.process_paypal_payment(payment_request)
         else:
-            raise HTTPException(status_code=400, detail="지원하지 않는 결제 방법입니다.")
-        
+            raise HTTPException(
+                status_code=400, detail="지원하지 않는 결제 방법입니다."
+            )
+
         # 성공시 확인 이메일 발송
         if result["success"]:
             subscription_data = {
@@ -3415,15 +3560,30 @@ async def process_payment(payment_request: PaymentRequest):
                 "total_amount": result["amount"],
                 "payment_method": payment_request.customer.paymentMethod,
                 "created_at": datetime.datetime.now().isoformat(),
-                "next_billing_date": (datetime.datetime.now() + datetime.timedelta(days=30)).isoformat()
+                "next_billing_date": (
+                    datetime.datetime.now() + datetime.timedelta(days=30)
+                ).isoformat(),
             }
-            
+
             await email_service.send_subscription_confirmation(subscription_data)
-        
+
+        # 🔥 결제 관리 앱에 데이터 저장
+        if result["success"]:
+            await save_payment_to_manager_db(payment_request, result)
+
+        # 📧 가상 링크가 있다면 클라이언트에게 전달
+        if result.get("service_links"):
+            # 성공 페이지로 리다이렉트할 URL 생성
+            redirect_url = f"/payment_success.html?subscription_id={result['subscription_id']}&amount={result['amount']}&method={payment_request.customer.paymentMethod}&status={result['status']}"
+            result["redirect_url"] = redirect_url
+            result["links_count"] = len(result["service_links"])
+
         return result
-        
+
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"결제 처리 중 오류가 발생했습니다: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"결제 처리 중 오류가 발생했습니다: {str(e)}"
+        )
 
 
 @app.post("/api/bank-transfer")
@@ -3434,9 +3594,13 @@ async def bank_transfer_request(customer: CustomerData, items: List[PaymentItem]
         customer.name = sanitize_input(customer.name)
         customer.email = sanitize_input(customer.email)
         customer.company = sanitize_input(customer.company)
-        
+
         result = await payment_processor.process_bank_transfer(customer, items)
-        
+
+        # 🔥 결제 관리 앱에 데이터 저장 (계좌이체)
+        if result["success"]:
+            await save_bank_transfer_to_manager_db(customer, items, result)
+
         # 계좌이체 신청 확인 이메일 발송
         if result["success"]:
             subscription_data = {
@@ -3447,15 +3611,182 @@ async def bank_transfer_request(customer: CustomerData, items: List[PaymentItem]
                 "total_amount": result["amount"],
                 "payment_method": "bank",
                 "created_at": datetime.datetime.now().isoformat(),
-                "bank_info": result["bank_info"]
+                "bank_info": result["bank_info"],
             }
-            
+
             await email_service.send_subscription_confirmation(subscription_data)
-        
+
         return result
-        
+
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"계좌이체 신청 중 오류가 발생했습니다: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"계좌이체 신청 중 오류가 발생했습니다: {str(e)}"
+        )
+
+
+# 🔥 결제 관리 앱용 API 엔드포인트들
+
+
+# 상태 업데이트 요청 모델
+class PaymentStatusUpdate(BaseModel):
+    status: str
+    notes: str = ""
+
+
+@app.get("/api/manager/payments")
+async def get_all_payments():
+    """모든 결제 내역 조회 (관리용)"""
+    try:
+
+        def get_payments():
+            conn = sqlite3.connect("hyojin_payments.db")
+            cursor = conn.cursor()
+
+            cursor.execute(
+                """
+                SELECT * FROM payments ORDER BY created_at DESC
+            """
+            )
+
+            payments = []
+            for row in cursor.fetchall():
+                payment = {
+                    "id": row[0],
+                    "subscription_id": row[1],
+                    "customer_name": row[2],
+                    "customer_email": row[3],
+                    "customer_company": row[4],
+                    "payment_method": row[5],
+                    "total_amount": row[6],
+                    "status": row[7],
+                    "items": json.loads(row[8]),
+                    "created_at": row[9],
+                    "updated_at": row[10],
+                    "notes": row[11] or "",
+                }
+                payments.append(payment)
+
+            conn.close()
+            return payments
+
+        payments = await asyncio.get_event_loop().run_in_executor(None, get_payments)
+        return {"success": True, "data": payments}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"결제 내역 조회 실패: {str(e)}")
+
+
+@app.put("/api/manager/payments/{payment_id}/status")
+async def update_payment_status(payment_id: int, update_data: PaymentStatusUpdate):
+    """결제 상태 업데이트 (관리용)"""
+    try:
+
+        def update_status():
+            conn = sqlite3.connect("hyojin_payments.db")
+            cursor = conn.cursor()
+
+            now = datetime.datetime.now().isoformat()
+
+            cursor.execute(
+                """
+                UPDATE payments 
+                SET status = ?, notes = ?, updated_at = ?
+                WHERE id = ?
+            """,
+                (update_data.status, update_data.notes, now, payment_id),
+            )
+
+            rows_affected = cursor.rowcount
+            conn.commit()
+            conn.close()
+            return rows_affected > 0
+
+        success = await asyncio.get_event_loop().run_in_executor(None, update_status)
+
+        if success:
+            return {"success": True, "message": "상태가 업데이트되었습니다."}
+        else:
+            raise HTTPException(status_code=404, detail="결제 내역을 찾을 수 없습니다.")
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"상태 업데이트 실패: {str(e)}")
+
+
+@app.get("/api/manager/statistics")
+async def get_payment_statistics():
+    """결제 통계 조회 (관리용)"""
+    try:
+
+        def get_stats():
+            conn = sqlite3.connect("hyojin_payments.db")
+            cursor = conn.cursor()
+
+            # 전체 통계
+            cursor.execute("SELECT COUNT(*), SUM(total_amount) FROM payments")
+            total_count, total_revenue = cursor.fetchone()
+
+            # 상태별 통계
+            cursor.execute(
+                """
+                SELECT status, COUNT(*), SUM(total_amount) 
+                FROM payments 
+                GROUP BY status
+            """
+            )
+            status_stats = cursor.fetchall()
+
+            # 결제 방법별 통계
+            cursor.execute(
+                """
+                SELECT payment_method, COUNT(*), SUM(total_amount) 
+                FROM payments 
+                GROUP BY payment_method
+            """
+            )
+            method_stats = cursor.fetchall()
+
+            # 월별 통계
+            cursor.execute(
+                """
+                SELECT strftime('%Y-%m', created_at) as month, 
+                       COUNT(*), SUM(total_amount) 
+                FROM payments 
+                GROUP BY month 
+                ORDER BY month DESC
+            """
+            )
+            monthly_stats = cursor.fetchall()
+
+            conn.close()
+
+            return {
+                "total_orders": total_count or 0,
+                "total_revenue": total_revenue or 0,
+                "status_breakdown": {
+                    row[0]: {"count": row[1], "revenue": row[2]} for row in status_stats
+                },
+                "method_breakdown": {
+                    row[0]: {"count": row[1], "revenue": row[2]} for row in method_stats
+                },
+                "monthly_breakdown": {
+                    row[0]: {"count": row[1], "revenue": row[2]}
+                    for row in monthly_stats
+                },
+            }
+
+        stats = await asyncio.get_event_loop().run_in_executor(None, get_stats)
+        return {"success": True, "data": stats}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"통계 조회 실패: {str(e)}")
+
+
+# 🔥 결제 관리 웹 대시보드
+@app.get("/admin/payments", response_class=HTMLResponse)
+async def payment_admin_dashboard():
+    """결제 관리자 대시보드"""
+    with open("payment_admin_dashboard.html", "r", encoding="utf-8") as f:
+        return HTMLResponse(content=f.read())
 
 
 @app.get("/api/subscription/{subscription_id}")
@@ -3463,11 +3794,13 @@ async def get_subscription_status(subscription_id: str):
     """구독 상태 조회 API"""
     try:
         # 구독 데이터 조회 (실제로는 데이터베이스에서)
-        subscription = payment_processor.subscription_service.subscriptions_db.get(subscription_id)
-        
+        subscription = payment_processor.subscription_service.subscriptions_db.get(
+            subscription_id
+        )
+
         if not subscription:
             raise HTTPException(status_code=404, detail="구독을 찾을 수 없습니다.")
-        
+
         return {
             "subscription_id": subscription["id"],
             "status": subscription["status"],
@@ -3475,11 +3808,13 @@ async def get_subscription_status(subscription_id: str):
             "items": subscription["items"],
             "total_amount": subscription["total_amount"],
             "next_billing_date": subscription["next_billing_date"],
-            "created_at": subscription["created_at"]
+            "created_at": subscription["created_at"],
         }
-        
+
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"구독 조회 중 오류가 발생했습니다: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"구독 조회 중 오류가 발생했습니다: {str(e)}"
+        )
 
 
 @app.post("/api/webhook/stripe")
@@ -3487,13 +3822,13 @@ async def stripe_webhook(request: Request):
     """Stripe 웹훅 처리"""
     try:
         payload = await request.body()
-        sig_header = request.headers.get('stripe-signature')
-        
+        sig_header = request.headers.get("stripe-signature")
+
         # Stripe 웹훅 검증 및 처리
         # 실제 구현시 Stripe webhook secret 필요
-        
+
         return {"received": True}
-        
+
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"웹훅 처리 실패: {str(e)}")
 
@@ -3502,15 +3837,185 @@ async def stripe_webhook(request: Request):
 async def get_payment_config():
     """결제 설정 정보 API"""
     return {
-        "stripe_publishable_key": os.getenv('STRIPE_PUBLISHABLE_KEY', 'pk_test_demo'),
+        "stripe_publishable_key": os.getenv("STRIPE_PUBLISHABLE_KEY", "pk_test_demo"),
         "supported_payment_methods": ["card", "paypal", "bank"],
         "currencies": ["USD"],
         "bank_info": {
             "bank_name": "국민은행",
-            "account_number": "123-456-789012", 
-            "account_holder": "HYOJIN.AI"
-        }
+            "account_number": "123-456-789012",
+            "account_holder": "HYOJIN.AI",
+        },
     }
+
+
+# 🔗 ==================== 가상 서비스 링크 API ====================
+
+
+@app.get("/api/service-links/{subscription_id}")
+async def get_service_links(subscription_id: str):
+    """구독 ID로 서비스 링크 조회"""
+    try:
+        links = virtual_service_manager.get_service_links_by_subscription(
+            subscription_id
+        )
+        return {
+            "success": True,
+            "subscription_id": subscription_id,
+            "links": links,
+            "total": len(links),
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.get("/api/verify-token/{token}")
+async def verify_service_token(token: str):
+    """서비스 접속 토큰 검증"""
+    try:
+        verification = virtual_service_manager.verify_access_token(token)
+        return verification
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.get("/demo/{service_id}")
+async def service_demo_page(service_id: str, token: Optional[str] = None):
+    """가상 서비스 데모 페이지"""
+    try:
+        # 토큰 검증 (선택사항)
+        if token:
+            verification = virtual_service_manager.verify_access_token(token)
+            if not verification.get("valid"):
+                raise HTTPException(status_code=403, detail="유효하지 않은 토큰입니다.")
+
+        # 데모 페이지 HTML 파일 반환
+        demo_file = Path("demo/service_demo.html")
+        if demo_file.exists():
+            return FileResponse("demo/service_demo.html")
+        else:
+            raise HTTPException(
+                status_code=404, detail="데모 페이지를 찾을 수 없습니다."
+            )
+
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.get("/access/{service_id}")
+async def service_access_page(service_id: str, token: str):
+    """실제 서비스 접속 페이지 (토큰 필수)"""
+    try:
+        # 토큰 검증
+        verification = virtual_service_manager.verify_access_token(token)
+        if not verification.get("valid"):
+            raise HTTPException(status_code=403, detail="유효하지 않은 토큰입니다.")
+
+        # 서비스별 전용 인터페이스로 리다이렉트
+        service_info = verification
+
+        return HTMLResponse(
+            f"""
+        <!DOCTYPE html>
+        <html lang="ko">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>{service_info['service_name']} - HYOJIN.AI</title>
+            <style>
+                body {{
+                    font-family: Arial, sans-serif;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    margin: 0;
+                    padding: 20px;
+                    min-height: 100vh;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }}
+                .access-container {{
+                    background: white;
+                    padding: 40px;
+                    border-radius: 20px;
+                    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+                    text-align: center;
+                    max-width: 600px;
+                }}
+                .service-icon {{
+                    font-size: 4em;
+                    margin-bottom: 20px;
+                }}
+                .service-title {{
+                    color: #333;
+                    margin-bottom: 20px;
+                    font-size: 2em;
+                }}
+                .access-info {{
+                    background: #e3f2fd;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 20px 0;
+                }}
+                .features-list {{
+                    text-align: left;
+                    margin: 20px 0;
+                }}
+                .feature-item {{
+                    padding: 10px 0;
+                    border-bottom: 1px solid #eee;
+                }}
+                .access-btn {{
+                    background: linear-gradient(45deg, #4CAF50, #45a049);
+                    color: white;
+                    padding: 15px 30px;
+                    border: none;
+                    border-radius: 25px;
+                    font-size: 1.2em;
+                    cursor: pointer;
+                    margin: 10px;
+                    transition: all 0.3s ease;
+                }}
+                .access-btn:hover {{
+                    transform: translateY(-2px);
+                    box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="access-container">
+                <div class="service-icon">🤖</div>
+                <h1 class="service-title">{service_info['service_name']}</h1>
+                
+                <div class="access-info">
+                    <h3>✅ 인증 완료</h3>
+                    <p>토큰: <code>{token[:20]}...</code></p>
+                    <p>만료일: {service_info['expires_at'][:10]}</p>
+                </div>
+                
+                <div class="features-list">
+                    <h3>🎯 이용 가능한 기능:</h3>
+                    {''.join([f'<div class="feature-item">✨ {feature}</div>' for feature in service_info['features']])}
+                </div>
+                
+                <button class="access-btn" onclick="startService()">🚀 서비스 시작</button>
+                <button class="access-btn" onclick="viewDemo()">🎬 데모 보기</button>
+            </div>
+            
+            <script>
+                function startService() {{
+                    alert('🚀 {service_info["service_name"]} 서비스를 시작합니다!\\n\\n실제 환경에서는 AI 서비스 인터페이스로 이동됩니다.');
+                }}
+                
+                function viewDemo() {{
+                    window.open('/demo/{service_id}?token={token}', '_blank');
+                }}
+            </script>
+        </body>
+        </html>
+        """
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 if __name__ == "__main__":

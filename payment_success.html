@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>결제 완료 - HYOJIN.AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .success-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            animation: slideUp 0.5s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .header {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .check-icon {
+            font-size: 3em;
+            margin-bottom: 20px;
+            animation: bounce 1s ease infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+        
+        .payment-info {
+            padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding: 10px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .info-value {
+            color: #666;
+        }
+        
+        .service-links {
+            padding: 30px;
+        }
+        
+        .service-links h2 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .links-grid {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .link-card {
+            background: #fff;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .link-card:hover {
+            border-color: #4CAF50;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(76, 175, 80, 0.2);
+        }
+        
+        .link-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+        }
+        
+        .service-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .service-features {
+            margin: 15px 0;
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        .access-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .access-btn {
+            background: linear-gradient(45deg, #2196F3, #21CBF3);
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+        
+        .access-btn:hover {
+            background: linear-gradient(45deg, #1976D2, #1BA8D3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
+        }
+        
+        .demo-btn {
+            background: linear-gradient(45deg, #FF9800, #F57C00);
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+        
+        .demo-btn:hover {
+            background: linear-gradient(45deg, #F57C00, #E65100);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 152, 0, 0.4);
+        }
+        
+        .token-display {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8em;
+            margin: 10px 0;
+            border: 1px solid #e9ecef;
+            word-break: break-all;
+        }
+        
+        .footer {
+            background: #333;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .footer h3 {
+            margin-bottom: 15px;
+        }
+        
+        .support-info {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4CAF50;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="success-container">
+        <div class="header">
+            <div class="check-icon">✅</div>
+            <h1>결제가 완료되었습니다!</h1>
+            <p>HYOJIN.AI 서비스를 이용해 주셔서 감사합니다</p>
+        </div>
+        
+        <div class="payment-info">
+            <h2>결제 정보</h2>
+            <div class="info-row">
+                <span class="info-label">구독 ID:</span>
+                <span class="info-value" id="subscriptionId">로딩 중...</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">결제 금액:</span>
+                <span class="info-value" id="paymentAmount">로딩 중...</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">결제 방법:</span>
+                <span class="info-value" id="paymentMethod">로딩 중...</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">결제 일시:</span>
+                <span class="info-value" id="paymentDate">로딩 중...</span>
+            </div>
+        </div>
+        
+        <div class="service-links">
+            <h2>🚀 이용 가능한 서비스</h2>
+            <div id="linksLoading" class="loading">
+                <div class="spinner"></div>
+                <p>서비스 링크를 생성하고 있습니다...</p>
+            </div>
+            <div id="linksContainer" class="links-grid" style="display: none;">
+                <!-- 서비스 링크들이 동적으로 추가됩니다 -->
+            </div>
+        </div>
+        
+        <div class="footer">
+            <h3>🎉 서비스 이용을 시작하세요!</h3>
+            <div class="support-info">
+                <p>문의사항이 있으시면 언제든지 고객지원팀으로 연락주세요</p>
+                <p>📧 support@hyojin.ai | 📞 1588-1234</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // URL 파라미터에서 결제 정보 추출
+        const urlParams = new URLSearchParams(window.location.search);
+        const paymentData = {
+            subscriptionId: urlParams.get('subscription_id') || 'N/A',
+            amount: urlParams.get('amount') || '0',
+            method: urlParams.get('method') || 'Unknown',
+            status: urlParams.get('status') || 'completed'
+        };
+        
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            displayPaymentInfo();
+            loadServiceLinks();
+        });
+        
+        function displayPaymentInfo() {
+            document.getElementById('subscriptionId').textContent = paymentData.subscriptionId;
+            document.getElementById('paymentAmount').textContent = `$${(parseInt(paymentData.amount) / 100).toFixed(2)}`;
+            document.getElementById('paymentMethod').textContent = getPaymentMethodName(paymentData.method);
+            document.getElementById('paymentDate').textContent = new Date().toLocaleString('ko-KR');
+        }
+        
+        function getPaymentMethodName(method) {
+            const methodNames = {
+                'card': '신용카드',
+                'paypal': 'PayPal',
+                'bank': '계좌이체'
+            };
+            return methodNames[method] || method;
+        }
+        
+        async function loadServiceLinks() {
+            try {
+                if (!paymentData.subscriptionId || paymentData.subscriptionId === 'N/A') {
+                    throw new Error('구독 ID가 없습니다');
+                }
+                
+                const response = await fetch(`/api/service-links/${paymentData.subscriptionId}`);
+                const data = await response.json();
+                
+                if (data.success && data.links.length > 0) {
+                    displayServiceLinks(data.links);
+                } else {
+                    showNoLinksMessage();
+                }
+            } catch (error) {
+                console.error('서비스 링크 로드 실패:', error);
+                showErrorMessage();
+            }
+        }
+        
+        function displayServiceLinks(links) {
+            const container = document.getElementById('linksContainer');
+            const loading = document.getElementById('linksLoading');
+            
+            // 로딩 숨기기
+            loading.style.display = 'none';
+            
+            // 링크 카드들 생성
+            container.innerHTML = '';
+            
+            links.forEach(link => {
+                const linkCard = document.createElement('div');
+                linkCard.className = 'link-card';
+                
+                linkCard.innerHTML = `
+                    <div class="service-name">🤖 ${link.service_name}</div>
+                    <div class="service-features">
+                        ${link.features.map(feature => `✨ ${feature}`).join('<br>')}
+                    </div>
+                    <div class="token-display">
+                        🔐 접속 토큰: ${link.access_token}
+                    </div>
+                    <div class="access-buttons">
+                        <a href="${link.demo_url}" target="_blank" class="demo-btn">
+                            🎬 데모 체험
+                        </a>
+                        <button class="access-btn" onclick="copyToken('${link.access_token}')">
+                            📋 토큰 복사
+                        </button>
+                        <button class="access-btn" onclick="openService('${link.service_id}', '${link.access_token}')">
+                            🚀 서비스 시작
+                        </button>
+                    </div>
+                `;
+                
+                container.appendChild(linkCard);
+            });
+            
+            // 컨테이너 보이기
+            container.style.display = 'grid';
+        }
+        
+        function showNoLinksMessage() {
+            const container = document.getElementById('linksContainer');
+            const loading = document.getElementById('linksLoading');
+            
+            loading.style.display = 'none';
+            container.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #666;">
+                    <h3>서비스 링크가 아직 생성되지 않았습니다</h3>
+                    <p>잠시 후 다시 확인해주세요</p>
+                </div>
+            `;
+            container.style.display = 'block';
+        }
+        
+        function showErrorMessage() {
+            const container = document.getElementById('linksContainer');
+            const loading = document.getElementById('linksLoading');
+            
+            loading.style.display = 'none';
+            container.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #f44336;">
+                    <h3>서비스 링크 로드 중 오류가 발생했습니다</h3>
+                    <p>고객지원팀으로 문의해주세요</p>
+                    <button onclick="loadServiceLinks()" style="margin-top: 20px; padding: 10px 20px; background: #2196F3; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        다시 시도
+                    </button>
+                </div>
+            `;
+            container.style.display = 'block';
+        }
+        
+        function copyToken(token) {
+            navigator.clipboard.writeText(token).then(() => {
+                alert('✅ 토큰이 클립보드에 복사되었습니다!');
+            }).catch(() => {
+                alert('❌ 토큰 복사에 실패했습니다. 수동으로 복사해주세요.');
+            });
+        }
+        
+        function openService(serviceId, token) {
+            const serviceUrl = `/access/${serviceId}?token=${token}`;
+            window.open(serviceUrl, '_blank');
+        }
+    </script>
+</body>
+</html>

@@ -979,7 +979,7 @@
                 }
                 
                 const result = await response.json();
-                showSuccess(orderData, result.subscription_id, result.status);
+                showSuccess(orderData, result.subscription_id, result.status, result);
                 
             } catch (error) {
                 // 실제 API 호출 실패시 데모 모드로 폴백
@@ -1020,7 +1020,7 @@
                 }
                 
                 const result = await response.json();
-                showSuccess(orderData, result.subscription_id, result.status);
+                showSuccess(orderData, result.subscription_id, result.status, result);
                 
             } catch (error) {
                 console.warn('PayPal 결제 실패, 데모 모드로 전환:', error.message);
@@ -1059,7 +1059,7 @@
                 }
                 
                 const result = await response.json();
-                showSuccess(orderData, result.subscription_id, result.status);
+                showSuccess(orderData, result.subscription_id, result.status, result);
                 
             } catch (error) {
                 console.warn('계좌이체 신청 실패, 데모 모드로 전환:', error.message);
@@ -1077,7 +1077,32 @@
         }
         
         // 성공 메시지 표시
-        function showSuccess(orderData, subscriptionId, status = 'completed') {
+        function showSuccess(orderData, subscriptionId, status = 'completed', result = null) {
+            // 🔗 결제 완료 후 가상 링크 포함된 성공 페이지로 리다이렉트
+            if (result && result.redirect_url) {
+                // 서버에서 제공한 리다이렉트 URL 사용
+                setTimeout(() => {
+                    window.location.href = result.redirect_url;
+                }, 2000); // 2초 후 리다이렉트
+                
+                // 일시적으로 성공 메시지 표시
+                const successEl = document.getElementById('paymentSuccess');
+                const detailsEl = document.getElementById('subscriptionDetails');
+                
+                detailsEl.innerHTML = `
+                    <div style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                        <p><strong>구독 ID:</strong> ${subscriptionId}</p>
+                        <p><strong>상태:</strong> <span style="color: #2ecc71">결제 완료</span></p>
+                        <p><strong>가상 서비스 링크:</strong> ${result.links_count || 0}개 생성</p>
+                        <p style="color: #f39c12; margin-top: 10px;">🔗 가상 서비스 링크 페이지로 이동합니다...</p>
+                    </div>
+                `;
+                
+                successEl.style.display = 'block';
+                return;
+            }
+            
+            // 기존 로직 (리다이렉트 정보가 없는 경우)
             const successEl = document.getElementById('paymentSuccess');
             const detailsEl = document.getElementById('subscriptionDetails');
             

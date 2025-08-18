@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HYOJIN.AI 가상 서비스 데모</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .service-info {
+            padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .token-info {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .token-info h3 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+        
+        .token-display {
+            font-family: 'Courier New', monospace;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #90caf9;
+            font-size: 0.9em;
+            color: #333;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 30px;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid #4CAF50;
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-card h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .demo-interface {
+            background: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .demo-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .demo-btn {
+            background: linear-gradient(45deg, #2196F3, #21CBF3);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .demo-btn:hover {
+            background: linear-gradient(45deg, #1976D2, #1BA8D3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
+        }
+        
+        .status-active {
+            background: #4CAF50;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            display: inline-block;
+        }
+        
+        .expires-info {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .ai-simulation {
+            background: #e8f5e8;
+            border: 2px dashed #4CAF50;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .ai-simulation h4 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+        
+        .footer {
+            background: #333;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="header">
+            <h1>🤖 HYOJIN.AI 서비스 데모</h1>
+            <p>가상 AI 서비스 체험 환경</p>
+            <span class="status-active">✅ 서비스 활성화</span>
+        </div>
+        
+        <div class="service-info">
+            <div class="token-info">
+                <h3>🔐 인증된 접속 토큰</h3>
+                <div class="token-display" id="tokenDisplay">토큰을 로딩 중...</div>
+            </div>
+            
+            <div class="expires-info">
+                <strong>⏰ 서비스 이용 기간:</strong> <span id="expiresAt">로딩 중...</span>
+            </div>
+        </div>
+        
+        <div class="features-grid" id="featuresGrid">
+            <!-- 서비스별 기능들이 동적으로 로드됩니다 -->
+        </div>
+        
+        <div class="ai-simulation">
+            <h4>🎯 AI 서비스 시뮬레이션</h4>
+            <p>실제 AI 서비스와 동일한 인터페이스로 체험하실 수 있습니다</p>
+        </div>
+        
+        <div class="demo-interface">
+            <h2>🚀 체험하기</h2>
+            <div class="demo-buttons">
+                <button class="demo-btn" onclick="startDemo()">AI 서비스 시작</button>
+                <button class="demo-btn" onclick="viewDashboard()">대시보드 보기</button>
+                <button class="demo-btn" onclick="testFeatures()">기능 테스트</button>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2024 HYOJIN.AI - 가상 서비스 체험 환경</p>
+            <p>실제 서비스와 동일한 기능을 제공합니다</p>
+        </div>
+    </div>
+
+    <script>
+        // URL에서 토큰과 서비스 정보 추출
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        const serviceId = window.location.pathname.split('/').pop();
+        
+        // 서비스별 설정
+        const serviceConfigs = {
+            'medical-ai': {
+                name: '의료 AI 도메인',
+                icon: '🏥',
+                features: [
+                    { name: '진단 보조', description: 'AI 기반 의료 진단 지원 시스템' },
+                    { name: '의료 영상 분석', description: 'X-ray, CT, MRI 영상 자동 분석' },
+                    { name: '환자 데이터 관리', description: '통합 환자 정보 관리 시스템' },
+                    { name: '치료 계획', description: '맞춤형 치료 계획 수립 지원' }
+                ]
+            },
+            'finance-ai': {
+                name: '금융 AI 도메인',
+                icon: '💰',
+                features: [
+                    { name: '투자 분석', description: '포트폴리오 최적화 및 리스크 분석' },
+                    { name: '리스크 관리', description: '실시간 금융 리스크 모니터링' },
+                    { name: '사기 탐지', description: 'AI 기반 금융 사기 탐지 시스템' },
+                    { name: '신용 평가', description: '고도화된 신용 평가 모델' }
+                ]
+            },
+            'education-ai': {
+                name: '교육 AI 도메인',
+                icon: '📚',
+                features: [
+                    { name: '맞춤형 학습', description: '개인별 학습 수준에 맞춘 콘텐츠 제공' },
+                    { name: '자동 채점', description: 'AI 기반 자동 채점 및 피드백' },
+                    { name: '콘텐츠 생성', description: '교육 콘텐츠 자동 생성 시스템' },
+                    { name: '학습 분석', description: '학습 패턴 분석 및 개선 제안' }
+                ]
+            },
+            'medical-doctor-ai': {
+                name: '닥터 김 AI',
+                icon: '👨‍⚕️',
+                features: [
+                    { name: '증상 분석', description: '환자 증상 기반 초기 진단 보조' },
+                    { name: '진단 보조', description: '전문의 수준의 진단 지원' },
+                    { name: '치료 추천', description: '최적의 치료 방법 추천' },
+                    { name: '의료 상담', description: '24/7 AI 의료 상담 서비스' }
+                ]
+            },
+            'finance-analyst-ai': {
+                name: '애널리스트 박 AI',
+                icon: '📊',
+                features: [
+                    { name: '투자 분석', description: '전문가급 투자 분석 및 추천' },
+                    { name: '포트폴리오 관리', description: '최적 포트폴리오 구성 및 관리' },
+                    { name: '리스크 평가', description: '투자 리스크 정밀 평가' },
+                    { name: '시장 예측', description: 'AI 기반 시장 동향 예측' }
+                ]
+            },
+            'starter-bundle': {
+                name: '스타터 번들',
+                icon: '🚀',
+                features: [
+                    { name: '의료+금융+교육 AI', description: '핵심 3개 도메인 통합 서비스' },
+                    { name: '핵심 에이전트 5명', description: '전문 AI 에이전트 5명 포함' },
+                    { name: '24/7 지원', description: '연중무휴 고객 지원 서비스' },
+                    { name: '월간 리포트', description: '상세한 사용 분석 리포트 제공' }
+                ]
+            },
+            'business-bundle': {
+                name: '비즈니스 번들',
+                icon: '💼',
+                features: [
+                    { name: '주요 AI 도메인 8개', description: '비즈니스 핵심 AI 도메인 포함' },
+                    { name: '전문 에이전트 10명', description: '다양한 전문 분야 AI 에이전트' },
+                    { name: '우선 지원', description: '비즈니스 우선 고객 지원' },
+                    { name: '커스텀 기능', description: '기업별 맞춤 기능 개발' }
+                ]
+            },
+            'enterprise-bundle': {
+                name: '엔터프라이즈 번들',
+                icon: '🏢',
+                features: [
+                    { name: '전체 AI 도메인', description: 'HYOJIN.AI 모든 도메인 이용' },
+                    { name: '모든 에이전트', description: '전체 AI 에이전트 무제한 이용' },
+                    { name: '전담 지원', description: '전담 고객 성공 매니저 배정' },
+                    { name: '무제한 커스터마이징', description: '기업 요구사항 맞춤 개발' }
+                ]
+            }
+        };
+        
+        // 페이지 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePage();
+        });
+        
+        function initializePage() {
+            // 토큰 표시
+            if (token) {
+                document.getElementById('tokenDisplay').textContent = token;
+            }
+            
+            // 만료일 표시 (30일 후)
+            const expiresDate = new Date();
+            expiresDate.setDate(expiresDate.getDate() + 30);
+            document.getElementById('expiresAt').textContent = expiresDate.toLocaleDateString('ko-KR');
+            
+            // 서비스별 기능 표시
+            displayServiceFeatures();
+            
+            // 헤더 업데이트
+            if (serviceConfigs[serviceId]) {
+                const config = serviceConfigs[serviceId];
+                document.querySelector('.header h1').innerHTML = 
+                    `${config.icon} ${config.name} 데모`;
+            }
+        }
+        
+        function displayServiceFeatures() {
+            const featuresGrid = document.getElementById('featuresGrid');
+            const config = serviceConfigs[serviceId];
+            
+            if (!config) return;
+            
+            featuresGrid.innerHTML = '';
+            
+            config.features.forEach(feature => {
+                const featureCard = document.createElement('div');
+                featureCard.className = 'feature-card';
+                featureCard.innerHTML = `
+                    <h3>✨ ${feature.name}</h3>
+                    <p>${feature.description}</p>
+                    <div style="margin-top: 15px;">
+                        <button class="demo-btn" onclick="demonstrateFeature('${feature.name}')">
+                            체험하기
+                        </button>
+                    </div>
+                `;
+                featuresGrid.appendChild(featureCard);
+            });
+        }
+        
+        function startDemo() {
+            alert(`🚀 ${serviceConfigs[serviceId].name} 서비스를 시작합니다!\n\n실제 환경에서는 AI 서비스 인터페이스로 이동됩니다.`);
+        }
+        
+        function viewDashboard() {
+            alert(`📊 ${serviceConfigs[serviceId].name} 대시보드를 열고 있습니다!\n\n사용량, 성과, 설정 등을 확인할 수 있습니다.`);
+        }
+        
+        function testFeatures() {
+            alert(`🧪 ${serviceConfigs[serviceId].name} 기능 테스트를 시작합니다!\n\n모든 기능을 안전한 테스트 환경에서 체험할 수 있습니다.`);
+        }
+        
+        function demonstrateFeature(featureName) {
+            alert(`✨ ${featureName} 기능을 체험합니다!\n\n실제 환경에서는 해당 기능의 인터페이스가 열립니다.`);
+        }
+    </script>
+</body>
+</html>

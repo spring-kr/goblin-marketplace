@@ -2,6 +2,7 @@
 HYOJIN.AI 결제 서비스
 실제 Stripe, PayPal 결제 처리를 위한 백엔드 서비스
 """
+
 import os
 import stripe
 import json
@@ -10,11 +11,19 @@ from fastapi import HTTPException
 from pydantic import BaseModel
 from typing import List, Dict, Any
 import smtplib
-from email.mime.text import MimeText
-from email.mime.multipart import MimeMultipart
+
+try:
+    from email.mime.text import MimeText
+    from email.mime.multipart import MimeMultipart
+
+    EMAIL_AVAILABLE = True
+except ImportError:
+    EMAIL_AVAILABLE = False
+    print("이메일 기능을 사용할 수 없습니다. 결제는 정상 작동합니다.")
 
 # Stripe 설정 (실제 사용시 환경변수로 관리)
-stripe.api_key = os.getenv('STRIPE_SECRET_KEY', 'sk_test_...')  # 실제 Secret Key
+stripe.api_key = os.getenv("STRIPE_SECRET_KEY", "sk_test_...")  # 실제 Secret Key
+
 
 class PaymentItem(BaseModel):
     id: str
@@ -22,11 +31,13 @@ class PaymentItem(BaseModel):
     price: float
     type: str
 
+
 class CustomerData(BaseModel):
     name: str
     email: str
     company: str = ""
     paymentMethod: str
+
 
 class PaymentRequest(BaseModel):
     token: str = None
@@ -34,17 +45,23 @@ class PaymentRequest(BaseModel):
     customer: CustomerData
     items: List[PaymentItem]
 
+
 class SubscriptionService:
     """구독 서비스 관리"""
-    
+
     def __init__(self):
         self.subscriptions_db = {}  # 실제로는 데이터베이스 사용
-        
-    async def create_subscription(self, customer_data: CustomerData, items: List[PaymentItem], payment_method: str = "card") -> Dict[str, Any]:
+
+    async def create_subscription(
+        self,
+        customer_data: CustomerData,
+        items: List[PaymentItem],
+        payment_method: str = "card",
+    ) -> Dict[str, Any]:
         """구독 생성"""
-        
+
         subscription_id = f"sub_{datetime.now().strftime('%Y%m%d%H%M%S')}_{customer_data.email.split('@')[0]}"
-        
+
         # 구독 데이터 생성
         subscription = {
             "id": subscription_id,
@@ -55,46 +72,47 @@ class SubscriptionService:
             "payment_method": payment_method,
             "created_at": datetime.now().isoformat(),
             "next_billing_date": (datetime.now() + timedelta(days=30)).isoformat(),
-            "billing_cycle": "monthly"
+            "billing_cycle": "monthly",
         }
-        
+
         # 데이터베이스에 저장 (시뮬레이션)
         self.subscriptions_db[subscription_id] = subscription
-        
+
         return subscription
+
 
 class PaymentProcessor:
     """결제 처리 서비스"""
-    
+
     def __init__(self):
         self.subscription_service = SubscriptionService()
-        
-    async def process_card_payment(self, payment_request: PaymentRequest) -> Dict[str, Any]:
+
+    async def process_card_payment(
+        self, payment_request: PaymentRequest
+    ) -> Dict[str, Any]:
         """신용카드 결제 처리"""
         try:
             # Stripe 고객 생성
             customer = stripe.Customer.create(
                 email=payment_request.customer.email,
                 name=payment_request.customer.name,
-                description=f"HYOJIN.AI 구독 - {payment_request.customer.company or '개인'}"
+                description=f"HYOJIN.AI 구독 - {payment_request.customer.company or '개인'}",
             )
-            
+
             # 결제 처리
             charge = stripe.Charge.create(
                 amount=payment_request.amount,
-                currency='usd',
+                currency="usd",
                 source=payment_request.token,
                 customer=customer.id,
-                description=f"HYOJIN.AI 구독 서비스 - {len(payment_request.items)}개 상품"
+                description=f"HYOJIN.AI 구독 서비스 - {len(payment_request.items)}개 상품",
             )
-            
+
             # 구독 생성
             subscription = await self.subscription_service.create_subscription(
-                payment_request.customer, 
-                payment_request.items, 
-                "card"
+                payment_request.customer, payment_request.items, "card"
             )
-            
+
             # 결제 성공 결과
             return {
                 "success": True,
@@ -102,61 +120,73 @@ class PaymentProcessor:
                 "charge_id": charge.id,
                 "amount": payment_request.amount / 100,
                 "status": "completed",
-                "message": "결제가 성공적으로 완료되었습니다."
+                "message": "결제가 성공적으로 완료되었습니다.",
             }
-            
+
         except stripe.error.CardError as e:
             # 카드 오류
             raise HTTPException(status_code=400, detail=f"카드 오류: {e.user_message}")
         except stripe.error.RateLimitError as e:
             # 너무 많은 요청
-            raise HTTPException(status_code=429, detail="요청이 너무 많습니다. 잠시 후 다시 시도해주세요.")
+            raise HTTPException(
+                status_code=429,
+                detail="요청이 너무 많습니다. 잠시 후 다시 시도해주세요.",
+            )
         except stripe.error.InvalidRequestError as e:
             # 잘못된 요청
-            raise HTTPException(status_code=400, detail=f"잘못된 요청: {e.user_message}")
+            raise HTTPException(
+                status_code=400, detail=f"잘못된 요청: {e.user_message}"
+            )
         except stripe.error.AuthenticationError as e:
             # 인증 오류
             raise HTTPException(status_code=401, detail="결제 인증에 실패했습니다.")
         except stripe.error.APIConnectionError as e:
             # 네트워크 오류
-            raise HTTPException(status_code=503, detail="결제 서비스에 연결할 수 없습니다.")
+            raise HTTPException(
+                status_code=503, detail="결제 서비스에 연결할 수 없습니다."
+            )
         except stripe.error.StripeError as e:
             # 기타 Stripe 오류
-            raise HTTPException(status_code=500, detail=f"결제 처리 중 오류가 발생했습니다: {e.user_message}")
+            raise HTTPException(
+                status_code=500,
+                detail=f"결제 처리 중 오류가 발생했습니다: {e.user_message}",
+            )
         except Exception as e:
             # 기타 오류
-            raise HTTPException(status_code=500, detail=f"알 수 없는 오류가 발생했습니다: {str(e)}")
-    
-    async def process_paypal_payment(self, payment_request: PaymentRequest) -> Dict[str, Any]:
+            raise HTTPException(
+                status_code=500, detail=f"알 수 없는 오류가 발생했습니다: {str(e)}"
+            )
+
+    async def process_paypal_payment(
+        self, payment_request: PaymentRequest
+    ) -> Dict[str, Any]:
         """PayPal 결제 처리"""
         # PayPal SDK를 사용한 실제 구현
         # 현재는 시뮬레이션
-        
+
         # 구독 생성
         subscription = await self.subscription_service.create_subscription(
-            payment_request.customer, 
-            payment_request.items, 
-            "paypal"
+            payment_request.customer, payment_request.items, "paypal"
         )
-        
+
         return {
             "success": True,
             "subscription_id": subscription["id"],
             "amount": payment_request.amount / 100,
             "status": "completed",
-            "message": "PayPal 결제가 완료되었습니다."
+            "message": "PayPal 결제가 완료되었습니다.",
         }
-    
-    async def process_bank_transfer(self, customer_data: CustomerData, items: List[PaymentItem]) -> Dict[str, Any]:
+
+    async def process_bank_transfer(
+        self, customer_data: CustomerData, items: List[PaymentItem]
+    ) -> Dict[str, Any]:
         """계좌이체 처리"""
-        
+
         # 구독 생성 (대기 상태)
         subscription = await self.subscription_service.create_subscription(
-            customer_data, 
-            items, 
-            "bank"
+            customer_data, items, "bank"
         )
-        
+
         return {
             "success": True,
             "subscription_id": subscription["id"],
@@ -167,64 +197,69 @@ class PaymentProcessor:
                 "bank_name": "국민은행",
                 "account_number": "123-456-789012",
                 "account_holder": "HYOJIN.AI",
-                "amount": sum(item.price for item in items)
-            }
+                "amount": sum(item.price for item in items),
+            },
         }
+
 
 class EmailService:
     """이메일 서비스"""
-    
+
     def __init__(self):
-        self.smtp_server = os.getenv('SMTP_SERVER', 'smtp.gmail.com')
-        self.smtp_port = int(os.getenv('SMTP_PORT', '587'))
-        self.email_user = os.getenv('EMAIL_USER', 'support@hyojin.ai')
-        self.email_password = os.getenv('EMAIL_PASSWORD', '')
-    
-    async def send_subscription_confirmation(self, subscription_data: Dict[str, Any]) -> bool:
+        self.smtp_server = os.getenv("SMTP_SERVER", "smtp.gmail.com")
+        self.smtp_port = int(os.getenv("SMTP_PORT", "587"))
+        self.email_user = os.getenv("EMAIL_USER", "support@hyojin.ai")
+        self.email_password = os.getenv("EMAIL_PASSWORD", "")
+
+    async def send_subscription_confirmation(
+        self, subscription_data: Dict[str, Any]
+    ) -> bool:
         """구독 확인 이메일 발송"""
         try:
             customer = subscription_data["customer"]
             items = subscription_data["items"]
-            
+
             # 이메일 내용 생성
             subject = f"🎉 HYOJIN.AI 구독 서비스 {subscription_data['status'] == 'active' and '활성화' or '신청'} 완료"
-            
+
             html_content = self._generate_email_template(subscription_data)
-            
+
             # 이메일 발송
-            msg = MimeMultipart('alternative')
-            msg['Subject'] = subject
-            msg['From'] = self.email_user
-            msg['To'] = customer['email']
-            
-            html_part = MimeText(html_content, 'html')
+            msg = MimeMultipart("alternative")
+            msg["Subject"] = subject
+            msg["From"] = self.email_user
+            msg["To"] = customer["email"]
+
+            html_part = MimeText(html_content, "html")
             msg.attach(html_part)
-            
+
             # SMTP 서버 연결 및 발송
             if self.email_password:  # 실제 SMTP 설정이 있는 경우
                 with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:
                     server.starttls()
                     server.login(self.email_user, self.email_password)
                     server.send_message(msg)
-            
+
             return True
-            
+
         except Exception as e:
             print(f"이메일 발송 실패: {str(e)}")
             return False
-    
+
     def _generate_email_template(self, subscription_data: Dict[str, Any]) -> str:
         """이메일 템플릿 생성"""
         customer = subscription_data["customer"]
         items = subscription_data["items"]
         status = subscription_data["status"]
-        
-        items_html = "".join([
-            f"<tr><td style='padding: 8px; border-bottom: 1px solid #eee;'>{item['name']}</td>"
-            f"<td style='padding: 8px; border-bottom: 1px solid #eee; text-align: right;'>${item['price']}/월</td></tr>"
-            for item in items
-        ])
-        
+
+        items_html = "".join(
+            [
+                f"<tr><td style='padding: 8px; border-bottom: 1px solid #eee;'>{item['name']}</td>"
+                f"<td style='padding: 8px; border-bottom: 1px solid #eee; text-align: right;'>${item['price']}/월</td></tr>"
+                for item in items
+            ]
+        )
+
         return f"""
         <!DOCTYPE html>
         <html>
@@ -283,19 +318,15 @@ class EmailService:
         </body>
         </html>
         """
-    
+
     def _get_payment_method_name(self, method: str) -> str:
         """결제 방법 이름 반환"""
-        names = {
-            'card': '신용카드',
-            'paypal': 'PayPal',
-            'bank': '계좌이체'
-        }
+        names = {"card": "신용카드", "paypal": "PayPal", "bank": "계좌이체"}
         return names.get(method, method)
-    
+
     def _get_status_specific_content(self, subscription_data: Dict[str, Any]) -> str:
         """상태별 특화 콘텐츠"""
-        if subscription_data['status'] == 'active':
+        if subscription_data["status"] == "active":
             return """
             <div style="background: #d4edda; border: 1px solid #c3e6cb; border-radius: 8px; padding: 20px; margin: 20px 0;">
                 <h3 style="color: #155724;">🚀 서비스 이용 안내</h3>
@@ -317,6 +348,7 @@ class EmailService:
                 <p>입금 확인 후 24시간 내에 서비스가 활성화됩니다.</p>
             </div>
             """
+
 
 # 전역 인스턴스
 payment_processor = PaymentProcessor()
