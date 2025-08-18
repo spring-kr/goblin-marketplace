@@ -3724,6 +3724,7 @@ async def verify_service_token(token: str):
 
 # 🔐 ==================== 토큰 인증 시스템 ====================
 
+
 @app.post("/api/authenticate")
 async def authenticate_service_access(request: Request):
     """토큰으로 서비스 접근 인증"""
@@ -3731,42 +3732,30 @@ async def authenticate_service_access(request: Request):
         data = await request.json()
         token = data.get("token")
         service_id = data.get("service_id")
-        
+
         if not token or not service_id:
-            raise HTTPException(
-                status_code=400, 
-                detail="토큰과 서비스 ID가 필요합니다"
-            )
-        
+            raise HTTPException(status_code=400, detail="토큰과 서비스 ID가 필요합니다")
+
         # 토큰 검증 및 세션 생성
         auth_result = auth_system.validate_token(token, service_id)
-        
+
         if not auth_result["valid"]:
-            raise HTTPException(
-                status_code=401,
-                detail=auth_result["message"]
-            )
-        
+            raise HTTPException(status_code=401, detail=auth_result["message"])
+
         # 접근 로그 기록
-        client_ip = getattr(request.client, 'host', 'unknown') if request.client else 'unknown'
-        user_agent = request.headers.get("user-agent", "")
         auth_system.log_access(
-            auth_result["user_id"], 
-            service_id, 
-            token, 
-            client_ip, 
-            user_agent
+            auth_result["user_id"], service_id, token, "unknown", ""
         )
-        
+
         return {
             "success": True,
             "session_id": auth_result["session_id"],
             "user_id": auth_result["user_id"],
             "service_name": auth_result["service_name"],
             "expires_at": auth_result["expires_at"],
-            "message": "인증 성공"
+            "message": "인증 성공",
         }
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -3778,19 +3767,16 @@ async def validate_session(session_id: str):
     """세션 유효성 검증"""
     try:
         session_result = auth_system.validate_session(session_id)
-        
+
         if not session_result["valid"]:
-            raise HTTPException(
-                status_code=401,
-                detail="유효하지 않은 세션입니다"
-            )
-        
+            raise HTTPException(status_code=401, detail="유효하지 않은 세션입니다")
+
         return {
             "valid": True,
             "user_id": session_result["user_id"],
-            "service_id": session_result["service_id"]
+            "service_id": session_result["service_id"],
         }
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -3803,17 +3789,17 @@ async def revoke_access_token(request: Request):
     try:
         data = await request.json()
         token = data.get("token")
-        
+
         if not token:
             raise HTTPException(status_code=400, detail="토큰이 필요합니다")
-        
+
         success = auth_system.revoke_token(token)
-        
+
         if success:
             return {"success": True, "message": "토큰이 폐기되었습니다"}
         else:
             raise HTTPException(status_code=400, detail="토큰 폐기에 실패했습니다")
-            
+
     except HTTPException:
         raise
     except Exception as e:
@@ -3821,15 +3807,317 @@ async def revoke_access_token(request: Request):
 
 
 @app.get("/service/{service_id}")
-async def access_service_with_token(service_id: str, token: str, request: Request):
-    """토큰으로 서비스 접근"""
+async def access_service_with_token(service_id: str, token: Optional[str] = None):
+    """토큰으로 서비스 접근 - 토큰이 없으면 입력창 표시"""
+    
+    # 토큰이 없으면 토큰 입력 페이지 표시
+    if not token:
+        return HTMLResponse(f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>🔐 서비스 인증 - {service_id}</title>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <style>
+                * {{
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                }}
+                
+                body {{
+                    font-family: 'Arial', sans-serif;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    min-height: 100vh;
+                    padding: 20px;
+                }}
+                
+                .auth-container {{
+                    background: white;
+                    padding: 50px;
+                    border-radius: 25px;
+                    box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+                    text-align: center;
+                    max-width: 500px;
+                    width: 100%;
+                    animation: slideUp 0.5s ease-out;
+                }}
+                
+                @keyframes slideUp {{
+                    from {{
+                        opacity: 0;
+                        transform: translateY(30px);
+                    }}
+                    to {{
+                        opacity: 1;
+                        transform: translateY(0);
+                    }}
+                }}
+                
+                .auth-icon {{
+                    font-size: 4em;
+                    margin-bottom: 20px;
+                    animation: bounce 2s ease-in-out infinite;
+                }}
+                
+                @keyframes bounce {{
+                    0%, 20%, 50%, 80%, 100% {{
+                        transform: translateY(0);
+                    }}
+                    40% {{
+                        transform: translateY(-10px);
+                    }}
+                    60% {{
+                        transform: translateY(-5px);
+                    }}
+                }}
+                
+                h1 {{
+                    color: #333;
+                    margin-bottom: 15px;
+                    font-size: 2em;
+                }}
+                
+                .service-info {{
+                    background: #f8f9fa;
+                    padding: 20px;
+                    border-radius: 15px;
+                    margin: 25px 0;
+                    border-left: 4px solid #4CAF50;
+                }}
+                
+                .token-input-group {{
+                    margin: 30px 0;
+                }}
+                
+                .token-input-group label {{
+                    display: block;
+                    font-weight: 600;
+                    color: #333;
+                    margin-bottom: 10px;
+                    text-align: left;
+                }}
+                
+                .token-input {{
+                    width: 100%;
+                    padding: 15px;
+                    border: 2px solid #e9ecef;
+                    border-radius: 12px;
+                    font-size: 1em;
+                    font-family: 'Courier New', monospace;
+                    transition: all 0.3s ease;
+                    background: #f8f9fa;
+                }}
+                
+                .token-input:focus {{
+                    outline: none;
+                    border-color: #4CAF50;
+                    box-shadow: 0 0 15px rgba(76, 175, 80, 0.2);
+                    background: white;
+                }}
+                
+                .btn {{
+                    padding: 15px 30px;
+                    border: none;
+                    border-radius: 25px;
+                    font-weight: 600;
+                    font-size: 1.1em;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    text-decoration: none;
+                    display: inline-block;
+                    margin: 10px;
+                }}
+                
+                .btn-primary {{
+                    background: linear-gradient(45deg, #4CAF50, #45a049);
+                    color: white;
+                    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+                }}
+                
+                .btn-primary:hover {{
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 25px rgba(76, 175, 80, 0.6);
+                }}
+                
+                .btn-secondary {{
+                    background: linear-gradient(45deg, #6c757d, #5a6268);
+                    color: white;
+                    box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
+                }}
+                
+                .btn-secondary:hover {{
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 25px rgba(108, 117, 125, 0.6);
+                }}
+                
+                .help-text {{
+                    color: #666;
+                    font-size: 0.9em;
+                    margin-top: 20px;
+                    line-height: 1.6;
+                }}
+                
+                .error-message {{
+                    background: #f8d7da;
+                    color: #721c24;
+                    padding: 15px;
+                    border-radius: 10px;
+                    margin: 20px 0;
+                    border: 1px solid #f5c6cb;
+                    display: none;
+                }}
+                
+                .loading {{
+                    display: none;
+                    color: #4CAF50;
+                    margin-top: 15px;
+                }}
+                
+                .spinner {{
+                    display: inline-block;
+                    width: 20px;
+                    height: 20px;
+                    border: 2px solid #f3f3f3;
+                    border-top: 2px solid #4CAF50;
+                    border-radius: 50%;
+                    animation: spin 1s linear infinite;
+                    margin-right: 10px;
+                }}
+                
+                @keyframes spin {{
+                    0% {{ transform: rotate(0deg); }}
+                    100% {{ transform: rotate(360deg); }}
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="auth-container">
+                <div class="auth-icon">🔐</div>
+                <h1>서비스 인증</h1>
+                
+                <div class="service-info">
+                    <h3>🤖 {service_id.upper()} 서비스</h3>
+                    <p>안전한 접근을 위해 인증이 필요합니다</p>
+                </div>
+                
+                <div class="token-input-group">
+                    <label for="accessToken">🔑 접속 토큰을 입력하세요:</label>
+                    <input 
+                        type="text" 
+                        id="accessToken" 
+                        class="token-input" 
+                        placeholder="hyojin_xxxxxxxxxxxxxxxxxx" 
+                        autofocus
+                    >
+                </div>
+                
+                <div class="error-message" id="errorMessage"></div>
+                
+                <div class="loading" id="loadingMessage">
+                    <span class="spinner"></span>
+                    인증 처리 중...
+                </div>
+                
+                <div>
+                    <button class="btn btn-primary" onclick="authenticateToken()">
+                        🚀 서비스 시작
+                    </button>
+                    <a href="/" class="btn btn-secondary">
+                        🏠 홈으로
+                    </a>
+                </div>
+                
+                <div class="help-text">
+                    💡 토큰이 없으신가요? <a href="/" style="color: #4CAF50; text-decoration: none;">구매 페이지</a>에서 서비스를 구독하세요!
+                </div>
+            </div>
+            
+            <script>
+                // Enter 키로 인증 실행
+                document.getElementById('accessToken').addEventListener('keypress', function(e) {{
+                    if (e.key === 'Enter') {{
+                        authenticateToken();
+                    }}
+                }});
+                
+                async function authenticateToken() {{
+                    const token = document.getElementById('accessToken').value.trim();
+                    const errorDiv = document.getElementById('errorMessage');
+                    const loadingDiv = document.getElementById('loadingMessage');
+                    
+                    // 입력 검증
+                    if (!token) {{
+                        showError('토큰을 입력해주세요.');
+                        return;
+                    }}
+                    
+                    if (token.length < 10) {{
+                        showError('올바른 토큰 형식이 아닙니다.');
+                        return;
+                    }}
+                    
+                    // 로딩 표시
+                    errorDiv.style.display = 'none';
+                    loadingDiv.style.display = 'block';
+                    
+                    try {{
+                        // 인증 API 호출
+                        const response = await fetch('/api/authenticate', {{
+                            method: 'POST',
+                            headers: {{
+                                'Content-Type': 'application/json',
+                            }},
+                            body: JSON.stringify({{
+                                token: token,
+                                service_id: '{service_id}'
+                            }})
+                        }});
+                        
+                        const data = await response.json();
+                        
+                        if (response.ok && data.success) {{
+                            // 인증 성공 - 서비스 페이지로 이동
+                            window.location.href = `/service/{service_id}?token=${{encodeURIComponent(token)}}`;
+                        }} else {{
+                            // 인증 실패
+                            showError(data.detail || '인증에 실패했습니다.');
+                        }}
+                    }} catch (error) {{
+                        console.error('인증 오류:', error);
+                        showError('인증 처리 중 오류가 발생했습니다.');
+                    }} finally {{
+                        loadingDiv.style.display = 'none';
+                    }}
+                }}
+                
+                function showError(message) {{
+                    const errorDiv = document.getElementById('errorMessage');
+                    errorDiv.textContent = message;
+                    errorDiv.style.display = 'block';
+                    
+                    // 3초 후 자동 숨김
+                    setTimeout(() => {{
+                        errorDiv.style.display = 'none';
+                    }}, 3000);
+                }}
+            </script>
+        </body>
+        </html>
+        """)
+    
     try:
         # 토큰 검증
         auth_result = auth_system.validate_token(token, service_id)
-        
+
         if not auth_result["valid"]:
             # 인증 실패 시 로그인 페이지로 리다이렉트
-            return HTMLResponse(f"""
+            return HTMLResponse(
+                f"""
             <!DOCTYPE html>
             <html>
             <head>
@@ -3892,23 +4180,18 @@ async def access_service_with_token(service_id: str, token: str, request: Reques
                 </div>
             </body>
             </html>
-            """)
+            """
+        )
         
         # 접근 로그 기록
-        client_ip = getattr(request.client, 'host', 'unknown') if request.client else 'unknown'
-        user_agent = request.headers.get("user-agent", "")
         auth_system.log_access(
-            auth_result["user_id"], 
-            service_id, 
-            token, 
-            client_ip, 
-            user_agent
+            auth_result["user_id"], service_id, token, "unknown", ""
         )
         
         # 서비스별 페이지 반환
         service_page = get_service_page(service_id, auth_result)
         return HTMLResponse(service_page)
-        
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"서비스 접근 중 오류: {str(e)}")
 
@@ -3917,47 +4200,50 @@ def get_service_page(service_id: str, auth_result: dict) -> str:
     """서비스별 페이지 생성"""
     service_name = auth_result["service_name"]
     user_id = auth_result["user_id"]
-    
+
     # 서비스별 콘텐츠 정의
     service_content = {
         "finance-ai": {
             "title": "💰 AI 재무 분석",
             "description": "AI 기반 재무 분석 및 투자 상담 서비스",
             "features": [
-                "📊 포트폴리오 분석", 
-                "📈 시장 예측", 
+                "📊 포트폴리오 분석",
+                "📈 시장 예측",
                 "💡 투자 조언",
-                "🔍 리스크 분석"
-            ]
+                "🔍 리스크 분석",
+            ],
         },
         "health-ai": {
             "title": "🏥 AI 헬스케어",
             "description": "AI 기반 건강 모니터링 및 상담 서비스",
             "features": [
-                "💊 건강 분석", 
-                "🩺 증상 체크", 
+                "💊 건강 분석",
+                "🩺 증상 체크",
                 "🏃‍♂️ 운동 플랜",
-                "🥗 영양 관리"
-            ]
+                "🥗 영양 관리",
+            ],
         },
         "education-ai": {
             "title": "🎓 AI 교육",
             "description": "개인 맞춤형 AI 튜터링 서비스",
             "features": [
-                "📚 맞춤 학습", 
-                "🧠 지능 분석", 
+                "📚 맞춤 학습",
+                "🧠 지능 분석",
                 "📝 과제 도움",
-                "🎯 목표 설정"
-            ]
-        }
+                "🎯 목표 설정",
+            ],
+        },
     }
-    
-    content = service_content.get(service_id, {
-        "title": f"🤖 {service_name}",
-        "description": f"{service_name} 서비스에 오신 것을 환영합니다",
-        "features": ["🚀 AI 기반 분석", "💡 맞춤형 서비스", "📊 실시간 데이터"]
-    })
-    
+
+    content = service_content.get(
+        service_id,
+        {
+            "title": f"🤖 {service_name}",
+            "description": f"{service_name} 서비스에 오신 것을 환영합니다",
+            "features": ["🚀 AI 기반 분석", "💡 맞춤형 서비스", "📊 실시간 데이터"],
+        },
+    )
+
     return f"""
     <!DOCTYPE html>
     <html>

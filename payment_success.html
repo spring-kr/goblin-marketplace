@@ -590,35 +590,23 @@
         }
         
         function openService(serviceId, token) {
-            // 토큰 인증 후 서비스 접근
-            showNotification('🔐 인증 처리 중...', 'info');
+            // 서비스 페이지로 직접 이동 (토큰 입력창이 나옴)
+            showNotification('� 서비스 페이지로 이동합니다...', 'info');
             
-            // 인증 API 호출
-            fetch('/api/authenticate', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    token: token,
-                    service_id: serviceId
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // 인증 성공 시 서비스 페이지로 이동
-                    const serviceUrl = `/service/${serviceId}?token=${token}`;
-                    window.open(serviceUrl, '_blank');
-                    showNotification('🎉 인증 완료! 서비스가 열렸습니다.', 'success');
-                } else {
-                    showNotification('❌ 인증에 실패했습니다: ' + (data.detail || '알 수 없는 오류'), 'error');
-                }
-            })
-            .catch(error => {
-                console.error('인증 오류:', error);
-                showNotification('❌ 인증 처리 중 오류가 발생했습니다.', 'error');
-            });
+            // 새 탭에서 서비스 페이지 열기 (토큰 없이)
+            const serviceUrl = `/service/${serviceId}`;
+            window.open(serviceUrl, '_blank');
+            
+            // 토큰을 클립보드에 복사해두기 (사용자 편의)
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(token).then(() => {
+                    showNotification('📋 토큰이 클립보드에 복사되었습니다. 인증창에 붙여넣으세요!', 'success');
+                }).catch(() => {
+                    showNotification('💡 인증창에서 다음 토큰을 입력하세요: ' + token.substring(0, 20) + '...', 'info');
+                });
+            } else {
+                showNotification('💡 인증창에서 다음 토큰을 입력하세요: ' + token.substring(0, 20) + '...', 'info');
+            }
         }
         
         function addRippleEffect(event) {
