@@ -590,10 +590,35 @@
         }
         
         function openService(serviceId, token) {
-            // 새 탭에서 서비스 열기
-            const serviceUrl = `https://service.hyojin.ai/${serviceId}?token=${token}`;
-            window.open(serviceUrl, '_blank');
-            showNotification('🚀 서비스가 새 탭에서 열렸습니다!', 'info');
+            // 토큰 인증 후 서비스 접근
+            showNotification('🔐 인증 처리 중...', 'info');
+            
+            // 인증 API 호출
+            fetch('/api/authenticate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    token: token,
+                    service_id: serviceId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // 인증 성공 시 서비스 페이지로 이동
+                    const serviceUrl = `/service/${serviceId}?token=${token}`;
+                    window.open(serviceUrl, '_blank');
+                    showNotification('🎉 인증 완료! 서비스가 열렸습니다.', 'success');
+                } else {
+                    showNotification('❌ 인증에 실패했습니다: ' + (data.detail || '알 수 없는 오류'), 'error');
+                }
+            })
+            .catch(error => {
+                console.error('인증 오류:', error);
+                showNotification('❌ 인증 처리 중 오류가 발생했습니다.', 'error');
+            });
         }
         
         function addRippleEffect(event) {

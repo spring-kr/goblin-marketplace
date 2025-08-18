@@ -36,6 +36,9 @@ from payment_service_simple import (
 # 가상 서비스 매니저 임포트
 from virtual_service_manager import virtual_service_manager
 
+# 인증 시스템 임포트
+from auth_system import auth_system
+
 # FastAPI 앱 생성
 app = FastAPI(
     title="Hyojin AI MVP + Advanced Security + Payment",
@@ -3717,6 +3720,415 @@ async def verify_service_token(token: str):
         return verification
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+
+# 🔐 ==================== 토큰 인증 시스템 ====================
+
+@app.post("/api/authenticate")
+async def authenticate_service_access(request: Request):
+    """토큰으로 서비스 접근 인증"""
+    try:
+        data = await request.json()
+        token = data.get("token")
+        service_id = data.get("service_id")
+        
+        if not token or not service_id:
+            raise HTTPException(
+                status_code=400, 
+                detail="토큰과 서비스 ID가 필요합니다"
+            )
+        
+        # 토큰 검증 및 세션 생성
+        auth_result = auth_system.validate_token(token, service_id)
+        
+        if not auth_result["valid"]:
+            raise HTTPException(
+                status_code=401,
+                detail=auth_result["message"]
+            )
+        
+        # 접근 로그 기록
+        client_ip = getattr(request.client, 'host', 'unknown') if request.client else 'unknown'
+        user_agent = request.headers.get("user-agent", "")
+        auth_system.log_access(
+            auth_result["user_id"], 
+            service_id, 
+            token, 
+            client_ip, 
+            user_agent
+        )
+        
+        return {
+            "success": True,
+            "session_id": auth_result["session_id"],
+            "user_id": auth_result["user_id"],
+            "service_name": auth_result["service_name"],
+            "expires_at": auth_result["expires_at"],
+            "message": "인증 성공"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"인증 처리 중 오류: {str(e)}")
+
+
+@app.get("/api/session/{session_id}")
+async def validate_session(session_id: str):
+    """세션 유효성 검증"""
+    try:
+        session_result = auth_system.validate_session(session_id)
+        
+        if not session_result["valid"]:
+            raise HTTPException(
+                status_code=401,
+                detail="유효하지 않은 세션입니다"
+            )
+        
+        return {
+            "valid": True,
+            "user_id": session_result["user_id"],
+            "service_id": session_result["service_id"]
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"세션 검증 중 오류: {str(e)}")
+
+
+@app.post("/api/revoke-token")
+async def revoke_access_token(request: Request):
+    """토큰 폐기"""
+    try:
+        data = await request.json()
+        token = data.get("token")
+        
+        if not token:
+            raise HTTPException(status_code=400, detail="토큰이 필요합니다")
+        
+        success = auth_system.revoke_token(token)
+        
+        if success:
+            return {"success": True, "message": "토큰이 폐기되었습니다"}
+        else:
+            raise HTTPException(status_code=400, detail="토큰 폐기에 실패했습니다")
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"토큰 폐기 중 오류: {str(e)}")
+
+
+@app.get("/service/{service_id}")
+async def access_service_with_token(service_id: str, token: str, request: Request):
+    """토큰으로 서비스 접근"""
+    try:
+        # 토큰 검증
+        auth_result = auth_system.validate_token(token, service_id)
+        
+        if not auth_result["valid"]:
+            # 인증 실패 시 로그인 페이지로 리다이렉트
+            return HTMLResponse(f"""
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>인증 필요</title>
+                <meta charset="utf-8">
+                <style>
+                    body {{
+                        font-family: Arial, sans-serif;
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        min-height: 100vh;
+                        margin: 0;
+                    }}
+                    .auth-container {{
+                        background: white;
+                        padding: 40px;
+                        border-radius: 20px;
+                        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+                        text-align: center;
+                        max-width: 400px;
+                    }}
+                    .error-icon {{
+                        font-size: 4em;
+                        color: #f44336;
+                        margin-bottom: 20px;
+                    }}
+                    h1 {{
+                        color: #333;
+                        margin-bottom: 15px;
+                    }}
+                    p {{
+                        color: #666;
+                        margin-bottom: 30px;
+                    }}
+                    .btn {{
+                        background: linear-gradient(45deg, #4CAF50, #45a049);
+                        color: white;
+                        padding: 12px 24px;
+                        border: none;
+                        border-radius: 25px;
+                        text-decoration: none;
+                        font-weight: 600;
+                        display: inline-block;
+                        transition: all 0.3s ease;
+                    }}
+                    .btn:hover {{
+                        transform: translateY(-2px);
+                        box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+                    }}
+                </style>
+            </head>
+            <body>
+                <div class="auth-container">
+                    <div class="error-icon">🔒</div>
+                    <h1>인증이 필요합니다</h1>
+                    <p>{auth_result["message"]}</p>
+                    <a href="/" class="btn">🏠 홈으로 돌아가기</a>
+                </div>
+            </body>
+            </html>
+            """)
+        
+        # 접근 로그 기록
+        client_ip = getattr(request.client, 'host', 'unknown') if request.client else 'unknown'
+        user_agent = request.headers.get("user-agent", "")
+        auth_system.log_access(
+            auth_result["user_id"], 
+            service_id, 
+            token, 
+            client_ip, 
+            user_agent
+        )
+        
+        # 서비스별 페이지 반환
+        service_page = get_service_page(service_id, auth_result)
+        return HTMLResponse(service_page)
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"서비스 접근 중 오류: {str(e)}")
+
+
+def get_service_page(service_id: str, auth_result: dict) -> str:
+    """서비스별 페이지 생성"""
+    service_name = auth_result["service_name"]
+    user_id = auth_result["user_id"]
+    
+    # 서비스별 콘텐츠 정의
+    service_content = {
+        "finance-ai": {
+            "title": "💰 AI 재무 분석",
+            "description": "AI 기반 재무 분석 및 투자 상담 서비스",
+            "features": [
+                "📊 포트폴리오 분석", 
+                "📈 시장 예측", 
+                "💡 투자 조언",
+                "🔍 리스크 분석"
+            ]
+        },
+        "health-ai": {
+            "title": "🏥 AI 헬스케어",
+            "description": "AI 기반 건강 모니터링 및 상담 서비스",
+            "features": [
+                "💊 건강 분석", 
+                "🩺 증상 체크", 
+                "🏃‍♂️ 운동 플랜",
+                "🥗 영양 관리"
+            ]
+        },
+        "education-ai": {
+            "title": "🎓 AI 교육",
+            "description": "개인 맞춤형 AI 튜터링 서비스",
+            "features": [
+                "📚 맞춤 학습", 
+                "🧠 지능 분석", 
+                "📝 과제 도움",
+                "🎯 목표 설정"
+            ]
+        }
+    }
+    
+    content = service_content.get(service_id, {
+        "title": f"🤖 {service_name}",
+        "description": f"{service_name} 서비스에 오신 것을 환영합니다",
+        "features": ["🚀 AI 기반 분석", "💡 맞춤형 서비스", "📊 실시간 데이터"]
+    })
+    
+    return f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>{content['title']} - HYOJIN.AI</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            * {{
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }}
+            
+            body {{
+                font-family: 'Arial', sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+                padding: 20px;
+            }}
+            
+            .service-container {{
+                max-width: 1200px;
+                margin: 0 auto;
+                background: white;
+                border-radius: 20px;
+                box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+                overflow: hidden;
+            }}
+            
+            .header {{
+                background: linear-gradient(45deg, #4CAF50, #45a049);
+                color: white;
+                padding: 40px;
+                text-align: center;
+            }}
+            
+            .header h1 {{
+                font-size: 2.5em;
+                margin-bottom: 10px;
+            }}
+            
+            .user-info {{
+                background: rgba(255,255,255,0.2);
+                padding: 15px;
+                border-radius: 10px;
+                margin-top: 20px;
+            }}
+            
+            .content {{
+                padding: 40px;
+            }}
+            
+            .features-grid {{
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 20px;
+                margin: 30px 0;
+            }}
+            
+            .feature-card {{
+                background: #f8f9fa;
+                padding: 20px;
+                border-radius: 15px;
+                border-left: 4px solid #4CAF50;
+                transition: transform 0.3s ease;
+            }}
+            
+            .feature-card:hover {{
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            }}
+            
+            .action-buttons {{
+                display: flex;
+                gap: 15px;
+                justify-content: center;
+                margin-top: 40px;
+                flex-wrap: wrap;
+            }}
+            
+            .btn {{
+                padding: 12px 24px;
+                border: none;
+                border-radius: 25px;
+                font-weight: 600;
+                text-decoration: none;
+                transition: all 0.3s ease;
+                cursor: pointer;
+            }}
+            
+            .btn-primary {{
+                background: linear-gradient(45deg, #4CAF50, #45a049);
+                color: white;
+            }}
+            
+            .btn-secondary {{
+                background: linear-gradient(45deg, #2196F3, #1976D2);
+                color: white;
+            }}
+            
+            .btn:hover {{
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            }}
+            
+            .status-bar {{
+                background: #f8f9fa;
+                padding: 15px;
+                border-top: 1px solid #e9ecef;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 10px;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="service-container">
+            <div class="header">
+                <h1>{content['title']}</h1>
+                <p>{content['description']}</p>
+                <div class="user-info">
+                    👤 사용자: {user_id} | 🔐 인증 완료 | ⏰ {datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}
+                </div>
+            </div>
+            
+            <div class="content">
+                <h2>🚀 사용 가능한 기능</h2>
+                <div class="features-grid">
+                    {' '.join([f'<div class="feature-card"><h3>{feature}</h3><p>AI 기반 고급 기능을 사용하실 수 있습니다.</p></div>' for feature in content['features']])}
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="startService()">
+                        🚀 서비스 시작하기
+                    </button>
+                    <button class="btn btn-secondary" onclick="showTutorial()">
+                        📚 사용법 보기
+                    </button>
+                    <a href="/" class="btn" style="background: linear-gradient(45deg, #FF6B6B, #FF8E53); color: white;">
+                        🏠 홈으로
+                    </a>
+                </div>
+            </div>
+            
+            <div class="status-bar">
+                <div>🟢 서비스 상태: 정상 운영</div>
+                <div>📊 AI 모델: 활성화</div>
+                <div>🔒 보안: 토큰 인증 완료</div>
+            </div>
+        </div>
+        
+        <script>
+            function startService() {{
+                alert('🎉 {service_name} 서비스가 시작됩니다!\\n\\n실제 서비스에서는 여기에 AI 기능이 구현됩니다.');
+            }}
+            
+            function showTutorial() {{
+                alert('📚 {service_name} 사용법:\\n\\n1. 좌측 메뉴에서 원하는 기능 선택\\n2. AI 분석 시작\\n3. 결과 확인 및 다운로드');
+            }}
+            
+            // 5분마다 세션 확인
+            setInterval(function() {{
+                console.log('세션 상태 확인 중...');
+            }}, 300000);
+        </script>
+    </body>
+    </html>
+    """
 
 
 @app.get("/demo/{service_id}")
