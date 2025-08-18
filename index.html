@@ -694,10 +694,84 @@
         // Stripe 초기화 (실제 사용시에는 본인의 Publishable Key로 교체)
         let STRIPE_PUBLISHABLE_KEY = 'pk_test_demo'; // 기본값
         
-        // 페이지 로드시 Stripe 초기화
+        // 페이지 로드시 Stripe 초기화 및 에이전트 로드
         document.addEventListener('DOMContentLoaded', function() {
             loadPaymentConfig();
+            loadAgents();
         });
+        
+        // API에서 에이전트 데이터 로드
+        async function loadAgents() {
+            try {
+                console.log('에이전트 데이터 로딩 시작...');
+                const response = await fetch('/agents');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const agentsData = await response.json();
+                console.log('로드된 에이전트 데이터:', agentsData);
+                console.log('agentsData.success:', agentsData.success);
+                console.log('agentsData.agents:', agentsData.agents);
+                console.log('agentsData.agents 타입:', typeof agentsData.agents);
+                console.log('agentsData.agents.length:', agentsData.agents ? agentsData.agents.length : 'undefined');
+                
+                // API 응답 구조에 맞게 agents 배열 추출
+                let agentsArray = [];
+                if (agentsData && agentsData.success && agentsData.agents) {
+                    if (Array.isArray(agentsData.agents)) {
+                        agentsArray = agentsData.agents;
+                        console.log('agents 배열 추출 성공');
+                    } else if (typeof agentsData.agents === 'object') {
+                        // agents가 객체인 경우 값들을 배열로 변환
+                        agentsArray = Object.values(agentsData.agents);
+                        console.log('agents 객체를 배열로 변환:', agentsArray);
+                    }
+                } else if (Array.isArray(agentsData)) {
+                    agentsArray = agentsData;
+                    console.log('직접 배열 사용');
+                } else {
+                    console.warn('예상되지 않은 API 응답 구조:', agentsData);
+                    console.log('응답 구조 분석:');
+                    console.log('- success 필드:', agentsData.success);
+                    console.log('- agents 필드:', agentsData.agents);
+                    console.log('- 전체 키:', Object.keys(agentsData));
+                    return;
+                }
+                
+                console.log('최종 추출된 에이전트 배열:', agentsArray);
+                console.log('배열 길이:', agentsArray.length);
+                
+                if (agentsArray && agentsArray.length > 0) {
+                    // API 데이터를 제품 형식으로 변환
+                    const convertedAgents = agentsArray.map((agent, index) => {
+                        console.log(`에이전트 ${index + 1}:`, agent);
+                        return {
+                            id: agent.id || agent.agent_id || `agent-${index}`,
+                            name: agent.name || agent.agent_name || `에이전트 ${index + 1}`,
+                            description: agent.description || '설명 없음',
+                            features: agent.capabilities || ['기본 기능'],
+                            price: agent.pricing?.monthly || 99,
+                            originalPrice: (agent.pricing?.monthly || 99) * 1.4,
+                            type: 'agent'
+                        };
+                    });
+                    
+                    // products 객체의 agents 배열 교체
+                    products.agents = convertedAgents;
+                    console.log('에이전트 데이터 업데이트 완료:', products.agents);
+                    
+                    // 화면 새로고침
+                    renderProducts();
+                } else {
+                    console.warn('에이전트 데이터가 비어있습니다:', agentsArray);
+                }
+            } catch (error) {
+                console.error('에이전트 로딩 실패:', error);
+                console.log('하드코딩된 데이터 사용');
+            }
+        }
         
         async function loadPaymentConfig() {
             try {
