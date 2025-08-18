@@ -28,6 +28,7 @@ app = FastAPI(
     version="3.2.0",
 )
 
+
 # 🔒 보안 함수들
 def sanitize_input(input_data: str) -> str:
     """XSS 방지를 위한 입력 살균"""
@@ -44,11 +45,13 @@ def sanitize_input(input_data: str) -> str:
 
     return clean_data.strip()
 
+
 def hash_password(password: str) -> str:
     """비밀번호 해싱"""
     salt = secrets.token_hex(16)
     pwd_hash = hashlib.pbkdf2_hmac("sha256", password.encode(), salt.encode(), 100000)
     return f"{salt}${pwd_hash.hex()}"
+
 
 def verify_password(password: str, hashed: str) -> bool:
     """비밀번호 검증"""
@@ -63,6 +66,7 @@ def verify_password(password: str, hashed: str) -> bool:
     except:
         return False
 
+
 def log_security_event(event_type: str, user_id: str, details: Dict[str, Any]):
     """보안 이벤트 로깅"""
     log_entry = {
@@ -73,9 +77,11 @@ def log_security_event(event_type: str, user_id: str, details: Dict[str, Any]):
     }
     print(f"🔒 Security Event: {log_entry}")
 
+
 def get_client_ip(request: Request) -> str:
     """클라이언트 IP 주소 가져오기"""
     return getattr(request.client, "host", "unknown") if request.client else "unknown"
+
 
 # CORS 설정 (보안 강화)
 app.add_middleware(
@@ -110,15 +116,17 @@ ADMIN_CREDENTIALS = {
 # 세션 토큰 저장소 (실제 운영에서는 Redis 사용)
 ACTIVE_SESSIONS = {}
 
+
 def verify_admin_credentials(username: str, password: str) -> bool:
     """관리자 인증 확인 (강화된 보안)"""
     # 입력 살균
     username = sanitize_input(username)
-    
+
     if username != ADMIN_CREDENTIALS["username"]:
         return False
-    
+
     return verify_password(password, ADMIN_CREDENTIALS["password_hash"])
+
 
 def create_session_token() -> str:
     """보안 세션 토큰 생성"""
@@ -131,38 +139,41 @@ def create_session_token() -> str:
     }
     return token
 
+
 def verify_session_token(token: str) -> bool:
     """세션 토큰 검증"""
     if token not in ACTIVE_SESSIONS:
         return False
-    
+
     session = ACTIVE_SESSIONS[token]
-    
+
     # 24시간 만료 확인
     if datetime.datetime.now() - session["created_at"] > datetime.timedelta(hours=24):
         del ACTIVE_SESSIONS[token]
         return False
-    
+
     # 마지막 사용 시간 업데이트
     session["last_used"] = datetime.datetime.now()
     return True
+
 
 def verify_api_key(api_key: str) -> bool:
     """API 키 검증"""
     return api_key == ADMIN_CREDENTIALS["api_key"]
 
+
 async def admin_required(credentials: HTTPAuthorizationCredentials = Depends(security)):
     """관리자 권한 필요한 엔드포인트용 의존성"""
     token = credentials.credentials
-    
+
     # API 키 방식 확인
     if verify_api_key(token):
         return True
-    
-    # 세션 토큰 방식 확인  
+
+    # 세션 토큰 방식 확인
     if verify_session_token(token):
         return True
-    
+
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="관리자 권한이 필요합니다",
@@ -170,47 +181,51 @@ async def admin_required(credentials: HTTPAuthorizationCredentials = Depends(sec
     )
     return password_hash == ADMIN_CREDENTIALS["password_hash"]
 
+
 def create_session_token() -> str:
     """세션 토큰 생성"""
     token = secrets.token_urlsafe(32)
     ACTIVE_SESSIONS[token] = {
         "created_at": datetime.datetime.now(),
         "last_used": datetime.datetime.now(),
-        "user": "admin"
+        "user": "admin",
     }
     return token
+
 
 def verify_session_token(token: str) -> bool:
     """세션 토큰 검증"""
     if token not in ACTIVE_SESSIONS:
         return False
-    
+
     session = ACTIVE_SESSIONS[token]
     # 토큰 만료 확인 (24시간)
     if datetime.datetime.now() - session["created_at"] > datetime.timedelta(hours=24):
         del ACTIVE_SESSIONS[token]
         return False
-    
+
     # 마지막 사용 시간 업데이트
     session["last_used"] = datetime.datetime.now()
     return True
+
 
 def verify_api_key(api_key: str) -> bool:
     """API 키 검증"""
     return api_key == ADMIN_CREDENTIALS["api_key"]
 
+
 async def admin_required(credentials: HTTPAuthorizationCredentials = Depends(security)):
     """관리자 권한 필요한 엔드포인트용 의존성"""
     token = credentials.credentials
-    
+
     # API 키 방식 확인
     if verify_api_key(token):
         return True
-    
+
     # 세션 토큰 방식 확인
     if verify_session_token(token):
         return True
-    
+
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="관리자 권한이 필요합니다",
@@ -704,7 +719,7 @@ async def root():
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>HYOJIN.AI - 12개 AI 도메인 완전체</title>
+        <title>HYOJIN.AI - 12개 AI 도메인 완전체 + 보안</title>
         <style>
             * { margin: 0; padding: 0; box-sizing: border-box; }
             body { 
@@ -767,11 +782,13 @@ async def root():
         <a href="/admin/links/dashboard" class="admin-link">🔒 관리자</a>
         
         <div class="container">
-        <div class="header">
-            <h1>🤖 HYOJIN.AI</h1>
-            <div class="version-badge">🚀 MVP v3.2.0 + Security</div>
-            <p>12개 AI 도메인을 한번에! 고급 보안으로 보호되는 차세대 AI 플랫폼</p>
-        </div>            <div class="stats">
+            <div class="header">
+                <h1>🤖 HYOJIN.AI</h1>
+                <div class="version-badge">🚀 MVP v3.2.0 + Security</div>
+                <p>12개 AI 도메인을 한번에! 고급 보안으로 보호되는 차세대 AI 플랫폼</p>
+            </div>
+
+            <div class="stats">
                 <div class="stat-item">
                     <span class="stat-number">12</span>
                     <span class="stat-label">AI 도메인</span>
@@ -787,51 +804,51 @@ async def root():
             </div>
 
             <div class="features">
-                <div class="feature-card" onclick="location.href='/domains/healthcare'">
+                <div class="feature-card" onclick="location.href='/predict?domain=healthcare'">
                     <h3>🏥 의료 AI</h3>
                     <p>진단 보조, 의료 영상 분석, 건강 모니터링 시스템</p>
                 </div>
-                <div class="feature-card" onclick="location.href='/domains/paymentapp'">
+                <div class="feature-card" onclick="location.href='/predict?domain=paymentapp'">
                     <h3>💰 금융 AI</h3>
                     <p>결제 시스템, 리스크 분석, 투자 추천, 사기 탐지</p>
                 </div>
-                <div class="feature-card" onclick="location.href='/domains/education'">
+                <div class="feature-card" onclick="location.href='/predict?domain=education'">
                     <h3>🎓 교육 AI</h3>
                     <p>개인화 학습, 콘텐츠 생성, 평가 시스템</p>
                 </div>
-                <div class="feature-card" onclick="location.href='/domains/manufacturing'">
+                <div class="feature-card" onclick="location.href='/predict?domain=manufacturing'">
                     <h3>🏭 제조 AI</h3>
                     <p>품질 관리, 예측 유지보수, 공급망 최적화</p>
                 </div>
-                <div class="feature-card" onclick="location.href='/domains/mobility'">
+                <div class="feature-card" onclick="location.href='/predict?domain=mobility'">
                     <h3>🚗 모빌리티 AI</h3>
                     <p>자율주행, 교통 최적화, 안전 시스템</p>
                 </div>
-                <div class="feature-card" onclick="location.href='/domains/entertainment'">
+                <div class="feature-card" onclick="location.href='/predict?domain=entertainment'">
                     <h3>🎮 엔터테인먼트 AI</h3>
                     <p>게임 AI, 콘텐츠 추천, 개인화 경험</p>
                 </div>
-                <div class="feature-card" onclick="location.href='/domains/retail'">
+                <div class="feature-card" onclick="location.href='/predict?domain=retail'">
                     <h3>🏪 리테일 AI</h3>
                     <p>수요 예측, 재고 관리, 고객 분석</p>
                 </div>
-                <div class="feature-card" onclick="location.href='/domains/energy'">
+                <div class="feature-card" onclick="location.href='/predict?domain=energy'">
                     <h3>⚡ 에너지 AI</h3>
                     <p>스마트 그리드, 에너지 최적화, 신재생 관리</p>
                 </div>
-                <div class="feature-card" onclick="location.href='/domains/agriculture'">
+                <div class="feature-card" onclick="location.href='/predict?domain=agriculture'">
                     <h3>🌾 농업 AI</h3>
                     <p>스마트 농업, 작물 모니터링, 수확량 예측</p>
                 </div>
-                <div class="feature-card" onclick="location.href='/domains/realestate'">
+                <div class="feature-card" onclick="location.href='/predict?domain=realestate'">
                     <h3>🏢 부동산 AI</h3>
                     <p>가격 예측, 투자 분석, 매물 추천</p>
                 </div>
-                <div class="feature-card" onclick="location.href='/domains/customerservice'">
+                <div class="feature-card" onclick="location.href='/predict?domain=customerservice'">
                     <h3>📞 고객서비스 AI</h3>
                     <p>챗봇, 감정 분석, 자동 응답 시스템</p>
                 </div>
-                <div class="feature-card" onclick="location.href='/domains/saas'">
+                <div class="feature-card" onclick="location.href='/predict?domain=saas'">
                     <h3>☁️ SaaS AI</h3>
                     <p>클라우드 서비스, API 관리, 자동화 솔루션</p>
                 </div>
@@ -840,9 +857,9 @@ async def root():
             <div class="cta-section">
                 <h2>지금 시작하세요!</h2>
                 <p>7일 무료 체험으로 모든 기능을 경험해보세요</p>
-                <a href="/domains" class="cta-button">🚀 도메인 탐색</a>
+                <a href="/api/v1/domains" class="cta-button">🚀 도메인 탐색</a>
                 <a href="/agents/marketplace" class="cta-button">🤖 AI 에이전트</a>
-                <a href="/subscribe-page" class="cta-button">💳 구독하기</a>
+                <a href="/subscribers" class="cta-button">💳 구독하기</a>
                 <a href="/l/demo" class="cta-button">🔗 데모 체험</a>
             </div>
         </div>
@@ -900,30 +917,32 @@ class AdminLoginRequest(BaseModel):
     username: str
     password: str
 
+
 @app.post("/admin/login")
 async def admin_login(request: AdminLoginRequest):
     """관리자 로그인"""
     if not verify_admin_credentials(request.username, request.password):
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="잘못된 인증 정보입니다"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="잘못된 인증 정보입니다"
         )
-    
+
     # 세션 토큰 생성
     token = create_session_token()
-    
+
     return {
         "success": True,
         "token": token,
         "message": "로그인 성공",
-        "expires_in": "24시간"
+        "expires_in": "24시간",
     }
+
 
 @app.post("/admin/logout")
 async def admin_logout(admin: bool = Depends(admin_required)):
     """관리자 로그아웃"""
     # 실제로는 토큰을 무효화해야 함
     return {"success": True, "message": "로그아웃 성공"}
+
 
 @app.get("/admin/auth/check")
 async def check_admin_auth(admin: bool = Depends(admin_required)):
@@ -997,7 +1016,9 @@ async def get_link_analytics(admin: bool = Depends(admin_required)):
 
 
 @app.post("/admin/links/create")
-async def create_virtual_link(short_code: str, target_url: str, admin: bool = Depends(admin_required)):
+async def create_virtual_link(
+    short_code: str, target_url: str, admin: bool = Depends(admin_required)
+):
     """새 가상링크 생성 (관리자용)"""
     if short_code in VIRTUAL_LINKS:
         raise HTTPException(status_code=400, detail="이미 존재하는 가상링크입니다")
@@ -1364,10 +1385,163 @@ async def get_subscribers():
 
 
 @app.get("/predict")
-async def predict_simple(domain: str, text: str):
+async def predict_simple(domain: str, text: Optional[str] = None):
     """데모용 무료 예측 엔드포인트 (제한된 기능)"""
     if domain not in DOMAINS:
         raise HTTPException(status_code=404, detail=f"Domain '{domain}' not found")
+
+    # text가 없으면 도메인 정보 페이지 반환
+    if text is None:
+        domain_info = {
+            "healthcare": {
+                "name": "의료 AI",
+                "description": "진단 보조, 의료 영상 분석, 건강 모니터링 시스템",
+                "features": ["진단 보조", "의료 영상 분석", "건강 모니터링", "환자 데이터 분석"]
+            },
+            "paymentapp": {
+                "name": "금융 AI",
+                "description": "결제 시스템, 리스크 분석, 투자 추천, 사기 탐지",
+                "features": ["결제 시스템", "리스크 분석", "투자 추천", "사기 탐지"]
+            },
+            "education": {
+                "name": "교육 AI",
+                "description": "개인화 학습, 콘텐츠 생성, 평가 시스템",
+                "features": ["개인화 학습", "콘텐츠 생성", "평가 시스템", "학습 분석"]
+            },
+            "manufacturing": {
+                "name": "제조 AI",
+                "description": "품질 관리, 예측 유지보수, 공급망 최적화",
+                "features": ["품질 관리", "예측 유지보수", "공급망 최적화", "생산 계획"]
+            },
+            "mobility": {
+                "name": "모빌리티 AI",
+                "description": "자율주행, 교통 최적화, 안전 시스템",
+                "features": ["자율주행", "교통 최적화", "안전 시스템", "경로 최적화"]
+            },
+            "entertainment": {
+                "name": "엔터테인먼트 AI",
+                "description": "게임 AI, 콘텐츠 추천, 개인화 경험",
+                "features": ["게임 AI", "콘텐츠 추천", "개인화 경험", "미디어 분석"]
+            },
+            "retail": {
+                "name": "리테일 AI",
+                "description": "수요 예측, 재고 관리, 고객 분석",
+                "features": ["수요 예측", "재고 관리", "고객 분석", "가격 최적화"]
+            },
+            "energy": {
+                "name": "에너지 AI",
+                "description": "스마트 그리드, 에너지 최적화, 신재생 관리",
+                "features": ["스마트 그리드", "에너지 최적화", "신재생 관리", "소비 예측"]
+            },
+            "agriculture": {
+                "name": "농업 AI",
+                "description": "스마트 농업, 작물 모니터링, 수확량 예측",
+                "features": ["스마트 농업", "작물 모니터링", "수확량 예측", "토양 분석"]
+            },
+            "realestate": {
+                "name": "부동산 AI",
+                "description": "가격 예측, 투자 분석, 매물 추천",
+                "features": ["가격 예측", "투자 분석", "매물 추천", "시장 분석"]
+            },
+            "customerservice": {
+                "name": "고객서비스 AI",
+                "description": "챗봇, 감정 분석, 자동 응답 시스템",
+                "features": ["챗봇", "감정 분석", "자동 응답", "고객 분석"]
+            },
+            "saas": {
+                "name": "SaaS AI",
+                "description": "클라우드 서비스, API 관리, 자동화 솔루션",
+                "features": ["클라우드 서비스", "API 관리", "자동화 솔루션", "시스템 최적화"]
+            }
+        }
+        
+        info = domain_info.get(domain, {
+            "name": "AI 도메인",
+            "description": "전문 AI 서비스",
+            "features": ["AI 분석", "데이터 처리", "예측 모델", "자동화"]
+        })
+        
+        return HTMLResponse(f"""
+        <!DOCTYPE html>
+        <html lang="ko">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>{info['name']} - HYOJIN.AI</title>
+            <style>
+                * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+                body {{ 
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    min-height: 100vh;
+                    padding: 20px;
+                }}
+                .container {{ max-width: 800px; margin: 0 auto; padding: 40px 20px; }}
+                .header {{ text-align: center; margin-bottom: 40px; }}
+                .header h1 {{ font-size: 2.5em; margin-bottom: 10px; }}
+                .header p {{ font-size: 1.2em; opacity: 0.9; }}
+                .features {{ 
+                    background: rgba(255,255,255,0.1);
+                    padding: 30px;
+                    border-radius: 15px;
+                    backdrop-filter: blur(10px);
+                    margin-bottom: 30px;
+                }}
+                .features h3 {{ margin-bottom: 20px; }}
+                .features ul {{ list-style: none; }}
+                .features li {{ 
+                    padding: 10px 0;
+                    border-bottom: 1px solid rgba(255,255,255,0.1);
+                }}
+                .features li:last-child {{ border-bottom: none; }}
+                .buttons {{ text-align: center; }}
+                .btn {{ 
+                    background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+                    color: white;
+                    padding: 15px 30px;
+                    border: none;
+                    border-radius: 25px;
+                    text-decoration: none;
+                    display: inline-block;
+                    margin: 10px;
+                    font-size: 1.1em;
+                    transition: transform 0.3s;
+                }}
+                .btn:hover {{ transform: scale(1.05); }}
+                .back-btn {{ 
+                    background: rgba(255,255,255,0.2);
+                    color: white;
+                    padding: 10px 20px;
+                    border: none;
+                    border-radius: 20px;
+                    text-decoration: none;
+                    display: inline-block;
+                    margin-bottom: 20px;
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <a href="/" class="back-btn">← 홈으로 돌아가기</a>
+                <div class="header">
+                    <h1>{info['name']}</h1>
+                    <p>{info['description']}</p>
+                </div>
+                <div class="features">
+                    <h3>주요 기능</h3>
+                    <ul>
+                        {''.join(f'<li>✓ {feature}</li>' for feature in info['features'])}
+                    </ul>
+                </div>
+                <div class="buttons">
+                    <a href="/agents/marketplace?domain={domain}" class="btn">🤖 AI 에이전트 체험</a>
+                    <a href="/subscribers" class="btn">💳 구독하기</a>
+                </div>
+            </div>
+        </body>
+        </html>
+        """)
 
     # 데모용은 간단한 응답만 제공
     demo_results = {
@@ -2137,7 +2311,9 @@ async def get_subscription_management_dashboard(admin: bool = Depends(admin_requ
 
 
 @app.post("/admin/update-subscription")
-async def update_subscription(request: SubscriptionUpdateRequest, admin: bool = Depends(admin_required)):
+async def update_subscription(
+    request: SubscriptionUpdateRequest, admin: bool = Depends(admin_required)
+):
     """구독 정보 업데이트 (관리자용)"""
     global subscribers
 
@@ -2165,7 +2341,9 @@ class DomainManagementRequest(BaseModel):
 
 
 @app.post("/admin/manage-domain")
-async def manage_domain(request: DomainManagementRequest, admin: bool = Depends(admin_required)):
+async def manage_domain(
+    request: DomainManagementRequest, admin: bool = Depends(admin_required)
+):
     """12개 도메인 랜딩페이지 관리"""
 
     # 도메인별 관리 작업 로그 저장 (실제로는 데이터베이스에 저장)
@@ -2234,7 +2412,9 @@ async def get_domain_analytics(domain: str, admin: bool = Depends(admin_required
 
 
 @app.post("/admin/user-management")
-async def user_management(request: UserManagementRequest, admin: bool = Depends(admin_required)):
+async def user_management(
+    request: UserManagementRequest, admin: bool = Depends(admin_required)
+):
     """사용자 관리 기능 (생성, 수정, 삭제, 일시정지)"""
     global subscribers
 
@@ -2292,7 +2472,9 @@ async def user_management(request: UserManagementRequest, admin: bool = Depends(
 
 
 @app.post("/admin/financial-analysis")
-async def financial_analysis(request: FinancialAnalysisRequest, admin: bool = Depends(admin_required)):
+async def financial_analysis(
+    request: FinancialAnalysisRequest, admin: bool = Depends(admin_required)
+):
     """재무 분석 및 ROI 계산"""
 
     # 플랜별 요금
