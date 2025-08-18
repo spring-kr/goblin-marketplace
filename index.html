@@ -88,51 +88,51 @@
         </div>
 
         <div class="features">
-            <div class="feature-card" onclick="location.href='/predict?domain=healthcare'">
+            <div class="feature-card" onclick="showDomainInfo('healthcare')">
                 <h3>🏥 의료 AI</h3>
                 <p>진단 보조, 의료 영상 분석, 건강 모니터링 시스템</p>
             </div>
-            <div class="feature-card" onclick="location.href='/predict?domain=paymentapp'">
+            <div class="feature-card" onclick="showDomainInfo('paymentapp')">
                 <h3>💰 금융 AI</h3>
                 <p>결제 시스템, 리스크 분석, 투자 추천, 사기 탐지</p>
             </div>
-            <div class="feature-card" onclick="location.href='/predict?domain=education'">
+            <div class="feature-card" onclick="showDomainInfo('education')">
                 <h3>🎓 교육 AI</h3>
                 <p>개인화 학습, 콘텐츠 생성, 평가 시스템</p>
             </div>
-            <div class="feature-card" onclick="location.href='/predict?domain=manufacturing'">
+            <div class="feature-card" onclick="showDomainInfo('manufacturing')">
                 <h3>🏭 제조 AI</h3>
                 <p>품질 관리, 예측 유지보수, 공급망 최적화</p>
             </div>
-            <div class="feature-card" onclick="location.href='/predict?domain=mobility'">
+            <div class="feature-card" onclick="showDomainInfo('mobility')">
                 <h3>🚗 모빌리티 AI</h3>
                 <p>자율주행, 교통 최적화, 안전 시스템</p>
             </div>
-            <div class="feature-card" onclick="location.href='/predict?domain=entertainment'">
+            <div class="feature-card" onclick="showDomainInfo('entertainment')">
                 <h3>🎮 엔터테인먼트 AI</h3>
                 <p>게임 AI, 콘텐츠 추천, 개인화 경험</p>
             </div>
-            <div class="feature-card" onclick="location.href='/predict?domain=retail'">
+            <div class="feature-card" onclick="showDomainInfo('retail')">
                 <h3>🏪 리테일 AI</h3>
                 <p>수요 예측, 재고 관리, 고객 분석</p>
             </div>
-            <div class="feature-card" onclick="location.href='/predict?domain=energy'">
+            <div class="feature-card" onclick="showDomainInfo('energy')">
                 <h3>⚡ 에너지 AI</h3>
                 <p>스마트 그리드, 에너지 최적화, 신재생 관리</p>
             </div>
-            <div class="feature-card" onclick="location.href='/predict?domain=agriculture'">
+            <div class="feature-card" onclick="showDomainInfo('agriculture')">
                 <h3>🌾 농업 AI</h3>
                 <p>스마트 농업, 작물 모니터링, 수확량 예측</p>
             </div>
-            <div class="feature-card" onclick="location.href='/predict?domain=realestate'">
+            <div class="feature-card" onclick="showDomainInfo('realestate')">
                 <h3>🏢 부동산 AI</h3>
                 <p>가격 예측, 투자 분석, 매물 추천</p>
             </div>
-            <div class="feature-card" onclick="location.href='/predict?domain=customerservice'">
+            <div class="feature-card" onclick="showDomainInfo('customerservice')">
                 <h3>📞 고객서비스 AI</h3>
                 <p>챗봇, 감정 분석, 자동 응답 시스템</p>
             </div>
-            <div class="feature-card" onclick="location.href='/predict?domain=saas'">
+            <div class="feature-card" onclick="showDomainInfo('saas')">
                 <h3>☁️ SaaS AI</h3>
                 <p>클라우드 서비스, API 관리, 자동화 솔루션</p>
             </div>
@@ -171,6 +171,89 @@
                 }
                 element.textContent = Math.floor(current);
             }, 20);
+        }
+
+        // 도메인 정보 표시 함수
+        function showDomainInfo(domain) {
+            const domainData = {
+                healthcare: {
+                    title: "🏥 의료 AI 플랫폼",
+                    description: "박사급 의료 AI로 진단부터 치료까지 혁신적인 솔루션을 제공합니다.",
+                    features: ["AI 진단 보조", "의료 영상 분석", "환자 모니터링", "약물 상호작용 분석"],
+                    demo: "의료진을 위한 AI 어시스턴트를 체험해보세요"
+                },
+                paymentapp: {
+                    title: "💰 금융 AI 플랫폼", 
+                    description: "지능형 결제 시스템과 리스크 분석으로 안전한 금융 서비스를 구현합니다.",
+                    features: ["사기 탐지 AI", "신용 평가", "투자 추천", "결제 최적화"],
+                    demo: "스마트 금융 AI를 직접 체험해보세요"
+                },
+                education: {
+                    title: "🎓 교육 AI 플랫폼",
+                    description: "개인화된 학습 경험과 지능형 콘텐츠로 교육의 미래를 만듭니다.",
+                    features: ["개인화 학습", "자동 평가", "콘텐츠 생성", "학습 분석"],
+                    demo: "AI 기반 맞춤형 교육을 체험해보세요"
+                },
+                manufacturing: {
+                    title: "🏭 제조 AI 플랫폼",
+                    description: "스마트 팩토리와 예측 유지보수로 제조업의 디지털 전환을 이끕니다.",
+                    features: ["품질 관리 AI", "예측 유지보수", "공급망 최적화", "생산 계획"],
+                    demo: "스마트 제조 솔루션을 확인해보세요"
+                },
+                mobility: {
+                    title: "🚗 모빌리티 AI 플랫폼",
+                    description: "자율주행과 교통 최적화로 미래의 이동성을 구현합니다.",
+                    features: ["자율주행 AI", "교통 최적화", "안전 시스템", "경로 분석"],
+                    demo: "차세대 모빌리티 AI를 체험해보세요"
+                },
+                entertainment: {
+                    title: "🎮 엔터테인먼트 AI 플랫폼",
+                    description: "게임과 콘텐츠에 AI를 접목하여 새로운 경험을 창조합니다.",
+                    features: ["게임 AI", "콘텐츠 추천", "개인화 경험", "실시간 분석"],
+                    demo: "엔터테인먼트 AI의 마법을 경험하세요"
+                },
+                retail: {
+                    title: "🏪 리테일 AI 플랫폼",
+                    description: "수요 예측과 고객 분석으로 리테일 비즈니스를 혁신합니다.",
+                    features: ["수요 예측", "재고 최적화", "고객 분석", "가격 최적화"],
+                    demo: "스마트 리테일 솔루션을 확인하세요"
+                },
+                energy: {
+                    title: "⚡ 에너지 AI 플랫폼",
+                    description: "스마트 그리드와 에너지 최적화로 지속가능한 미래를 만듭니다.",
+                    features: ["스마트 그리드", "에너지 예측", "신재생 관리", "효율성 분석"],
+                    demo: "차세대 에너지 AI를 체험하세요"
+                },
+                agriculture: {
+                    title: "🌾 농업 AI 플랫폼",
+                    description: "스마트팜과 작물 모니터링으로 농업의 미래를 설계합니다.",
+                    features: ["작물 모니터링", "수확량 예측", "스마트 관개", "질병 진단"],
+                    demo: "스마트 농업 AI를 경험해보세요"
+                },
+                realestate: {
+                    title: "🏢 부동산 AI 플랫폼",
+                    description: "데이터 기반 부동산 분석과 투자 추천으로 최적의 결정을 지원합니다.",
+                    features: ["가격 예측", "투자 분석", "매물 추천", "시장 분석"],
+                    demo: "AI 부동산 컨설팅을 체험하세요"
+                },
+                customerservice: {
+                    title: "📞 고객서비스 AI 플랫폼",
+                    description: "지능형 챗봇과 감정 분석으로 고객 만족도를 극대화합니다.",
+                    features: ["AI 챗봇", "감정 분석", "자동 응답", "고객 인사이트"],
+                    demo: "차세대 고객서비스를 체험해보세요"
+                },
+                saas: {
+                    title: "☁️ SaaS AI 플랫폼",
+                    description: "클라우드 기반 AI 서비스로 비즈니스 자동화를 실현합니다.",
+                    features: ["API 관리", "자동화 워크플로", "클라우드 AI", "통합 솔루션"],
+                    demo: "올인원 SaaS AI를 확인해보세요"
+                }
+            };
+
+            const data = domainData[domain];
+            if (data) {
+                alert(`${data.title}\n\n${data.description}\n\n주요 기능:\n${data.features.map(f => `• ${f}`).join('\n')}\n\n${data.demo}`);
+            }
         }
 
         // 페이지 로드 시 애니메이션 실행
