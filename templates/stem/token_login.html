@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 STEM급 에이전트 - 토큰 로그인</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .title {
+            color: #333;
+            font-size: 2.2em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .flow-steps {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .flow-steps h3 {
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 8px;
+            border-radius: 8px;
+            background: white;
+        }
+
+        .step-number {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-right: 15px;
+        }
+
+        .step-text {
+            color: #333;
+            font-size: 0.95em;
+        }
+
+        .token-form {
+            margin-bottom: 20px;
+        }
+
+        .token-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 15px;
+            transition: border-color 0.3s ease;
+            font-family: 'Courier New', monospace;
+        }
+
+        .token-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .login-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-message {
+            background: #ff4444;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .success-message {
+            background: #4CAF50;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .loading {
+            display: none;
+            color: #667eea;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .github-link {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .github-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .github-link a:hover {
+            text-decoration: underline;
+        }
+
+        .agent-preview {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .agent-preview h4 {
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .agent-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 0.9em;
+        }
+
+        .agent-item {
+            display: flex;
+            align-items: center;
+            color: #666;
+        }
+
+        .agent-emoji {
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">🎯</div>
+        <h1 class="title">STEM급 에이전트 서비스</h1>
+        <p class="subtitle">
+            박사급에서 고블린으로 진화한 AI 전문가들과 대화하세요!<br>
+            구독자 전용 서비스입니다.
+        </p>
+
+        <div class="flow-steps">
+            <h3>🔗 서비스 이용 흐름</h3>
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-text">GitHub Pages에서 구독 구매</div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-text">결제 성공 후 토큰 발급 받기</div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-text">토큰으로 STEM급 에이전트 이용</div>
+            </div>
+        </div>
+
+        <form class="token-form" id="tokenForm">
+            <input 
+                type="text" 
+                class="token-input" 
+                id="tokenInput" 
+                placeholder="구독 토큰을 입력하세요 (예: stem-abc123-def456)"
+                required
+            >
+            <button type="submit" class="login-button" id="loginButton">
+                🔓 토큰으로 입장하기
+            </button>
+        </form>
+
+        <div class="loading" id="loading">
+            🔄 토큰 검증 중...
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+        <div class="success-message" id="successMessage"></div>
+
+        <div class="agent-preview">
+            <h4>🏆 이용 가능한 STEM급 에이전트들</h4>
+            <div class="agent-list">
+                <div class="agent-item">
+                    <span class="agent-emoji">🧮</span>
+                    <span>수학 천재 고블린</span>
+                </div>
+                <div class="agent-item">
+                    <span class="agent-emoji">⚗️</span>
+                    <span>물리학 마스터</span>
+                </div>
+                <div class="agent-item">
+                    <span class="agent-emoji">🧪</span>
+                    <span>화학 전문가</span>
+                </div>
+                <div class="agent-item">
+                    <span class="agent-emoji">🧬</span>
+                    <span>생물학 천재</span>
+                </div>
+                <div class="agent-item">
+                    <span class="agent-emoji">⚙️</span>
+                    <span>공학 마법사</span>
+                </div>
+                <div class="agent-item">
+                    <span class="agent-emoji">🤖</span>
+                    <span>AI 어시스턴트</span>
+                </div>
+                <div class="agent-item">
+                    <span class="agent-emoji">📊</span>
+                    <span>마케팅 전략가</span>
+                </div>
+                <div class="agent-item">
+                    <span class="agent-emoji">🚀</span>
+                    <span>스타트업 컨설턴트</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="github-link">
+            <p>
+                구독이 없으신가요? 
+                <a href="https://hyojin-ai-mvp.onrender.com" target="_blank">
+                    🌟 여기서 구독하기
+                </a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('tokenForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const token = document.getElementById('tokenInput').value.trim();
+            const loadingElement = document.getElementById('loading');
+            const errorElement = document.getElementById('errorMessage');
+            const successElement = document.getElementById('successMessage');
+            const loginButton = document.getElementById('loginButton');
+            
+            if (!token) {
+                showError('토큰을 입력해주세요.');
+                return;
+            }
+            
+            // UI 상태 변경
+            loadingElement.style.display = 'block';
+            errorElement.style.display = 'none';
+            successElement.style.display = 'none';
+            loginButton.disabled = true;
+            
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ token: token })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    successElement.textContent = data.message;
+                    successElement.style.display = 'block';
+                    
+                    // 1초 후 대시보드로 이동
+                    setTimeout(() => {
+                        window.location.href = data.redirect;
+                    }, 1000);
+                    
+                } else {
+                    showError(data.error);
+                }
+                
+            } catch (error) {
+                showError('서버 연결에 실패했습니다. 다시 시도해주세요.');
+            } finally {
+                loadingElement.style.display = 'none';
+                loginButton.disabled = false;
+            }
+        });
+        
+        function showError(message) {
+            const errorElement = document.getElementById('errorMessage');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+        
+        // 토큰 입력 시 자동 포맷팅 (선택사항)
+        document.getElementById('tokenInput').addEventListener('input', function(e) {
+            // 여기서 토큰 포맷 검증이나 자동 완성 기능 추가 가능
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>🏘️ 마을 관리 도깨비</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f0f2f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .header { text-align: center; margin-bottom: 30px; color: #333; }
+        .chat-area { border: 2px solid #ddd; border-radius: 8px; height: 300px; padding: 20px; background: #fafafa; overflow-y: auto; }
+        .input-area { margin-top: 20px; display: flex; gap: 10px; }
+        .input-area input { flex: 1; padding: 10px; border: 2px solid #ddd; border-radius: 5px; }
+        .input-area button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏘️ 마을 관리 도깨비</h1>
+            <p>커뮤니티 구축과 자원 관리 전문</p>
+        </div>
+        
+        <div class="chat-area" id="chatArea">
+            <div style="text-align: center; color: #888; margin-top: 100px;">
+                🏘️ 마을 관리 도깨비에게 무엇이든 물어보세요!
+            </div>
+        </div>
+        
+        <div class="input-area">
+            <input type="text" id="userInput" placeholder="질문을 입력하세요...">
+            <button onclick="sendMessage()">전송</button>
+        </div>
+    </div>
+    
+    <script>
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const chatArea = document.getElementById('chatArea');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // 사용자 메시지
+            const userDiv = document.createElement('div');
+            userDiv.style.cssText = 'margin: 10px 0; padding: 10px; background: #e3f2fd; border-radius: 8px; text-align: right;';
+            userDiv.innerHTML = `<strong>사용자:</strong> ${message}`;
+            chatArea.appendChild(userDiv);
+            
+            // 에이전트 응답
+            setTimeout(() => {
+                const agentDiv = document.createElement('div');
+                agentDiv.style.cssText = 'margin: 10px 0; padding: 10px; background: #f3e5f5; border-radius: 8px;';
+                agentDiv.innerHTML = `
+                    <strong>🏘️ 마을 관리 도깨비:</strong><br>
+                    커뮤니티 구축과 자원 관리 전문 전문가로서 답변드립니다.<br><br>
+                    요청사항: "<em>${message}</em>"<br><br>
+                    전문적인 분석과 솔루션을 제공해드리겠습니다!
+                `;
+                chatArea.appendChild(agentDiv);
+                chatArea.scrollTop = chatArea.scrollHeight;
+            }, 1000);
+            
+            input.value = '';
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+    </script>
+</body>
+</html>

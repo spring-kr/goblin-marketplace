@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 STEM급 에이전트 대시보드 (실제 API 연동)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.2em;
+        }
+
+        .server-status {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .agent-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .agent-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .agent-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
+        }
+
+        .agent-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .agent-emoji {
+            font-size: 2.5em;
+            margin-right: 15px;
+        }
+
+        .agent-info h3 {
+            color: #333;
+            font-size: 1.3em;
+            margin-bottom: 5px;
+        }
+
+        .agent-level {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            color: white;
+        }
+
+        .level-stem { background: #4CAF50; }
+        .level-expert { background: #FF9800; }
+        .level-chief { background: #9C27B0; }
+
+        .agent-description {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .chat-interface {
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+
+        .chat-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 14px;
+            margin-bottom: 10px;
+            transition: border-color 0.3s ease;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .chat-button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .chat-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .chat-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .response-area {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            min-height: 100px;
+            display: none;
+            white-space: pre-wrap;
+            font-size: 14px;
+            line-height: 1.6;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #667eea;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .error-message {
+            background: #ff4444;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .stats-section {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-item h3 {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 STEM급 에이전트 대시보드</h1>
+            <p>박사급에서 고블린으로 진화한 AI 전문가들과 실제로 대화하세요!</p>
+        </div>
+
+        <div class="server-status" id="serverStatus">
+            🔄 서버 상태 확인 중...
+        </div>
+
+        <div class="agent-grid">
+            <!-- STEM 과학 에이전트들 -->
+            <div class="agent-card">
+                <div class="agent-header">
+                    <div class="agent-emoji">🧮</div>
+                    <div class="agent-info">
+                        <h3>수학 천재 고블린</h3>
+                        <span class="agent-level level-stem">STEM급</span>
+                    </div>
+                </div>
+                <div class="agent-description">
+                    원래는 수학 박사였는데 고블린이 되었습니다. 복잡한 수학 문제를 해결하고 논리적 사고를 도와드립니다.
+                </div>
+                <div class="chat-interface">
+                    <input type="text" class="chat-input" placeholder="수학 문제나 질문을 입력하세요..." data-agent="math">
+                    <button class="chat-button" onclick="askAgent('math')">질문하기</button>
+                    <div class="loading" id="loading-math">🧮 수학 고블린이 생각 중...</div>
+                    <div class="error-message" id="error-math"></div>
+                    <div class="response-area" id="response-math"></div>
+                </div>
+            </div>
+
+            <div class="agent-card">
+                <div class="agent-header">
+                    <div class="agent-emoji">⚗️</div>
+                    <div class="agent-info">
+                        <h3>물리학 마스터 고블린</h3>
+                        <span class="agent-level level-stem">STEM급</span>
+                    </div>
+                </div>
+                <div class="agent-description">
+                    물리학 박사에서 고블린 마스터로 변신! 물리 현상과 원리를 쉽게 설명해드립니다.
+                </div>
+                <div class="chat-interface">
+                    <input type="text" class="chat-input" placeholder="물리학 질문을 입력하세요..." data-agent="physics">
+                    <button class="chat-button" onclick="askAgent('physics')">질문하기</button>
+                    <div class="loading" id="loading-physics">⚗️ 물리학 고블린이 실험 중...</div>
+                    <div class="error-message" id="error-physics"></div>
+                    <div class="response-area" id="response-physics"></div>
+                </div>
+            </div>
+
+            <div class="agent-card">
+                <div class="agent-header">
+                    <div class="agent-emoji">🧪</div>
+                    <div class="agent-info">
+                        <h3>화학 전문가 고블린</h3>
+                        <span class="agent-level level-stem">STEM급</span>
+                    </div>
+                </div>
+                <div class="agent-description">
+                    화학 박사가 고블린이 되어도 전문성은 그대로! 화학 반응과 분석을 도와드립니다.
+                </div>
+                <div class="chat-interface">
+                    <input type="text" class="chat-input" placeholder="화학 질문을 입력하세요..." data-agent="chemistry">
+                    <button class="chat-button" onclick="askAgent('chemistry')">질문하기</button>
+                    <div class="loading" id="loading-chemistry">🧪 화학 고블린이 실험 중...</div>
+                    <div class="error-message" id="error-chemistry"></div>
+                    <div class="response-area" id="response-chemistry"></div>
+                </div>
+            </div>
+
+            <div class="agent-card">
+                <div class="agent-header">
+                    <div class="agent-emoji">🧬</div>
+                    <div class="agent-info">
+                        <h3>생물학 천재 고블린</h3>
+                        <span class="agent-level level-stem">STEM급</span>
+                    </div>
+                </div>
+                <div class="agent-description">
+                    생물학 박사 출신 고블린! 생명과학과 생물학적 현상을 전문적으로 설명해드립니다.
+                </div>
+                <div class="chat-interface">
+                    <input type="text" class="chat-input" placeholder="생물학 질문을 입력하세요..." data-agent="biology">
+                    <button class="chat-button" onclick="askAgent('biology')">질문하기</button>
+                    <div class="loading" id="loading-biology">🧬 생물학 고블린이 연구 중...</div>
+                    <div class="error-message" id="error-biology"></div>
+                    <div class="response-area" id="response-biology"></div>
+                </div>
+            </div>
+
+            <div class="agent-card">
+                <div class="agent-header">
+                    <div class="agent-emoji">⚙️</div>
+                    <div class="agent-info">
+                        <h3>공학 마법사 고블린</h3>
+                        <span class="agent-level level-stem">STEM급</span>
+                    </div>
+                </div>
+                <div class="agent-description">
+                    공학 박사에서 마법사 고블린으로! 공학 설계와 기술 문제를 해결해드립니다.
+                </div>
+                <div class="chat-interface">
+                    <input type="text" class="chat-input" placeholder="공학 질문을 입력하세요..." data-agent="engineering">
+                    <button class="chat-button" onclick="askAgent('engineering')">질문하기</button>
+                    <div class="loading" id="loading-engineering">⚙️ 공학 고블린이 설계 중...</div>
+                    <div class="error-message" id="error-engineering"></div>
+                    <div class="response-area" id="response-engineering"></div>
+                </div>
+            </div>
+
+            <!-- 전문 고블린 에이전트들 -->
+            <div class="agent-card">
+                <div class="agent-header">
+                    <div class="agent-emoji">🤖</div>
+                    <div class="agent-info">
+                        <h3>AI 어시스턴트 고블린</h3>
+                        <span class="agent-level level-chief">촌장급</span>
+                    </div>
+                </div>
+                <div class="agent-description">
+                    44,478자의 촌장급 고블린! 종합적인 AI 어시스턴트 업무를 처리합니다.
+                </div>
+                <div class="chat-interface">
+                    <input type="text" class="chat-input" placeholder="어떤 도움이 필요하세요?" data-agent="assistant">
+                    <button class="chat-button" onclick="askAgent('assistant')">질문하기</button>
+                    <div class="loading" id="loading-assistant">🤖 AI 촌장이 처리 중...</div>
+                    <div class="error-message" id="error-assistant"></div>
+                    <div class="response-area" id="response-assistant"></div>
+                </div>
+            </div>
+
+            <div class="agent-card">
+                <div class="agent-header">
+                    <div class="agent-emoji">📊</div>
+                    <div class="agent-info">
+                        <h3>마케팅 전략가</h3>
+                        <span class="agent-level level-chief">촌장급</span>
+                    </div>
+                </div>
+                <div class="agent-description">
+                    39,362자의 마케팅 촌장! 디지털 마케팅과 브랜드 전략을 도와드립니다.
+                </div>
+                <div class="chat-interface">
+                    <input type="text" class="chat-input" placeholder="마케팅 전략에 대해 질문하세요..." data-agent="marketing">
+                    <button class="chat-button" onclick="askAgent('marketing')">질문하기</button>
+                    <div class="loading" id="loading-marketing">📊 마케팅 촌장이 전략 수립 중...</div>
+                    <div class="error-message" id="error-marketing"></div>
+                    <div class="response-area" id="response-marketing"></div>
+                </div>
+            </div>
+
+            <div class="agent-card">
+                <div class="agent-header">
+                    <div class="agent-emoji">🚀</div>
+                    <div class="agent-info">
+                        <h3>스타트업 컨설턴트</h3>
+                        <span class="agent-level level-chief">촌장급</span>
+                    </div>
+                </div>
+                <div class="agent-description">
+                    44,160자의 스타트업 촌장! 창업과 비즈니스 성장을 전문적으로 컨설팅합니다.
+                </div>
+                <div class="chat-interface">
+                    <input type="text" class="chat-input" placeholder="스타트업 관련 질문을 입력하세요..." data-agent="startup">
+                    <button class="chat-button" onclick="askAgent('startup')">질문하기</button>
+                    <div class="loading" id="loading-startup">🚀 스타트업 촌장이 분석 중...</div>
+                    <div class="error-message" id="error-startup"></div>
+                    <div class="response-area" id="response-startup"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-section">
+            <h2>🏆 도깨비 마을 통계</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <h3 id="totalAgents">31</h3>
+                    <p>총 에이전트 수</p>
+                </div>
+                <div class="stat-item">
+                    <h3 id="activeAgents">8</h3>
+                    <p>활성 에이전트</p>
+                </div>
+                <div class="stat-item">
+                    <h3>12</h3>
+                    <p>전문가급 (17,000자+)</p>
+                </div>
+                <div class="stat-item">
+                    <h3>100%</h3>
+                    <p>STEM급 달성률</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 서버 상태 확인
+        async function checkServerStatus() {
+            try {
+                const response = await fetch('/health');
+                const data = await response.json();
+                
+                document.getElementById('serverStatus').innerHTML = 
+                    `✅ 서버 정상 작동 중 | 로드된 에이전트: ${data.loaded_agents}개 | ${data.server_time}`;
+                document.getElementById('serverStatus').style.background = 
+                    'linear-gradient(135deg, #4CAF50, #45a049)';
+                    
+                // 활성 에이전트 수 업데이트
+                document.getElementById('activeAgents').textContent = data.loaded_agents;
+                
+            } catch (error) {
+                document.getElementById('serverStatus').innerHTML = 
+                    '❌ 서버 연결 실패 - web_server.py를 먼저 실행해주세요!';
+                document.getElementById('serverStatus').style.background = 
+                    'linear-gradient(135deg, #ff4444, #cc0000)';
+            }
+        }
+
+        async function askAgent(agentType) {
+            const inputElement = document.querySelector(`input[data-agent="${agentType}"]`);
+            const question = inputElement.value.trim();
+            
+            if (!question) {
+                alert('질문을 입력해주세요!');
+                return;
+            }
+
+            const loadingElement = document.getElementById(`loading-${agentType}`);
+            const responseElement = document.getElementById(`response-${agentType}`);
+            const errorElement = document.getElementById(`error-${agentType}`);
+            const buttonElement = inputElement.nextElementSibling;
+            
+            // UI 상태 초기화
+            loadingElement.style.display = 'block';
+            responseElement.style.display = 'none';
+            errorElement.style.display = 'none';
+            buttonElement.disabled = true;
+            
+            try {
+                const response = await fetch('/api/ask', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        agent_type: agentType,
+                        question: question
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    responseElement.textContent = data.response;
+                    responseElement.style.display = 'block';
+                    inputElement.value = '';
+                } else {
+                    throw new Error(data.error || '알 수 없는 오류가 발생했습니다.');
+                }
+                
+            } catch (error) {
+                errorElement.textContent = `오류: ${error.message}`;
+                errorElement.style.display = 'block';
+            } finally {
+                loadingElement.style.display = 'none';
+                buttonElement.disabled = false;
+            }
+        }
+
+        // Enter 키로 질문하기
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && e.target.classList.contains('chat-input')) {
+                const agentType = e.target.getAttribute('data-agent');
+                askAgent(agentType);
+            }
+        });
+
+        // 페이지 로드 시 서버 상태 확인
+        document.addEventListener('DOMContentLoaded', function() {
+            checkServerStatus();
+            
+            // 5분마다 서버 상태 재확인
+            setInterval(checkServerStatus, 300000);
+        });
+    </script>
+</body>
+</html>

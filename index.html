@@ -616,6 +616,55 @@
                     <h3>결제가 완료되었습니다!</h3>
                     <p>구독 서비스가 곧 활성화됩니다.</p>
                     <div id="subscriptionDetails"></div>
+                    
+                    <!-- 🎯 STEM급 에이전트 서비스 연결 -->
+                    <div id="stemAgentAccess" style="display: none; margin-top: 30px; padding: 25px; background: rgba(255,255,255,0.15); border-radius: 15px; border: 2px solid rgba(255,255,255,0.3);">
+                        <div style="font-size: 2.5em; margin-bottom: 15px;">🎯</div>
+                        <h3 style="color: #fff; margin-bottom: 15px;">STEM급 에이전트 서비스 이용</h3>
+                        <p style="color: #f0f0f0; margin-bottom: 20px;">박사급에서 고블린으로 진화한 31개 AI 전문가와 대화하세요!</p>
+                        
+                        <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 10px; margin: 20px 0;">
+                            <h4 style="color: #fff; margin-bottom: 10px;">🔑 구독 토큰</h4>
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                                <input type="text" id="accessToken" readonly style="flex: 1; padding: 12px; border: 2px solid #4CAF50; border-radius: 8px; background: #fff; font-family: 'Courier New', monospace; font-size: 16px; color: #333;">
+                                <button onclick="copyToken()" style="padding: 12px 20px; background: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">📋 복사</button>
+                            </div>
+                            <p style="color: #f39c12; font-size: 0.9em;">⚠️ 이 토큰은 STEM급 에이전트 서비스 로그인에 필요합니다. 안전하게 보관하세요.</p>
+                        </div>
+                        
+                        <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px; margin: 20px 0;">
+                            <h4 style="color: #fff; margin-bottom: 15px;">🏆 이용 가능한 STEM급 에이전트</h4>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; font-size: 0.9em;">
+                                <div style="color: #f0f0f0;">🧮 수학 천재 고블린</div>
+                                <div style="color: #f0f0f0;">⚗️ 물리학 마스터</div>
+                                <div style="color: #f0f0f0;">🧪 화학 전문가</div>
+                                <div style="color: #f0f0f0;">🧬 생물학 천재</div>
+                                <div style="color: #f0f0f0;">⚙️ 공학 마법사</div>
+                                <div style="color: #f0f0f0;">🤖 AI 어시스턴트</div>
+                                <div style="color: #f0f0f0;">📊 마케팅 전략가</div>
+                                <div style="color: #f0f0f0;">🚀 스타트업 컨설턴트</div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 25px;">
+                            <button onclick="goToStemService()" style="width: 100%; padding: 18px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s ease;">
+                                🎯 STEM급 에이전트 서비스 이용하기
+                            </button>
+                            <p style="color: #f0f0f0; text-align: center; margin-top: 10px; font-size: 0.9em;">
+                                ↑ 클릭하여 전문 AI 에이전트들과 대화를 시작하세요
+                            </p>
+                        </div>
+                        
+                        <div style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 8px; font-size: 0.9em;">
+                            <h5 style="color: #fff; margin-bottom: 8px;">📋 이용 안내</h5>
+                            <ul style="color: #f0f0f0; margin: 0; padding-left: 20px;">
+                                <li>토큰을 복사하여 STEM급 에이전트 서비스에 로그인</li>
+                                <li>31개 전문 분야 에이전트 중 자유 선택</li>
+                                <li>무제한 질문 및 전문적인 답변 제공</li>
+                                <li>구독 기간 동안 언제든지 이용 가능</li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
                 
                 <button type="submit" class="checkout-btn" id="submitBtn">
@@ -1438,6 +1487,24 @@
             
             if (successEl) successEl.style.display = 'block';
             
+            // 🎯 STEM급 에이전트 토큰 생성 및 표시
+            if (status === 'completed') {
+                const stemToken = generateAccessToken(subscriptionId);
+                const tokenInput = document.getElementById('accessToken');
+                const stemAccessDiv = document.getElementById('stemAgentAccess');
+                
+                if (tokenInput && stemAccessDiv) {
+                    tokenInput.value = stemToken;
+                    stemAccessDiv.style.display = 'block';
+                    
+                    // 토큰을 세션 스토리지에도 저장
+                    sessionStorage.setItem('current_stem_token', stemToken);
+                    sessionStorage.setItem('subscription_id', subscriptionId);
+                    
+                    console.log('🎯 STEM급 토큰 생성 완료:', stemToken);
+                }
+            }
+            
             // 이메일 전송
             sendConfirmationEmail(orderData, subscriptionId, status);
             
@@ -1665,6 +1732,68 @@ ${status === 'pending' ? `
             loadAgentsFromAPI();
             loadPaymentConfig();
         });
+        
+        // 🎯 STEM급 에이전트 서비스 연결 함수들
+        function generateAccessToken(subscriptionId) {
+            // STEM급 에이전트 전용 토큰 생성
+            const timestamp = Date.now();
+            const randomId = Math.random().toString(36).substring(2, 15);
+            return `stem-${subscriptionId}-${timestamp}-${randomId}`;
+        }
+        
+        function copyToken() {
+            const tokenInput = document.getElementById('accessToken');
+            tokenInput.select();
+            tokenInput.setSelectionRange(0, 99999); // 모바일용
+            
+            try {
+                document.execCommand('copy');
+                // 성공 메시지
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = '✅ 복사됨!';
+                button.style.background = '#2ecc71';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '#4CAF50';
+                }, 2000);
+                
+                alert('🎯 토큰이 클립보드에 복사되었습니다!\n\nSTEM급 에이전트 서비스에서 이 토큰으로 로그인하세요.');
+            } catch (err) {
+                // 폴백: 수동 복사 안내
+                alert('토큰을 수동으로 복사해주세요:\n\n' + tokenInput.value);
+            }
+        }
+        
+        function goToStemService() {
+            const token = document.getElementById('accessToken').value;
+            
+            if (!token) {
+                alert('❌ 토큰이 생성되지 않았습니다. 결제를 먼저 완료해주세요.');
+                return;
+            }
+            
+            // 토큰을 로컬 스토리지에 임시 저장 (자동 로그인용)
+            localStorage.setItem('stem_access_token', token);
+            localStorage.setItem('stem_token_timestamp', Date.now());
+            
+            // STEM급 에이전트 서비스 URL (클라우드 배포)
+            const stemServiceUrl = 'https://hyojin-stem-agents.onrender.com';  // Render 배포 서버
+            // const stemServiceUrl = 'http://localhost:5000';  // 로컬 개발용
+            
+            // 새 탭에서 STEM 서비스 열기
+            const stemWindow = window.open(stemServiceUrl, '_blank');
+            
+            if (!stemWindow) {
+                alert('팝업이 차단되었습니다. 브라우저 설정에서 팝업을 허용해주세요.\n\n직접 이동: ' + stemServiceUrl);
+            } else {
+                // 성공 메시지
+                setTimeout(() => {
+                    alert('🎯 STEM급 에이전트 서비스가 새 탭에서 열렸습니다!\n\n토큰으로 로그인하여 31개 전문 AI와 대화를 시작하세요.');
+                }, 1000);
+            }
+        }
     </script>
 </body>
 </html>

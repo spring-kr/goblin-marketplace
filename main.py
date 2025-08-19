@@ -39,11 +39,14 @@ from virtual_service_manager import virtual_service_manager
 # 인증 시스템 임포트
 from auth_system import auth_system
 
+# STEM 통합 임포트
+from stem_integration import setup_stem_routes
+
 # FastAPI 앱 생성
 app = FastAPI(
-    title="Hyojin AI MVP + Advanced Security + Payment",
-    description="12개 AI 비즈니스 도메인 + 고급 보안 시스템 + 실제 결제",
-    version="3.3.0",
+    title="Hyojin AI MVP + Advanced Security + Payment + STEM",
+    description="12개 AI 비즈니스 도메인 + 고급 보안 시스템 + 실제 결제 + 8개 STEM 에이전트",
+    version="3.4.0",
 )
 
 
@@ -4586,6 +4589,9 @@ async def service_access_page(service_id: str, token: str):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+
+# 🧪 STEM 라우트 설정
+setup_stem_routes(app)
 
 if __name__ == "__main__":
     import uvicorn
