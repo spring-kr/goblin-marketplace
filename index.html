@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>도깨비마을장터 - AI 도메인 & 에이전트 구독</title>
+    <title>🏪 도깨비마을장터 - AI 에이전트 입장권</title>
     <script src="https://js.stripe.com/v3/"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -18,177 +18,115 @@
         .header {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
-            padding: 20px;
+            padding: 30px;
             text-align: center;
             border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         }
         
-        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
-        .header p { font-size: 1.2em; opacity: 0.9; }
+        .header h1 { 
+            font-size: 3em; 
+            margin-bottom: 15px;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+        .header p { 
+            font-size: 1.3em; 
+            opacity: 0.9; 
+            margin-bottom: 10px;
+        }
         
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .container { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 40px 20px; 
+        }
         
-        .category-tabs {
-            display: flex;
-            justify-content: center;
+        .entrance-info {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 40px;
             margin: 30px 0;
-            gap: 10px;
-            flex-wrap: wrap;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.3);
         }
         
-        .tab {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 12px 25px;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 2px solid transparent;
+        .entrance-info h2 {
+            font-size: 2.2em;
+            margin-bottom: 20px;
+            color: #FFD700;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
         }
         
-        .tab.active {
-            background: rgba(255, 255, 255, 0.3);
-            border-color: rgba(255, 255, 255, 0.5);
+        .entrance-info p {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            line-height: 1.6;
         }
         
-        .tab:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        
-        .products-grid {
+        .agents-preview {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 25px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
             margin: 30px 0;
         }
         
-        .product-card {
+        .agent-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s;
+        }
+        
+        .agent-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .agent-emoji {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .agent-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .agent-desc {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+        
+        .pricing-section {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: transform 0.3s, box-shadow 0.3s;
-            position: relative;
+            border-radius: 20px;
+            padding: 40px;
+            margin: 40px 0;
+            text-align: center;
+            border: 2px solid rgba(255, 215, 0, 0.3);
         }
         
-        .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        .pricing-title {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #FFD700;
         }
         
-        .product-badge {
-            position: absolute;
-            top: 35px; /* 할인/프리미엄 배지 아래로 이동 */
-            right: 10px;
-            background: #e74c3c;
-            color: white;
-            padding: 4px 10px;
-            border-radius: 15px;
-            font-size: 0.7em;
-            font-weight: bold;
-            z-index: 2;
-        }
-        
-        .product-badge.domain { background: #3498db; }
-        .product-badge.agent { background: #f39c12; }
-        
-        /* 🏆 프리미엄 도메인 스타일 */
-        .product-card.premium {
+        .price-card {
             background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 140, 0, 0.1));
             border: 2px solid rgba(255, 215, 0, 0.5);
-            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
             position: relative;
             overflow: hidden;
         }
         
-        .product-card.premium::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            transform: rotate(45deg);
-            animation: premium-shine 3s infinite;
-        }
-        
-        @keyframes premium-shine {
-            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-            50% { transform: translateX(0%) translateY(0%) rotate(45deg); }
-            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
-        }
-        
-        .product-card.premium .product-title {
-            background: linear-gradient(45deg, #FFD700, #FFA500);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-size: 1.4em;
-        }
-        
-        .product-card.premium .price {
-            font-size: 1.6em;
-            background: linear-gradient(45deg, #2ecc71, #27ae60);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .product-card.premium .subscribe-btn {
-            background: linear-gradient(45deg, #FFD700, #FFA500);
-            color: #000;
-            font-weight: bold;
-            text-shadow: none;
-        }
-        
-        .product-card.premium .subscribe-btn:hover {
-            background: linear-gradient(45deg, #FFA500, #FFD700);
-            transform: scale(1.05);
-            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.5);
-        }
-        
-        /* 🎯 Coming Soon 스타일 */
-        .product-card.coming-soon {
-            opacity: 0.7;
-            position: relative;
-        }
-        
-        .product-card.coming-soon::after {
-            content: '개발예정';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 25px;
-            font-weight: bold;
-            font-size: 1.1em;
-        }
-        
-        .product-card.coming-soon .subscribe-btn {
-            background: #95a5a6;
-            cursor: not-allowed;
-        }
-        
-        /* 🏆 프리미엄 도메인 스타일링 */
-        .product-card.premium {
-            background: linear-gradient(135deg, 
-                rgba(255, 215, 0, 0.15) 0%,
-                rgba(255, 165, 0, 0.15) 50%,
-                rgba(255, 215, 0, 0.15) 100%);
-            border: 2px solid #FFD700;
-            box-shadow: 
-                0 0 30px rgba(255, 215, 0, 0.4),
-                0 4px 20px rgba(0, 0, 0, 0.3);
-            position: relative;
-            overflow: hidden;
-            transform: scale(1.02);
-        }
-        
-        .product-card.premium::before {
+        .price-card::before {
             content: '';
             position: absolute;
             top: -50%;
@@ -198,1602 +136,339 @@
             background: linear-gradient(
                 45deg,
                 transparent 30%,
-                rgba(255, 215, 0, 0.2) 50%,
+                rgba(255, 215, 0, 0.1) 50%,
                 transparent 70%
             );
-            animation: premiumShine 4s infinite;
+            animation: shine 3s infinite;
             pointer-events: none;
-            z-index: 1;
         }
         
-        .product-card.premium .product-title {
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+        
+        .price-amount {
+            font-size: 3em;
+            font-weight: bold;
             color: #FFD700;
             text-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
-            font-weight: bold;
-            position: relative;
-            z-index: 2;
-            margin-top: 15px; /* 프리미엄 배지와 간격 확보 */
-        }
-        
-        .product-card.premium .price {
-            color: #FFD700;
-            font-size: 1.4em;
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
-            font-weight: bold;
+            margin-bottom: 10px;
             position: relative;
             z-index: 2;
         }
         
-        .product-card.premium .subscribe-btn {
+        .price-period {
+            font-size: 1.2em;
+            opacity: 0.9;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .price-features {
+            list-style: none;
+            margin: 20px 0;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .price-features li {
+            margin: 10px 0;
+            padding-left: 25px;
+            position: relative;
+            font-size: 1.1em;
+        }
+        
+        .price-features li:before {
+            content: "✨";
+            position: absolute;
+            left: 0;
+            font-size: 1.2em;
+        }
+        
+        .entrance-btn {
             background: linear-gradient(45deg, #FFD700, #FF8C00, #FFD700);
             background-size: 200% 200%;
             color: #000;
+            border: none;
+            padding: 18px 40px;
+            border-radius: 30px;
+            font-size: 1.3em;
             font-weight: bold;
-            text-shadow: none;
-            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
-            transition: all 0.3s ease;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+            animation: goldPulse 2s infinite;
             position: relative;
             z-index: 2;
-            animation: goldGlow 3s infinite;
         }
         
-        .product-card.premium .subscribe-btn:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.7);
+        .entrance-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(255, 215, 0, 0.6);
             background-position: 100% 100%;
         }
         
-        /* 프리미엄 전용 컨텐츠 영역 패딩 */
-        .product-card.premium .product-content {
-            padding-top: 50px; /* 프리미엄은 더 큰 패딩 */
-        }
-        
-        @keyframes premiumShine {
-            0% { transform: translateX(-120%) translateY(-120%) rotate(45deg); }
-            100% { transform: translateX(120%) translateY(120%) rotate(45deg); }
-        }
-        
-        @keyframes goldGlow {
-            0%, 100% { background-position: 0% 0%; }
-            50% { background-position: 100% 100%; }
-        }
-        
-        /* 🎯 프리미엄 카드 컨텐츠 영역 조정 */
-        .product-card.premium .product-content {
-            padding-top: 45px !important; /* 프리미엄 배지 제거로 일반과 동일 */
-        }
-        
-        /* 일반 카드 컨텐츠 영역 조정 */
-        .product-card .product-content {
-            padding-top: 45px; /* 일반 배지들을 위한 공간 */
-        }
-        
-        /* 할인 배지 위치 조정 */
-        .discount-badge {
-            position: absolute;
-            top: 3px;
-            left: 3px;
-            background: linear-gradient(45deg, #e74c3c, #c0392b);
-            color: white;
-            padding: 2px 6px;
-            border-radius: 8px;
-            font-size: 0.6em;
-            font-weight: bold;
-            box-shadow: 0 2px 8px rgba(231, 76, 60, 0.4);
-            z-index: 3;
-            animation: discountPulse 2s infinite;
-        }
-        
-        /* 프리미엄 배지 위치 조정 */
-        .premium-badge {
-            position: absolute;
-            top: 3px;
-            right: 3px;
-            background: linear-gradient(45deg, #FFD700, #FF8C00);
-            color: #000;
-            padding: 2px 6px;
-            border-radius: 8px;
-            font-size: 0.6em;
-            font-weight: bold;
-            z-index: 4; /* 가장 위에 표시 */
-            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.5);
-        }
-        
-        /* 제품 카드 내용 영역 조정 */
-        .product-card .product-content {
-            padding-top: 40px; /* 배지들을 위한 공간 확보 */
-        }
-        
-        @keyframes discountPulse {
+        @keyframes goldPulse {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+            50% { transform: scale(1.02); }
         }
         
-        .product-title {
+        .benefit-section {
+            margin: 40px 0;
+        }
+        
+        .benefit-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            border-left: 4px solid #2ecc71;
+        }
+        
+        .benefit-title {
             font-size: 1.3em;
             font-weight: bold;
             margin-bottom: 10px;
-            color: #fff;
-        }
-        
-        .product-description {
-            opacity: 0.9;
-            margin-bottom: 15px;
-            line-height: 1.5;
-        }
-        
-        .product-features {
-            margin: 15px 0;
-        }
-        
-        .product-features li {
-            margin: 5px 0;
-            padding-left: 20px;
-            position: relative;
-        }
-        
-        .product-features li:before {
-            content: "✓";
-            position: absolute;
-            left: 0;
             color: #2ecc71;
-            font-weight: bold;
         }
         
-        .product-price {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 20px 0 15px 0;
-            padding: 15px 0;
+        .footer {
+            text-align: center;
+            padding: 30px;
+            opacity: 0.8;
             border-top: 1px solid rgba(255, 255, 255, 0.2);
         }
         
-        .price {
-            font-size: 1.4em;
-            font-weight: bold;
-            color: #2ecc71;
-        }
-        
-        .original-price {
-            text-decoration: line-through;
-            opacity: 0.6;
-            margin-right: 10px;
-        }
-        
-        .subscribe-btn {
-            background: linear-gradient(45deg, #2ecc71, #27ae60);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-            width: 100%;
-        }
-        
-        .subscribe-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4);
-        }
-        
-        .cart {
+        .loading {
+            display: none;
             position: fixed;
-            top: 20px;
-            right: 20px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             background: rgba(0, 0, 0, 0.8);
-            padding: 15px;
-            border-radius: 10px;
-            min-width: 200px;
-        }
-        
-        .cart-count {
-            background: #e74c3c;
             color: white;
-            border-radius: 50%;
-            width: 25px;
-            height: 25px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.9em;
-            margin-left: 10px;
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 1000;
         }
-        
-        .hidden { display: none; }
-        
-        .checkout-section {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 30px;
+
+        .quick-access {
+            background: rgba(46, 204, 113, 0.2);
+            border: 2px solid rgba(46, 204, 113, 0.5);
             border-radius: 15px;
-            margin: 30px 0;
-            backdrop-filter: blur(10px);
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
         }
-        
-        .form-group {
-            margin: 15px 0;
+
+        .quick-access h3 {
+            color: #2ecc71;
+            margin-bottom: 15px;
         }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-        }
-        
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.9);
-            color: #333;
-        }
-        
-        .checkout-btn {
-            background: linear-gradient(45deg, #e74c3c, #c0392b);
+
+        .quick-access-btn {
+            background: #2ecc71;
             color: white;
             border: none;
-            padding: 15px 30px;
+            padding: 12px 30px;
             border-radius: 25px;
+            font-size: 1.2em;
             cursor: pointer;
-            font-weight: bold;
-            font-size: 1.1em;
-            width: 100%;
-            margin-top: 20px;
-        }
-        
-        .total-price {
-            font-size: 1.5em;
-            font-weight: bold;
-            text-align: center;
-            margin: 20px 0;
-            color: #2ecc71;
-        }
-        
-        .payment-methods {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin: 20px 0;
-        }
-        
-        .payment-method {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            border-radius: 10px;
-            cursor: pointer;
-            border: 2px solid transparent;
             transition: all 0.3s;
-            text-align: center;
         }
-        
-        .payment-method:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        
-        .payment-method.selected {
-            border-color: #2ecc71;
-            background: rgba(46, 204, 113, 0.2);
-        }
-        
-        .payment-method img {
-            height: 40px;
-            margin-bottom: 10px;
-        }
-        
-        #card-element {
-            background: rgba(255, 255, 255, 0.9);
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-        }
-        
-        .payment-loading {
-            display: none;
-            text-align: center;
-            padding: 20px;
-        }
-        
-        .payment-success {
-            display: none;
-            background: rgba(46, 204, 113, 0.2);
-            border: 2px solid #2ecc71;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            margin: 20px 0;
-        }
-        
-        .payment-error {
-            display: none;
-            background: rgba(231, 76, 60, 0.2);
-            border: 2px solid #e74c3c;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 10px 0;
-            color: #e74c3c;
+
+        .quick-access-btn:hover {
+            background: #27ae60;
+            transform: translateY(-2px);
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>🏮 도깨비마을장터</h1>
-    </div>
-
-    <div class="cart">
-        <strong>🛍️ 장바구니</strong>
-        <span class="cart-count" id="cartCount">0</span>
-        <div id="cartItems" style="margin-top: 10px; max-height: 200px; overflow-y: auto;"></div>
-        <button onclick="showCheckout()" style="margin-top: 10px; padding: 8px 15px; background: #2ecc71; color: white; border: none; border-radius: 5px; cursor: pointer;">결제하기</button>
+        <h1>🏪 도깨비마을장터</h1>
+        <p>🧙‍♂️ 8명의 전문 AI 에이전트가 있는 마법의 장터</p>
+        <p>한 번의 입장권으로 모든 에이전트 이용 가능!</p>
     </div>
 
     <div class="container">
-        <div class="category-tabs">
-            <div class="tab active" data-category="all" onclick="switchCategory('all', this)">🌟 전체</div>
-            <div class="tab" data-category="domains" onclick="switchCategory('domains', this)">🤖 AI 도메인</div>
-            <div class="tab" data-category="agents" onclick="switchCategory('agents', this)">👨‍💼 AI 에이전트</div>
-            <div class="tab" data-category="premium" onclick="switchCategory('premium', this)">🏆 프리미엄</div>
-        </div>
-        
-        <div class="products-grid" id="productsGrid">
-            <!-- 제품들이 JavaScript로 동적 생성됩니다 -->
-        </div>
+        <div class="entrance-info">
+            <h2>🎫 마을 입장권 구독</h2>
+            <p>복잡한 개별 구독은 이제 그만! 간단한 입장권 하나로 모든 AI 에이전트를 만나보세요.</p>
+            <p>월 구독하면 8명의 전문가가 24시간 여러분을 도와드립니다.</p>
         </div>
 
-        <div id="productsContainer" class="products-grid">
-            <!-- 제품들이 여기에 동적으로 로드됩니다 -->
-        </div>
-
-        <div id="checkoutSection" class="checkout-section hidden">
-            <h2>🛍️ 주문 정보</h2>
-            <div id="orderSummary"></div>
-            
-            <div class="total-price" id="totalPrice">총 금액: $0/월</div>
-            
-            <div class="payment-methods">
-                <div class="payment-method selected" onclick="selectPaymentMethod('card', this)">
-                    <div style="font-size: 2em;">💳</div>
-                    <div>신용카드</div>
-                    <small>Visa, Mastercard, AMEX</small>
-                </div>
-                <div class="payment-method" onclick="selectPaymentMethod('paypal', this)">
-                    <div style="font-size: 2em;">💙</div>
-                    <div>PayPal</div>
-                    <small>안전한 PayPal 결제</small>
-                </div>
-                <div class="payment-method" onclick="selectPaymentMethod('bank', this)">
-                    <div style="font-size: 2em;">🏦</div>
-                    <div>계좌이체</div>
-                    <small>한국 은행 계좌</small>
-                </div>
+        <div class="agents-preview">
+            <div class="agent-card">
+                <span class="agent-emoji">🧮</span>
+                <div class="agent-name">수학 천재</div>
+                <div class="agent-desc">미적분, 통계, 대수</div>
             </div>
-            
-            <div class="payment-error" id="paymentError"></div>
-            
-            <form id="checkoutForm">
-                <div class="form-group">
-                    <label>이름 *</label>
-                    <input type="text" id="customerName" required>
-                </div>
-                <div class="form-group">
-                    <label>이메일 *</label>
-                    <input type="email" id="customerEmail" required>
-                </div>
-                <div class="form-group">
-                    <label>회사명</label>
-                    <input type="text" id="customerCompany">
-                </div>
-                
-                <!-- 신용카드 결제 폼 -->
-                <div id="cardPaymentForm">
-                    <div class="form-group">
-                        <label>신용카드 정보</label>
-                        <div id="card-element">
-                            <!-- Stripe Elements가 여기에 삽입됩니다 -->
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- 계좌이체 정보 -->
-                <div id="bankPaymentForm" style="display: none;">
-                    <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px; margin: 15px 0;">
-                        <h4>📋 계좌이체 정보</h4>
-                        <p><strong>은행:</strong> 국민은행</p>
-                        <p><strong>계좌번호:</strong> 123-456-789012</p>
-                        <p><strong>예금주:</strong> HYOJIN.AI</p>
-                        <small style="color: #f39c12;">⚠️ 입금 후 이메일로 입금확인서를 보내주세요.</small>
-                    </div>
-                </div>
-                
-                <div class="payment-loading" id="paymentLoading">
-                    <div style="font-size: 2em; margin-bottom: 10px;">⏳</div>
-                    <div>결제를 처리하고 있습니다...</div>
-                </div>
-                
-                <div class="payment-success" id="paymentSuccess">
-                    <div style="font-size: 3em; margin-bottom: 15px;">🎉</div>
-                    <h3>결제가 완료되었습니다!</h3>
-                    <p>구독 서비스가 곧 활성화됩니다.</p>
-                    <div id="subscriptionDetails"></div>
-                    
-                    <!-- 🎯 STEM급 에이전트 서비스 연결 -->
-                    <div id="stemAgentAccess" style="display: none; margin-top: 30px; padding: 25px; background: rgba(255,255,255,0.15); border-radius: 15px; border: 2px solid rgba(255,255,255,0.3);">
-                        <div style="font-size: 2.5em; margin-bottom: 15px;">🎯</div>
-                        <h3 style="color: #fff; margin-bottom: 15px;">STEM급 에이전트 서비스 이용</h3>
-                        <p style="color: #f0f0f0; margin-bottom: 20px;">박사급에서 고블린으로 진화한 31개 AI 전문가와 대화하세요!</p>
-                        
-                        <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 10px; margin: 20px 0;">
-                            <h4 style="color: #fff; margin-bottom: 10px;">🔑 구독 토큰</h4>
-                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
-                                <input type="text" id="accessToken" readonly style="flex: 1; padding: 12px; border: 2px solid #4CAF50; border-radius: 8px; background: #fff; font-family: 'Courier New', monospace; font-size: 16px; color: #333;">
-                                <button onclick="copyToken()" style="padding: 12px 20px; background: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">📋 복사</button>
-                            </div>
-                            <p style="color: #f39c12; font-size: 0.9em;">⚠️ 이 토큰은 STEM급 에이전트 서비스 로그인에 필요합니다. 안전하게 보관하세요.</p>
-                        </div>
-                        
-                        <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px; margin: 20px 0;">
-                            <h4 style="color: #fff; margin-bottom: 15px;">🏆 이용 가능한 STEM급 에이전트</h4>
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; font-size: 0.9em;">
-                                <div style="color: #f0f0f0;">🧮 수학 천재 고블린</div>
-                                <div style="color: #f0f0f0;">⚗️ 물리학 마스터</div>
-                                <div style="color: #f0f0f0;">🧪 화학 전문가</div>
-                                <div style="color: #f0f0f0;">🧬 생물학 천재</div>
-                                <div style="color: #f0f0f0;">⚙️ 공학 마법사</div>
-                                <div style="color: #f0f0f0;">🤖 AI 어시스턴트</div>
-                                <div style="color: #f0f0f0;">📊 마케팅 전략가</div>
-                                <div style="color: #f0f0f0;">🚀 스타트업 컨설턴트</div>
-                            </div>
-                        </div>
-                        
-                        <div style="margin-top: 25px;">
-                            <button onclick="goToStemService()" style="width: 100%; padding: 18px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s ease;">
-                                🎯 STEM급 에이전트 서비스 이용하기
-                            </button>
-                            <p style="color: #f0f0f0; text-align: center; margin-top: 10px; font-size: 0.9em;">
-                                ↑ 클릭하여 전문 AI 에이전트들과 대화를 시작하세요
-                            </p>
-                        </div>
-                        
-                        <div style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 8px; font-size: 0.9em;">
-                            <h5 style="color: #fff; margin-bottom: 8px;">📋 이용 안내</h5>
-                            <ul style="color: #f0f0f0; margin: 0; padding-left: 20px;">
-                                <li>토큰을 복사하여 STEM급 에이전트 서비스에 로그인</li>
-                                <li>31개 전문 분야 에이전트 중 자유 선택</li>
-                                <li>무제한 질문 및 전문적인 답변 제공</li>
-                                <li>구독 기간 동안 언제든지 이용 가능</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                
-                <button type="submit" class="checkout-btn" id="submitBtn">
-                    � 결제하기
+            <div class="agent-card">
+                <span class="agent-emoji">⚛️</span>
+                <div class="agent-name">물리학 마스터</div>
+                <div class="agent-desc">역학, 전자기학</div>
+            </div>
+            <div class="agent-card">
+                <span class="agent-emoji">🧪</span>
+                <div class="agent-name">화학 전문가</div>
+                <div class="agent-desc">유기화학, 무기화학</div>
+            </div>
+            <div class="agent-card">
+                <span class="agent-emoji">🧬</span>
+                <div class="agent-name">생물학 천재</div>
+                <div class="agent-desc">분자생물학, 유전학</div>
+            </div>
+            <div class="agent-card">
+                <span class="agent-emoji">⚙️</span>
+                <div class="agent-name">공학 마법사</div>
+                <div class="agent-desc">설계, 최적화</div>
+            </div>
+            <div class="agent-card">
+                <span class="agent-emoji">🤖</span>
+                <div class="agent-name">업무 어시스턴트</div>
+                <div class="agent-desc">프로젝트 관리</div>
+            </div>
+            <div class="agent-card">
+                <span class="agent-emoji">📈</span>
+                <div class="agent-name">마케팅 전략가</div>
+                <div class="agent-desc">브랜딩, 전략</div>
+            </div>
+            <div class="agent-card">
+                <span class="agent-emoji">🚀</span>
+                <div class="agent-name">스타트업 컨설턴트</div>
+                <div class="agent-desc">사업계획, 투자</div>
+            </div>
+        </div>
+
+        <div class="pricing-section">
+            <h2 class="pricing-title">🎫 마을 입장권 가격</h2>
+            <div class="price-card">
+                <div class="price-amount">₩29,000</div>
+                <div class="price-period">월 구독 (언제든 취소 가능)</div>
+                <ul class="price-features">
+                    <li>8명의 전문 AI 에이전트 무제한 이용</li>
+                    <li>24시간 언제든지 질문과 상담</li>
+                    <li>전문적인 분석과 해결책 제공</li>
+                    <li>개인 맞춤형 학습 및 업무 지원</li>
+                    <li>실시간 응답 및 피드백</li>
+                    <li>모든 기능 제한 없이 사용</li>
+                </ul>
+                <button class="entrance-btn" onclick="subscribePlan('village_entrance')">
+                    🎫 마을 입장권 구독하기
                 </button>
-            </form>
+            </div>
+        </div>
+
+        <div class="benefit-section">
+            <div class="benefit-card">
+                <div class="benefit-title">🎯 간단함의 혁신</div>
+                <p>복잡한 개별 구독 대신, 하나의 입장권으로 모든 전문가 서비스를 이용하세요. 더 이상 어떤 에이전트를 선택할지 고민할 필요가 없습니다.</p>
+            </div>
+            <div class="benefit-card">
+                <div class="benefit-title">💡 전문가 팀 보유</div>
+                <p>수학, 과학, 공학, 비즈니스 등 8개 분야의 전문가가 여러분의 모든 질문에 답변합니다. 한 번의 구독으로 종합적인 전문 서비스를 받으세요.</p>
+            </div>
+            <div class="benefit-card">
+                <div class="benefit-title">⚡ 즉시 이용 가능</div>
+                <p>구독 즉시 모든 에이전트에게 접근할 수 있습니다. 복잡한 설정이나 추가 결제 없이 바로 시작하세요.</p>
+            </div>
         </div>
     </div>
 
+    <div class="footer">
+        <p>🏪 도깨비마을장터 - 당신의 AI 전문가 팀</p>
+        <p>문의: support@hyojin-ai.com</p>
+    </div>
+
+    <div class="loading" id="loading">
+        <p>🎫 입장권을 준비하고 있습니다...</p>
+    </div>
+
     <script>
-        // 상품 데이터 - 프리미엄 도메인 가격 적용
-        const products = {
-            domains: [
-                // 🏆 프리미엄 도메인 (최고가)
-                {
-                    id: 'interdisciplinary-ai',
-                    name: '🔬 학제간 융복합 AI 도메인',
-                    description: '세계 최초 진정한 학제간 융복합 AI 시스템 - 다모달 데이터 처리, 양자 컴퓨팅 통합',
-                    features: ['다모달 데이터 처리', '학제간 패턴 분석', '도메인간 지식 융합', '자동 논문 생성', '연구 협업 엔진', '양자 컴퓨팅 통합'],
-                    price: 999,
-                    originalPrice: 199,
-                    type: 'domain',
-                    premium: true
-                },
-                {
-                    id: 'medical-ai',
-                    name: '🏥 의료 AI 도메인',
-                    description: 'HIPAA 준수 의료진단 AI - 생명과 직결되는 critical 의료 시스템',
-                    features: ['HIPAA 준수', '의료진단 AI', '환자 데이터 분석', '치료 계획 수립', '약물 상호작용 분석', '의료영상 분석'],
-                    price: 599,
-                    originalPrice: 199,
-                    type: 'domain',
-                    premium: true
-                },
-                
-                // 🏷️ 일반 도메인 (표준가)
-                {
-                    id: 'finance-ai',
-                    name: '💰 금융 AI 도메인',
-                    description: 'SOX 준수, 투자 위험 관리, 금융 분석을 위한 AI 시스템',
-                    features: ['SOX 준수', '위험 평가', '투자 전략', '사기 탐지', '신용 평가'],
-                    price: 199,
-                    originalPrice: 299,
-                    type: 'domain'
-                },
-                {
-                    id: 'agriculture-ai',
-                    name: '🌾 농업 AI 도메인',
-                    description: '스마트 농업, 작물 모니터링, 수확량 예측 AI',
-                    features: ['작물 모니터링', '수확량 예측', '토양 분석', '병해충 탐지', '농장 관리'],
-                    price: 199,
-                    originalPrice: 279,
-                    type: 'domain'
-                },
-                {
-                    id: 'energy-ai',
-                    name: '⚡ 에너지 AI 도메인',
-                    description: '에너지 효율, 스마트 그리드, 예측 분석 AI',
-                    features: ['에너지 효율', '그리드 최적화', '예측 분석', '비용 절감'],
-                    price: 199,
-                    originalPrice: 269,
-                    type: 'domain'
-                },
-                {
-                    id: 'retail-ai',
-                    name: '🛒 리테일 AI 도메인',
-                    description: '고객 분석, 재고 관리, 매출 예측 AI',
-                    features: ['재고 관리', '매출 예측', '고객 분석', 'PCI 보안 기준'],
-                    price: 199,
-                    originalPrice: 239,
-                    type: 'domain'
-                },
-                {
-                    id: 'entertainment-ai',
-                    name: '🎮 엔터테인먼트 AI',
-                    description: '게임, 미디어, 콘텐츠 생성을 위한 AI',
-                    features: ['콘텐츠 분석', '시청률 예측', '추천 시스템', '콘텐츠 등급 기준'],
-                    price: 199,
-                    originalPrice: 249,
-                    type: 'domain'
-                },
-                {
-                    id: 'logistics-ai',
-                    name: '🚛 물류 AI 도메인',
-                    description: '배송 최적화, 경로 계획, 실시간 추적 AI',
-                    features: ['배송 최적화', '경로 계획', '실시간 추적', '운송 안전 기준'],
-                    price: 199,
-                    originalPrice: 279,
-                    type: 'domain'
-                },
-                
-                // 🎯 특별 도메인 (개발예정)
-                {
-                    id: 'quantum-medical-ai',
-                    name: '⚛️ 양자 의료 AI 도메인',
-                    description: '미래급 양자 의료진단, 양자 약물 설계 (개발예정)',
-                    features: ['양자 의료진단', '양자 약물 설계', '양자 유전체 분석'],
-                    price: 1499,
-                    originalPrice: 1999,
-                    type: 'domain',
-                    badge: '🌟 미래급',
-                    comingSoon: true
-                },
-                {
-                    id: 'ai-fusion-research',
-                    name: '🤖 AI 융합 연구 도메인',
-                    description: '혁명급 AI-AI 융합, 메타 연구 시스템 (구상중)',
-                    features: ['AI-AI 융합', '메타 연구', '자율 연구 시스템'],
-                    price: 1999,
-                    originalPrice: 2499,
-                    type: 'domain',
-                    badge: '🔥 혁명급',
-                    comingSoon: true
-                },
-                {
-                    id: 'customer-ai',
-                    name: '고객서비스 AI',
-                    description: '챗봇, 고객 분석, 서비스 자동화',
-                    features: ['지능형 챗봇', '감정 분석', '자동 응답', '고객 만족도'],
-                    price: 129,
-                    originalPrice: 179,
-                    type: 'domain'
-                },
-                {
-                    id: 'saas-ai',
-                    name: 'SaaS AI 도메인',
-                    description: '클라우드 기반 AI 서비스, API 통합',
-                    features: ['클라우드 AI', 'API 통합', '확장성', '보안'],
-                    price: 199,
-                    originalPrice: 279,
-                    type: 'domain'
-                }
-            ],
-            agents: [
-                {
-                    id: 'village-chief-dokkaebi',
-                    name: '🏘️ 촌장 도깨비',
-                    description: '도깨비 마을의 촌장, 모든 도깨비들을 총괄하고 마을 운영 전반을 관리하는 리더',
-                    features: ['마을관리', '도깨비총괄', '리더십', '종합관리'],
-                    price: 199,
-                    originalPrice: 299,
-                    type: 'agent',
-                    tier: 'premium',
-                    autonomy_score: 99
-                },
-                {
-                    id: 'math-dokkaebi',
-                    name: '📐 수학 도깨비',
-                    description: '수학 문제 해결, 통계 분석, 수치 계산, 알고리즘 최적화 전문가 (75.78% 성과)',
-                    features: ['수학문제해결', '통계분석', '수치계산', '알고리즘최적화'],
-                    price: 159,
-                    originalPrice: 239,
-                    type: 'agent',
-                    tier: 'premium',
-                    autonomy_score: 98
-                },
-                {
-                    id: 'physics-dokkaebi',
-                    name: '⚡ 물리 도깨비',
-                    description: '물리학 법칙 분석, 시뮬레이션, 실험 설계, 과학적 모델링 전문가 (100% 성과)',
-                    features: ['물리학분석', '시뮬레이션', '실험설계', '과학적모델링'],
-                    price: 179,
-                    originalPrice: 269,
-                    type: 'agent',
-                    tier: 'premium',
-                    autonomy_score: 100
-                },
-                {
-                    id: 'chemistry-dokkaebi',
-                    name: '🧪 화학 도깨비',
-                    description: '화학 반응 분석, 분자 구조 예측, 실험 결과 해석, 화학공정 최적화 전문가 (90% 성과)',
-                    features: ['화학반응분석', '분자구조예측', '실험결과해석', '화학공정최적화'],
-                    price: 149,
-                    originalPrice: 219,
-                    type: 'agent',
-                    tier: 'premium',
-                    autonomy_score: 90
-                },
-                {
-                    id: 'engineering-dokkaebi',
-                    name: '🔧 공학 도깨비',
-                    description: '공학 설계, 시스템 분석, 기술 최적화, 엔지니어링 솔루션 전문가 (95% 성과)',
-                    features: ['공학설계', '시스템분석', '기술최적화', '엔지니어링솔루션'],
-                    price: 169,
-                    originalPrice: 249,
-                    type: 'agent',
-                    tier: 'premium',
-                    autonomy_score: 95
-                },
-                {
-                    id: 'biology-dokkaebi',
-                    name: '🧬 생물학 도깨비',
-                    description: '생물학적 데이터 분석, 유전자 연구, 생태계 모델링, 바이오 기술 전문가 (88% 성과)',
-                    features: ['생물학데이터분석', '유전자연구', '생태계모델링', '바이오기술'],
-                    price: 139,
-                    originalPrice: 199,
-                    type: 'agent',
-                    tier: 'premium',
-                    autonomy_score: 88
-                },
-                {
-                    id: 'business-strategy-dokkaebi',
-                    name: '📈 비즈니스 전략 도깨비',
-                    description: '경영 전략 수립, 시장 분석, 비즈니스 모델 개발, 전략적 의사결정 전문가',
-                    features: ['경영전략수립', '시장분석', '비즈니스모델개발', '전략적의사결정'],
-                    price: 189,
-                    originalPrice: 279,
-                    type: 'agent',
-                    tier: 'enterprise',
-                    autonomy_score: 95
-                },
-                {
-                    id: 'communication-dokkaebi',
-                    name: '💬 커뮤니케이션 도깨비',
-                    description: '소통 전략, 대화 분석, 커뮤니케이션 최적화, 관계 관리 전문가',
-                    features: ['소통전략', '대화분석', '커뮤니케이션최적화', '관계관리'],
-                    price: 99,
-                    originalPrice: 149,
-                    type: 'agent',
-                    tier: 'standard',
-                    autonomy_score: 89
-                },
-                {
-                    id: 'financial-management-dokkaebi',
-                    name: '💰 재무 관리 도깨비',
-                    description: '재무 계획, 투자 분석, 리스크 관리, 포트폴리오 최적화 전문가',
-                    features: ['재무계획', '투자분석', '리스크관리', '포트폴리오최적화'],
-                    price: 179,
-                    originalPrice: 259,
-                    type: 'agent',
-                    tier: 'enterprise',
-                    autonomy_score: 96
-                },
-                {
-                    id: 'innovation-creation-dokkaebi',
-                    name: '🚀 혁신 창조 도깨비',
-                    description: '혁신 아이디어 창출, 창의적 문제 해결, 신기술 개발, 미래 예측 전문가',
-                    features: ['혁신아이디어창출', '창의적문제해결', '신기술개발', '미래예측'],
-                    price: 159,
-                    originalPrice: 229,
-                    type: 'agent',
-                    tier: 'premium',
-                    autonomy_score: 93
-                },
-                {
-                    id: 'technology-management-dokkaebi',
-                    name: '🔧 기술 관리 도깨비',
-                    description: '기술 시스템 관리, IT 인프라 최적화, 기술 전략 수립, 디지털 혁신 전문가',
-                    features: ['기술시스템관리', 'IT인프라최적화', '기술전략수립', '디지털혁신'],
-                    price: 149,
-                    originalPrice: 219,
-                    type: 'agent',
-                    tier: 'premium',
-                    autonomy_score: 94
-                },
-                {
-                    id: 'user-management-dokkaebi',
-                    name: '👥 사용자 관리 도깨비',
-                    description: '사용자 경험 최적화, 고객 관리, 서비스 개선, 사용자 행동 분석 전문가',
-                    features: ['사용자경험최적화', '고객관리', '서비스개선', '사용자행동분석'],
-                    price: 89,
-                    originalPrice: 129,
-                    type: 'agent',
-                    tier: 'standard',
-                    autonomy_score: 87
-                }
-            ],
-            bundles: [
-                {
-                    id: 'starter-bundle',
-                    name: '스타터 번들',
-                    description: '인기 AI 도메인 3개 + 에이전트 5명',
-                    features: ['의료+금융+교육 AI', '핵심 에이전트 5명', '24/7 지원', '월간 리포트'],
-                    price: 399,
-                    originalPrice: 699,
-                    type: 'bundle'
-                },
-                {
-                    id: 'business-bundle',
-                    name: '비즈니스 번들',
-                    description: 'AI 도메인 8개 + 에이전트 10명',
-                    features: ['주요 AI 도메인 8개', '전문 에이전트 10명', '우선 지원', '커스텀 기능'],
-                    price: 899,
-                    originalPrice: 1599,
-                    type: 'bundle'
-                },
-                {
-                    id: 'enterprise-bundle',
-                    name: '엔터프라이즈 번들',
-                    description: '모든 AI 도메인 12개 + 모든 에이전트 15명',
-                    features: ['전체 AI 도메인', '모든 에이전트', '전담 지원', '무제한 커스터마이징'],
-                    price: 1999,
-                    originalPrice: 3999,
-                    type: 'bundle'
-                }
-            ]
-        };
-
-        let cart = [];
-        let currentCategory = 'all';
-        let selectedPaymentMethod = 'card';
-        let stripe = null;
-        let elements = null;
-        let card = null;
-
-        // Stripe 초기화 (실제 사용시에는 본인의 Publishable Key로 교체)
-        let STRIPE_PUBLISHABLE_KEY = 'pk_test_demo'; // 기본값
+        // 간단한 입장권 구독 시스템
         
-        // 페이지 로드시 Stripe 초기화 및 에이전트 로드
-        document.addEventListener('DOMContentLoaded', function() {
-            loadPaymentConfig();
-            loadAgents();
-        });
-        
-        // API에서 에이전트 데이터 로드
-        async function loadAgents() {
+        // 입장권 구독 함수
+        async function subscribePlan(planType) {
+            const loading = document.getElementById('loading');
+            loading.style.display = 'block';
+            
             try {
-                console.log('에이전트 데이터 로딩 시작...');
-                const response = await fetch('/agents');
+                // 구독 데이터 생성
+                const subscriptionData = {
+                    name: '도깨비마을장터 방문자',
+                    email: 'visitor@example.com', // 실제로는 사용자 입력받기
+                    company: '개인',
+                    paymentMethod: 'card',
+                    total: 29000,
+                    items: [{
+                        name: '🎫 도깨비마을장터 입장권',
+                        description: '8명의 전문 AI 에이전트 이용권 (월 구독)',
+                        price: 29000,
+                        quantity: 1
+                    }]
+                };
                 
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
+                // 임시로 성공 시뮬레이션 (실제로는 서버 API 호출)
+                const mockResult = {
+                    success: true,
+                    subscription_id: 'village_' + Date.now()
+                };
                 
-                const agentsData = await response.json();
-                console.log('로드된 에이전트 데이터:', agentsData);
-                console.log('agentsData.success:', agentsData.success);
-                console.log('agentsData.agents:', agentsData.agents);
-                console.log('agentsData.agents 타입:', typeof agentsData.agents);
-                console.log('agentsData.agents.length:', agentsData.agents ? agentsData.agents.length : 'undefined');
-                
-                // API 응답 구조에 맞게 agents 배열 추출
-                let agentsArray = [];
-                if (agentsData && agentsData.success && agentsData.agents) {
-                    if (Array.isArray(agentsData.agents)) {
-                        agentsArray = agentsData.agents;
-                        console.log('agents 배열 추출 성공');
-                    } else if (typeof agentsData.agents === 'object') {
-                        // agents가 객체인 경우 값들을 배열로 변환
-                        agentsArray = Object.values(agentsData.agents);
-                        console.log('agents 객체를 배열로 변환:', agentsArray);
-                    }
-                } else if (Array.isArray(agentsData)) {
-                    agentsArray = agentsData;
-                    console.log('직접 배열 사용');
+                if (mockResult.success) {
+                    // 결제 성공 시 STEM 서비스로 이동
+                    const token = generateAccessToken(mockResult.subscription_id);
+                    
+                    // 토큰 저장
+                    sessionStorage.setItem('current_stem_token', token);
+                    sessionStorage.setItem('subscription_id', mockResult.subscription_id);
+                    
+                    // STEM 서비스로 이동
+                    window.location.href = `/stem/dashboard?token=${token}`;
                 } else {
-                    console.warn('예상되지 않은 API 응답 구조:', agentsData);
-                    console.log('응답 구조 분석:');
-                    console.log('- success 필드:', agentsData.success);
-                    console.log('- agents 필드:', agentsData.agents);
-                    console.log('- 전체 키:', Object.keys(agentsData));
-                    return;
+                    alert('결제 처리 중 오류가 발생했습니다.');
                 }
                 
-                console.log('최종 추출된 에이전트 배열:', agentsArray);
-                console.log('배열 길이:', agentsArray.length);
-                
-                if (agentsArray && agentsArray.length > 0) {
-                    // API 데이터를 제품 형식으로 변환
-                    const convertedAgents = agentsArray.map((agent, index) => {
-                        console.log(`에이전트 ${index + 1}:`, agent);
-                        return {
-                            id: agent.id || agent.agent_id || `agent-${index}`,
-                            name: agent.name || agent.agent_name || `에이전트 ${index + 1}`,
-                            description: agent.description || '설명 없음',
-                            features: agent.capabilities || ['기본 기능'],
-                            price: agent.pricing?.monthly || 99,
-                            originalPrice: (agent.pricing?.monthly || 99) * 1.4,
-                            type: 'agent'
-                        };
-                    });
-                    
-                    // products 객체의 agents 배열 교체
-                    products.agents = convertedAgents;
-                    console.log('에이전트 데이터 업데이트 완료:', products.agents);
-                    
-                    // 화면 새로고침
-                    renderProducts();
-                } else {
-                    console.warn('에이전트 데이터가 비어있습니다:', agentsArray);
-                }
             } catch (error) {
-                console.error('에이전트 로딩 실패:', error);
-                console.log('하드코딩된 데이터 사용');
-            }
-        }
-        
-        async function loadPaymentConfig() {
-            try {
-                const response = await fetch('/api/payment-config');
-                const config = await response.json();
-                STRIPE_PUBLISHABLE_KEY = config.stripe_publishable_key;
-                initializeStripe();
-            } catch (error) {
-                console.warn('결제 설정 로드 실패, 데모 모드로 실행:', error);
-                initializeStripe();
-            }
-        }
-        
-        function initializeStripe() {
-            try {
-                if (STRIPE_PUBLISHABLE_KEY !== 'pk_test_demo') {
-                    stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
-                    elements = stripe.elements();
-                    
-                    // 카드 요소 스타일
-                    const style = {
-                        base: {
-                            fontSize: '16px',
-                            color: '#424770',
-                            '::placeholder': {
-                                color: '#aab7c4',
-                            },
-                        },
-                    };
-                    
-                    card = elements.create('card', {style: style});
-                    card.mount('#card-element');
-                    
-                    // 카드 변경 이벤트 리스너
-                    card.addEventListener('change', function(event) {
-                        const displayError = document.getElementById('paymentError');
-                        if (event.error) {
-                            displayError.textContent = event.error.message;
-                            displayError.style.display = 'block';
-                        } else {
-                            displayError.style.display = 'none';
-                        }
-                    });
-                } else {
-                    console.log('데모 모드: Stripe 없이 실행');
-                }
-            } catch (error) {
-                console.warn('Stripe 초기화 실패 (데모 모드):', error.message);
-                // 데모 모드에서는 Stripe 없이도 동작
-            }
-        }
-
-        // 카테고리 표시
-        function showCategory(category) {
-            currentCategory = category;
-            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-            event.target.classList.add('active');
-            renderProducts();
-        }
-
-        // 상품 렌더링
-        function renderProducts() {
-            const container = document.getElementById('productsContainer');
-            let productsToShow = [];
-
-            if (currentCategory === 'all') {
-                productsToShow = [...products.domains, ...products.agents, ...products.bundles];
-            } else {
-                productsToShow = products[currentCategory] || [];
-            }
-
-            container.innerHTML = productsToShow.map(product => `
-                <div class="product-card">
-                    <div class="product-badge ${product.type}">${product.type.toUpperCase()}</div>
-                    <div class="product-title">${product.name}</div>
-                    <div class="product-description">${product.description}</div>
-                    <ul class="product-features">
-                        ${product.features.map(feature => `<li>${feature}</li>`).join('')}
-                    </ul>
-                    <div class="product-price">
-                        <div>
-                            <span class="original-price">$${product.originalPrice}</span>
-                            <span class="price">$${product.price}/월</span>
-                        </div>
-                    </div>
-                    <button class="subscribe-btn" onclick="addToCart('${product.id}')">
-                        🛒 장바구니 담기
-                    </button>
-                </div>
-            `).join('');
-        }
-
-        // 장바구니에 추가
-        function addToCart(productId) {
-            const allProducts = [...products.domains, ...products.agents, ...products.bundles];
-            const product = allProducts.find(p => p.id === productId);
-            
-            if (product && !cart.find(item => item.id === productId)) {
-                cart.push(product);
-                updateCartDisplay();
-                
-                // 추가 알림
-                alert(`✅ ${product.name}이(가) 장바구니에 추가되었습니다!`);
-            } else if (cart.find(item => item.id === productId)) {
-                alert('⚠️ 이미 장바구니에 있는 상품입니다.');
-            }
-        }
-
-        // 장바구니 표시 업데이트
-        function updateCartDisplay() {
-            const cartCount = document.getElementById('cartCount');
-            const cartItems = document.getElementById('cartItems');
-            
-            cartCount.textContent = cart.length;
-            
-            if (cart.length === 0) {
-                cartItems.innerHTML = '<small style="opacity: 0.7;">장바구니가 비어있습니다</small>';
-            } else {
-                cartItems.innerHTML = cart.map(item => `
-                    <div style="margin: 5px 0; padding: 5px; background: rgba(255,255,255,0.1); border-radius: 5px; font-size: 0.9em;">
-                        <strong>${item.name}</strong><br>
-                        <span style="color: #2ecc71;">$${item.price}/월</span>
-                        <button onclick="removeFromCart('${item.id}')" style="float: right; background: #e74c3c; color: white; border: none; border-radius: 3px; padding: 2px 6px; cursor: pointer;">×</button>
-                    </div>
-                `).join('');
-            }
-        }
-
-        // 장바구니에서 제거
-        function removeFromCart(productId) {
-            cart = cart.filter(item => item.id !== productId);
-            updateCartDisplay();
-        }
-
-        // 결제 페이지 표시
-        function showCheckout() {
-            if (cart.length === 0) {
-                alert('⚠️ 장바구니가 비어있습니다.');
-                return;
-            }
-
-            const checkoutSection = document.getElementById('checkoutSection');
-            const orderSummary = document.getElementById('orderSummary');
-            const totalPrice = document.getElementById('totalPrice');
-
-            // 주문 요약
-            const total = cart.reduce((sum, item) => sum + item.price, 0);
-            
-            orderSummary.innerHTML = cart.map(item => `
-                <div style="display: flex; justify-content: space-between; padding: 10px; background: rgba(255,255,255,0.1); margin: 5px 0; border-radius: 8px;">
-                    <span>${item.name}</span>
-                    <span>$${item.price}/월</span>
-                </div>
-            `).join('');
-
-            totalPrice.textContent = `총 금액: $${total}/월`;
-            
-            checkoutSection.classList.remove('hidden');
-            checkoutSection.scrollIntoView({ behavior: 'smooth' });
-        }
-
-        // 결제 방법 선택
-        function selectPaymentMethod(method, element) {
-            selectedPaymentMethod = method;
-            
-            // 모든 결제 방법 선택 해제
-            document.querySelectorAll('.payment-method').forEach(el => el.classList.remove('selected'));
-            element.classList.add('selected');
-            
-            // 결제 폼 표시/숨김
-            const cardForm = document.getElementById('cardPaymentForm');
-            const bankForm = document.getElementById('bankPaymentForm');
-            const submitBtn = document.getElementById('submitBtn');
-            
-            if (method === 'card') {
-                cardForm.style.display = 'block';
-                bankForm.style.display = 'none';
-                submitBtn.innerHTML = '💳 신용카드로 결제하기';
-            } else if (method === 'paypal') {
-                cardForm.style.display = 'none';
-                bankForm.style.display = 'none';
-                submitBtn.innerHTML = '💙 PayPal로 결제하기';
-            } else if (method === 'bank') {
-                cardForm.style.display = 'none';
-                bankForm.style.display = 'block';
-                submitBtn.innerHTML = '🏦 계좌이체 신청하기';
-            }
-        }
-
-        // 주문 제출
-        document.getElementById('checkoutForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = {
-                name: document.getElementById('customerName').value,
-                email: document.getElementById('customerEmail').value,
-                company: document.getElementById('customerCompany').value,
-                paymentMethod: selectedPaymentMethod,
-                items: cart,
-                total: cart.reduce((sum, item) => sum + item.price, 0)
-            };
-
-            // 결제 처리
-            processPayment(formData);
-        });
-
-        // 결제 처리
-        async function processPayment(orderData) {
-            const loadingEl = document.getElementById('paymentLoading');
-            const errorEl = document.getElementById('paymentError');
-            const successEl = document.getElementById('paymentSuccess');
-            const submitBtn = document.getElementById('submitBtn');
-            
-            // 로딩 시작
-            loadingEl.style.display = 'block';
-            errorEl.style.display = 'none';
-            successEl.style.display = 'none';
-            submitBtn.disabled = true;
-            
-            try {
-                if (selectedPaymentMethod === 'card') {
-                    await processCardPayment(orderData);
-                } else if (selectedPaymentMethod === 'paypal') {
-                    await processPayPalPayment(orderData);
-                } else if (selectedPaymentMethod === 'bank') {
-                    await processBankTransfer(orderData);
-                }
-            } catch (error) {
-                showError(error.message);
+                console.error('결제 오류:', error);
+                alert('결제 처리 중 오류가 발생했습니다.');
             } finally {
-                loadingEl.style.display = 'none';
-                submitBtn.disabled = false;
+                loading.style.display = 'none';
             }
         }
         
-        // 신용카드 결제 처리
-        async function processCardPayment(orderData) {
-            if (!stripe || !card) {
-                // 데모 모드: Stripe 없이 시뮬레이션
-                await simulatePayment(orderData);
-                return;
-            }
-            
-            try {
-                // Stripe 토큰 생성
-                const {token, error} = await stripe.createToken(card);
-                
-                if (error) {
-                    throw new Error(error.message);
-                }
-                
-                // 백엔드 API 호출
-                const response = await fetch('/api/process-payment', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        token: token.id,
-                        amount: orderData.total * 100, // cents
-                        customer: {
-                            name: orderData.name,
-                            email: orderData.email,
-                            company: orderData.company,
-                            paymentMethod: 'card'
-                        },
-                        items: orderData.items.map(item => ({
-                            id: item.id,
-                            name: item.name,
-                            price: item.price,
-                            type: item.type
-                        }))
-                    })
-                });
-                
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.detail || '결제 처리에 실패했습니다.');
-                }
-                
-                const result = await response.json();
-                showSuccess(orderData, result.subscription_id, result.status, result);
-                
-            } catch (error) {
-                // 실제 API 호출 실패시 데모 모드로 폴백
-                console.warn('실제 결제 실패, 데모 모드로 전환:', error.message);
-                await simulatePayment(orderData);
-            }
-        }
-        
-        // PayPal 결제 처리
-        async function processPayPalPayment(orderData) {
-            try {
-                // 백엔드 API 호출
-                const response = await fetch('/api/process-payment', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        amount: orderData.total * 100,
-                        customer: {
-                            name: orderData.name,
-                            email: orderData.email,
-                            company: orderData.company,
-                            paymentMethod: 'paypal'
-                        },
-                        items: orderData.items.map(item => ({
-                            id: item.id,
-                            name: item.name,
-                            price: item.price,
-                            type: item.type
-                        }))
-                    })
-                });
-                
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.detail || 'PayPal 결제에 실패했습니다.');
-                }
-                
-                const result = await response.json();
-                showSuccess(orderData, result.subscription_id, result.status, result);
-                
-            } catch (error) {
-                console.warn('PayPal 결제 실패, 데모 모드로 전환:', error.message);
-                await simulatePayment(orderData);
-            }
-        }
-        
-        // 계좌이체 처리
-        async function processBankTransfer(orderData) {
-            try {
-                // 백엔드 API 호출
-                const response = await fetch('/api/bank-transfer', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        customer: {
-                            name: orderData.name,
-                            email: orderData.email,
-                            company: orderData.company,
-                            paymentMethod: 'bank'
-                        },
-                        items: orderData.items.map(item => ({
-                            id: item.id,
-                            name: item.name,
-                            price: item.price,
-                            type: item.type
-                        }))
-                    })
-                });
-                
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.detail || '계좌이체 신청에 실패했습니다.');
-                }
-                
-                const result = await response.json();
-                showSuccess(orderData, result.subscription_id, result.status, result);
-                
-            } catch (error) {
-                console.warn('계좌이체 신청 실패, 데모 모드로 전환:', error.message);
-                await simulatePayment(orderData, 'pending');
-            }
-        }
-        
-        // 결제 시뮬레이션 (데모용)
-        async function simulatePayment(orderData, status = 'completed') {
-            // 2초 지연으로 실제 결제 처리 시뮬레이션
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            
-            const subscriptionId = 'sub_' + Math.random().toString(36).substr(2, 9);
-            showSuccess(orderData, subscriptionId, status);
-        }
-        
-        // 성공 메시지 표시
-        function showSuccess(orderData, subscriptionId, status = 'completed', result = null) {
-            console.log('🎯 showSuccess 호출됨:', { orderData, subscriptionId, status, result });
-            
-            // 🔗 결제 완료 후 가상 링크 포함된 성공 페이지로 리다이렉트
-            if (result && result.redirect_url) {
-                console.log('✅ redirect_url 발견:', result.redirect_url);
-                
-                // 일시적으로 성공 메시지 표시
-                const successEl = document.getElementById('paymentSuccess');
-                const detailsEl = document.getElementById('subscriptionDetails');
-                
-                if (successEl) successEl.style.display = 'block';
-                
-                if (detailsEl) {
-                    detailsEl.innerHTML = `
-                        <div style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 8px;">
-                            <p><strong>구독 ID:</strong> ${subscriptionId}</p>
-                            <p><strong>상태:</strong> <span style="color: #2ecc71">결제 완료</span></p>
-                            <p><strong>가상 서비스 링크:</strong> ${result.links_count || 0}개 생성</p>
-                            <p style="color: #f39c12; margin-top: 10px;">🔗 잠시 후 가상 서비스 링크 페이지로 이동합니다...</p>
-                        </div>
-                    `;
-                }
-                
-                // 즉시 리다이렉트 (지연 시간 단축)
-                console.log('🚀 1초 후 리다이렉트 시작...');
-                setTimeout(() => {
-                    console.log('🔗 리다이렉트 실행:', result.redirect_url);
-                    window.location.href = result.redirect_url;
-                }, 1000); // 1초 후 리다이렉트
-                
-                return; // 조기 종료
-            } 
-            
-            console.log('❌ redirect_url이 없음. 기본 성공 페이지 표시');
-            
-            // 기존 로직 (리다이렉트 정보가 없는 경우)
-            const successEl = document.getElementById('paymentSuccess');
-            const detailsEl = document.getElementById('subscriptionDetails');
-            
-            let statusText = status === 'pending' ? '입금 확인 대기 중' : '활성화됨';
-            let statusColor = status === 'pending' ? '#f39c12' : '#2ecc71';
-            
-            if (detailsEl) {
-                detailsEl.innerHTML = `
-                    <div style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 8px;">
-                        <p><strong>구독 ID:</strong> ${subscriptionId}</p>
-                        <p><strong>상태:</strong> <span style="color: ${statusColor}">${statusText}</span></p>
-                        <p><strong>월 결제액:</strong> $${orderData.total}</p>
-                        <p><strong>구독 상품:</strong> ${orderData.items.length}개</p>
-                        ${status === 'pending' ? '<p style="color: #f39c12; margin-top: 10px;">💡 입금 완료 후 24시간 내에 서비스가 활성화됩니다.</p>' : ''}
-                    </div>
-                `;
-            }
-            
-            if (successEl) successEl.style.display = 'block';
-            
-            // 🎯 STEM급 에이전트 토큰 생성 및 표시
-            if (status === 'completed') {
-                const stemToken = generateAccessToken(subscriptionId);
-                const tokenInput = document.getElementById('accessToken');
-                const stemAccessDiv = document.getElementById('stemAgentAccess');
-                
-                if (tokenInput && stemAccessDiv) {
-                    tokenInput.value = stemToken;
-                    stemAccessDiv.style.display = 'block';
-                    
-                    // 토큰을 세션 스토리지에도 저장
-                    sessionStorage.setItem('current_stem_token', stemToken);
-                    sessionStorage.setItem('subscription_id', subscriptionId);
-                    
-                    console.log('🎯 STEM급 토큰 생성 완료:', stemToken);
-                }
-            }
-            
-            // 이메일 전송
-            sendConfirmationEmail(orderData, subscriptionId, status);
-            
-            // 장바구니 초기화
-            setTimeout(() => {
-                cart = [];
-                updateCartDisplay();
-                document.getElementById('checkoutSection').classList.add('hidden');
-                document.getElementById('checkoutForm').reset();
-                if (successEl) successEl.style.display = 'none';
-            }, 10000); // 10초 후 자동 초기화
-        }
-        
-        // 에러 메시지 표시
-        function showError(message) {
-            const errorEl = document.getElementById('paymentError');
-            errorEl.textContent = message;
-            errorEl.style.display = 'block';
-        }
-        
-        // 확인 이메일 전송
-        function sendConfirmationEmail(orderData, subscriptionId, status) {
-            const emailSubject = `🎉 HYOJIN.AI 구독 ${status === 'pending' ? '신청' : '결제'} 완료 - ${subscriptionId}`;
-            const statusText = status === 'pending' ? '신청이 접수되었습니다' : '결제가 완료되었습니다';
-            
-            const emailBody = `HYOJIN.AI 구독 서비스 ${statusText}!
-
-📋 구독 정보:
-🆔 구독 ID: ${subscriptionId}
-👤 고객명: ${orderData.name}
-📧 이메일: ${orderData.email}
-🏢 회사: ${orderData.company || '개인'}
-💳 결제 방법: ${getPaymentMethodName(orderData.paymentMethod)}
-📊 상태: ${status === 'pending' ? '입금 확인 대기' : '활성화됨'}
-
-🛍️ 구독 상품 (${orderData.items.length}개):
-${orderData.items.map((item, i) => `${i+1}. ${item.name} - $${item.price}/월`).join('\n')}
-
-💰 월 결제 금액: $${orderData.total}
-📅 신청일: ${new Date().toLocaleString('ko-KR')}
-
-${status === 'pending' ? `
-🏦 입금 정보:
-은행: 국민은행
-계좌: 123-456-789012
-예금주: HYOJIN.AI
-입금액: $${orderData.total}
-
-⚠️ 입금 후 이 이메일에 입금확인서를 첨부하여 회신해주세요.
-` : `
-🎉 축하합니다! 구독이 활성화되었습니다.
-� 서비스 이용: https://app.hyojin.ai
-� 로그인 정보가 별도 이메일로 발송됩니다.
-`}
-
----
-도깨비마을장터
-🌐 https://hyojin.ai
-📧 support@hyojin.ai`;
-
-            // 이메일 앱 열기
-            window.open(`mailto:${orderData.email}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`, '_blank');
-        }
-        
-        // 결제 방법 이름 반환
-        function getPaymentMethodName(method) {
-            const names = {
-                'card': '신용카드',
-                'paypal': 'PayPal',
-                'bank': '계좌이체'
-            };
-            return names[method] || method;
-        }
-
-        // 제품 렌더링 함수
-        function renderProducts() {
-            console.log('제품 렌더링 시작...');
-            const container = document.getElementById('productsGrid') || document.querySelector('.products-grid');
-            if (!container) {
-                console.error('제품 그리드 컨테이너를 찾을 수 없습니다.');
-                return;
-            }
-            
-            const currentCategory = document.querySelector('.tab.active')?.dataset?.category || 'all';
-            let productsToShow = [];
-            
-            if (currentCategory === 'all') {
-                productsToShow = [...products.domains, ...products.agents];
-            } else if (currentCategory === 'domains') {
-                productsToShow = [...products.domains];
-            } else if (currentCategory === 'agents') {
-                productsToShow = [...products.agents];
-            } else if (currentCategory === 'premium') {
-                // 프리미엄 도메인만 필터링
-                productsToShow = products.domains.filter(product => product.premium || product.comingSoon);
-            }
-            
-            console.log(`현재 카테고리: ${currentCategory}, 표시할 제품: ${productsToShow.length}개`);
-            
-            container.innerHTML = productsToShow.map(product => {
-                const premiumClass = product.premium ? 'premium' : '';
-                const comingSoonClass = product.comingSoon ? 'coming-soon' : '';
-                const badgeText = product.type === 'domain' ? 'Domain' : 'Agent';
-                const badgeClass = product.type === 'domain' ? 'domain' : 'agent';
-                const discount = product.originalPrice > product.price ? 
-                    Math.round((1 - product.price / product.originalPrice) * 100) : 0;
-                
-                return `
-                    <div class="product-card ${premiumClass} ${comingSoonClass}">
-                        <!-- 상단 배지들 -->
-                        ${discount > 0 ? `<div class="discount-badge">${discount}% OFF</div>` : ''}
-                        
-                        <!-- 제품 내용 -->
-                        <div class="product-content">
-                            <div class="product-badge ${badgeClass}">${badgeText}</div>
-                            <div class="product-title">${product.name}</div>
-                            <div class="product-description">${product.description}</div>
-                            <ul class="product-features">
-                                ${product.features.slice(0, 4).map(feature => `<li>${feature}</li>`).join('')}
-                                ${product.features.length > 4 ? `<li style="opacity: 0.7; font-style: italic;">+${product.features.length - 4}개 더</li>` : ''}
-                            </ul>
-                            <div class="product-price">
-                                <div>
-                                    ${product.originalPrice > product.price ? `<span class="original-price">$${product.originalPrice}</span>` : ''}
-                                    <span class="price">$${product.price}/월</span>
-                                </div>
-                            </div>
-                            <button class="subscribe-btn" 
-                                    onclick="${product.comingSoon ? 'alertComingSoon()' : `addToCart('${product.id}')`}"
-                                    ${product.comingSoon ? 'disabled' : ''}>
-                                ${product.comingSoon ? '🔄 개발예정' : (product.premium ? '👑 프리미엄 구독' : '📦 구독하기')}
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-            
-            console.log('제품 렌더링 완료');
-        }
-        
-        // Coming Soon 알림
-        function alertComingSoon() {
-            alert('🚀 이 도메인은 현재 개발 중입니다.\n곧 출시될 예정이니 기대해 주세요!');
-        }
-        
-        // 쇼핑카트에 상품 추가
-        function addToCart(productId) {
-            // 모든 제품에서 찾기
-            const allProducts = [...products.domains, ...products.agents];
-            const product = allProducts.find(p => p.id === productId);
-            
-            if (!product) {
-                alert('⚠️ 제품을 찾을 수 없습니다.');
-                return;
-            }
-            
-            // 이미 카트에 있는지 확인
-            const existingItem = cart.find(item => item.id === productId);
-            if (existingItem) {
-                alert('📦 이미 카트에 추가된 상품입니다!');
-                return;
-            }
-            
-            // 카트에 추가
-            cart.push({
-                id: productId,
-                name: product.name,
-                price: product.price,
-                originalPrice: product.originalPrice || product.price,
-                type: product.type,
-                features: product.features.slice(0, 3) // 주요 기능 3개만
-            });
-            
-            // 성공 메시지
-            const cartTotal = cart.reduce((sum, item) => sum + item.price, 0);
-            const discountTotal = cart.reduce((sum, item) => sum + (item.originalPrice - item.price), 0);
-            
-            let message = `✅ "${product.name}"이(가) 카트에 추가되었습니다!\n\n`;
-            message += `📊 현재 카트: ${cart.length}개 상품\n`;
-            message += `💰 월 결제금액: $${cartTotal}\n`;
-            if (discountTotal > 0) {
-                message += `🎉 총 할인: $${discountTotal}/월\n`;
-            }
-            message += `\n🛒 결제하시려면 아래로 스크롤하세요!`;
-            
-            alert(message);
-            
-            // 카트 표시 업데이트
-            updateCartDisplay();
-            
-            console.log('카트에 추가됨:', product.name, '| 현재 카트:', cart);
-        }
-        
-        // 카트 표시 업데이트
-        function updateCartDisplay() {
-            // 카트 아이템 수 표시 (헤더에 있다면)
-            const cartCountElement = document.getElementById('cartCount');
-            if (cartCountElement) {
-                cartCountElement.textContent = cart.length;
-            }
-            
-            // 총 금액 업데이트
-            const totalElement = document.getElementById('orderTotal');
-            if (totalElement && cart.length > 0) {
-                const total = cart.reduce((sum, item) => sum + item.price, 0);
-                totalElement.textContent = `$${total}`;
-            }
-        }
-        
-        // 카테고리 탭 전환
-        function switchCategory(category, element) {
-            currentCategory = category;
-            // 모든 탭에서 active 클래스 제거
-            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-            // 클릭된 탭에 active 클래스 추가
-            element.classList.add('active');
-            // 제품 다시 렌더링
-            renderProducts();
-        }
-        // 초기 로드
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('페이지 로드 완료, 초기화 시작...');
-            renderProducts();
-            updateCartDisplay();
-            loadAgentsFromAPI();
-            loadPaymentConfig();
-        });
-        
-        // 🎯 STEM급 에이전트 서비스 연결 함수들
+        // 액세스 토큰 생성
         function generateAccessToken(subscriptionId) {
-            // STEM급 에이전트 전용 토큰 생성
             const timestamp = Date.now();
-            const randomId = Math.random().toString(36).substring(2, 15);
-            return `stem-${subscriptionId}-${timestamp}-${randomId}`;
+            const randomString = Math.random().toString(36).substring(2, 15);
+            return `stem_${subscriptionId}_${timestamp}_${randomString}`;
         }
         
-        function copyToken() {
-            const tokenInput = document.getElementById('accessToken');
-            tokenInput.select();
-            tokenInput.setSelectionRange(0, 99999); // 모바일용
-            
-            try {
-                document.execCommand('copy');
-                // 성공 메시지
-                const button = event.target;
-                const originalText = button.textContent;
-                button.textContent = '✅ 복사됨!';
-                button.style.background = '#2ecc71';
-                
-                setTimeout(() => {
-                    button.textContent = originalText;
-                    button.style.background = '#4CAF50';
-                }, 2000);
-                
-                alert('🎯 토큰이 클립보드에 복사되었습니다!\n\nSTEM급 에이전트 서비스에서 이 토큰으로 로그인하세요.');
-            } catch (err) {
-                // 폴백: 수동 복사 안내
-                alert('토큰을 수동으로 복사해주세요:\n\n' + tokenInput.value);
-            }
+        // 빠른 접근 버튼 추가
+        function addQuickAccessButton(token) {
+            const container = document.querySelector('.container');
+            const quickAccessDiv = document.createElement('div');
+            quickAccessDiv.className = 'quick-access';
+            quickAccessDiv.innerHTML = `
+                <h3>🎫 이미 입장권을 보유하고 계시네요!</h3>
+                <button class="quick-access-btn" onclick="window.location.href='/stem/dashboard?token=${token}'">
+                    🚀 바로 마을 입장하기
+                </button>
+            `;
+            container.insertBefore(quickAccessDiv, container.firstChild.nextSibling);
         }
         
-        function goToStemService() {
-            const token = document.getElementById('accessToken').value;
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🏪 도깨비마을장터 입장권 시스템 준비 완료');
             
-            if (!token) {
-                alert('❌ 토큰이 생성되지 않았습니다. 결제를 먼저 완료해주세요.');
-                return;
+            // 이미 토큰이 있는 경우 빠른 접근 버튼 표시
+            const existingToken = sessionStorage.getItem('current_stem_token');
+            if (existingToken) {
+                addQuickAccessButton(existingToken);
             }
-            
-            // 토큰을 로컬 스토리지에 임시 저장 (자동 로그인용)
-            localStorage.setItem('stem_access_token', token);
-            localStorage.setItem('stem_token_timestamp', Date.now());
-            
-            // STEM급 에이전트 서비스 URL (클라우드 배포)
-            const stemServiceUrl = 'https://hyojin-stem-agents.onrender.com';  // Render 배포 서버
-            // const stemServiceUrl = 'http://localhost:5000';  // 로컬 개발용
-            
-            // 새 탭에서 STEM 서비스 열기
-            const stemWindow = window.open(stemServiceUrl, '_blank');
-            
-            if (!stemWindow) {
-                alert('팝업이 차단되었습니다. 브라우저 설정에서 팝업을 허용해주세요.\n\n직접 이동: ' + stemServiceUrl);
-            } else {
-                // 성공 메시지
-                setTimeout(() => {
-                    alert('🎯 STEM급 에이전트 서비스가 새 탭에서 열렸습니다!\n\n토큰으로 로그인하여 31개 전문 AI와 대화를 시작하세요.');
-                }, 1000);
-            }
-        }
+        });
     </script>
 </body>
 </html>
