@@ -1,7 +1,7 @@
 """
-🚀 HYOJIN.AI MVP - 12개 도메인 완전체 + 고급 보안 시스템 + 실제 결제
-한방에 모든 AI 도메인 구현 + 엔터프라이즈 보안 + Stripe 결제!
-버전: v3.5.0 - 배포 최적화 및 안정성 개선
+🚀 HYOJIN.AI MVP - 도깨비마을장터 BETA + 촌장급 STEM 에이전트
+무료 베타 테스트: 8명의 촌장급 도깨비 전문가들과 함께!
+버전: v4.0.0 - 베타 서비스 및 무료 체험 최적화
 """
 
 from fastapi import FastAPI, HTTPException, Request, Depends, status
@@ -44,9 +44,9 @@ from stem_integration import setup_stem_routes
 
 # FastAPI 앱 생성
 app = FastAPI(
-    title="🏪 도깨비마을장터 - AI 에이전트 플랫폼",
-    description="8개 전문 AI 에이전트 + 간편한 입장권 구독 시스템",
-    version="3.5.0",
+    title="🏪 도깨비마을장터 BETA - 촌장급 도깨비 에이전트",
+    description="8명의 촌장급 도깨비 전문가들 + 무료 베타 체험",
+    version="4.0.0",
 )
 
 
