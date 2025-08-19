@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 효진의 AI 도깨비마을 STEM 센터 🎯</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            color: white;
+            min-height: 100vh;
+        }
+        
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .container {
+            padding: 40px 20px;
+        }
+        
+        .hero-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .hero-section h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+        
+        .hero-section p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            color: white;
+        }
+        
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 215, 0, 0.8);
+        }
+        
+        .card-body {
+            padding: 30px;
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #FFD700;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .features-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            margin-top: 40px;
+            text-align: center;
+        }
+        
+        .feature-item {
+            padding: 20px;
+            margin: 10px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            border-left: 5px solid #FFD700;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 히어로 섹션 -->
+        <div class="hero-section">
+            <h1>🎯 효진의 AI 도깨비마을 STEM 센터 🎯</h1>
+            <div class="alert alert-success">
+                <h4>🚀 STEM 베타 서비스 공개! 무료로 전문 도깨비들을 만나보세요!</h4>
+                <p class="mb-0">STEM 분야 전문가 도깨비들이 무료로 도와드립니다. 회원가입이나 결제 없이 바로 시작하세요!</p>
+            </div>
+        </div>
+        
+        <!-- STEM 도깨비들 -->
+        <div class="row">
+            <!-- 수학 전문가 도깨비 -->
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">🧮 수학 전문가 도깨비</h5>
+                        <p class="card-text">미적분, 대수, 통계 분야의 전문 지식으로 수학 문제를 해결해드립니다.</p>
+                        <a href="/stem/demo?agent=math" class="btn btn-primary">무료 체험하기</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 물리학 전문가 도깨비 -->
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">⚛️ 물리학 전문가 도깨비</h5>
+                        <p class="card-text">역학, 전자기학, 양자물리 전문가가 물리 현상을 분석해드립니다.</p>
+                        <a href="/stem/demo?agent=physics" class="btn btn-primary">무료 체험하기</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 화학 전문가 도깨비 -->
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">🧪 화학 전문가 도깨비</h5>
+                        <p class="card-text">유기화학, 무기화학 전문가가 화학 반응과 분자 구조를 분석합니다.</p>
+                        <a href="/stem/demo?agent=chemistry" class="btn btn-primary">무료 체험하기</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 생물학 전문가 도깨비 -->
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">🧬 생물학 전문가 도깨비</h5>
+                        <p class="card-text">분자생물학, 생태학, 유전학 전문가가 생명 현상을 설명해드립니다.</p>
+                        <a href="/stem/demo?agent=biology" class="btn btn-primary">무료 체험하기</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 공학 전문가 도깨비 -->
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">⚙️ 공학 전문가 도깨비</h5>
+                        <p class="card-text">공학적 설계와 시스템 분석으로 혁신적 솔루션을 제안합니다.</p>
+                        <a href="/stem/demo?agent=engineering" class="btn btn-primary">무료 체험하기</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 업무 도우미 도깨비 -->
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">🤖 업무 도우미 도깨비</h5>
+                        <p class="card-text">업무 최적화와 프로젝트 관리 전문가가 효율적인 솔루션을 제공합니다.</p>
+                        <a href="/stem/demo?agent=assistant" class="btn btn-primary">무료 체험하기</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 마케팅 전문가 도깨비 -->
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">📈 마케팅 전문가 도깨비</h5>
+                        <p class="card-text">마케팅 전략과 브랜딩 전문가가 시장 분석과 고객 인사이트를 제공합니다.</p>
+                        <a href="/stem/demo?agent=marketing" class="btn btn-primary">무료 체험하기</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 스타트업 전문가 도깨비 -->
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">🚀 스타트업 전문가 도깨비</h5>
+                        <p class="card-text">스타트업 전략과 사업 계획 전문가가 성공적인 창업을 위한 가이드를 제공합니다.</p>
+                        <a href="/stem/demo?agent=startup" class="btn btn-primary">무료 체험하기</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 특징 섹션 -->
+        <div class="features-section">
+            <h2>🎯 STEM 센터 특징</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="feature-item">
+                        <h5>🆓 완전 무료</h5>
+                        <p>베타 기간 동안 모든 서비스를 무료로 이용하세요</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-item">
+                        <h5>🧙‍♂️ 전문가 도깨비</h5>
+                        <p>각 분야별 촌장급 전문 도깨비들이 대기 중입니다</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-item">
+                        <h5>⚡ 즉시 시작</h5>
+                        <p>회원가입 없이 바로 서비스를 이용할 수 있습니다</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <a href="/stem" class="btn btn-primary btn-lg">🧙‍♂️ STEM 서비스 시작하기</a>
+                <a href="/health" class="btn btn-outline-light btn-lg ms-3">📊 서비스 상태 확인</a>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
