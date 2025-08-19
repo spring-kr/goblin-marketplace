@@ -130,10 +130,10 @@ def setup_stem_routes(app: FastAPI):
         """STEM 에이전트 데모 페이지"""
         agent_info = stem_service.get_agent_info()
         agent_descriptions = agent_info.get("agent_descriptions", {})
-        
+
         if agent not in agent_descriptions:
             agent = "math"  # 기본값
-        
+
         return f"""
         <html>
             <head>
