@@ -1,7 +1,7 @@
 """
 🚀 HYOJIN.AI MVP - 12개 도메인 완전체 + 고급 보안 시스템 + 실제 결제
 한방에 모든 AI 도메인 구현 + 엔터프라이즈 보안 + Stripe 결제!
-버전: v3.3.0 - 실제 결제 시스템 추가
+버전: v3.5.0 - 배포 최적화 및 안정성 개선
 """
 
 from fastapi import FastAPI, HTTPException, Request, Depends, status
@@ -44,9 +44,9 @@ from stem_integration import setup_stem_routes
 
 # FastAPI 앱 생성
 app = FastAPI(
-    title="Hyojin AI MVP + Advanced Security + Payment + STEM",
-    description="12개 AI 비즈니스 도메인 + 고급 보안 시스템 + 실제 결제 + 8개 STEM 에이전트",
-    version="3.4.0",
+    title="🏪 도깨비마을장터 - AI 에이전트 플랫폼",
+    description="8개 전문 AI 에이전트 + 간편한 입장권 구독 시스템",
+    version="3.5.0",
 )
 
 
