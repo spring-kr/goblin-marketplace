@@ -1,3 +1,6 @@
+# HYOJIN.AI MVP - Git 무시 파일
+# 업데이트: 2025.08.19
+
 # Python
 __pycache__/
 *.py[cod]
