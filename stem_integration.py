@@ -125,6 +125,108 @@ stem_service = STEMService()
 def setup_stem_routes(app: FastAPI):
     """FastAPI 앱에 STEM 라우트 추가"""
 
+    @app.get("/stem/demo", response_class=HTMLResponse)
+    async def stem_demo(request: Request, agent: str = "math"):
+        """STEM 에이전트 데모 페이지"""
+        agent_info = stem_service.get_agent_info()
+        agent_descriptions = agent_info.get("agent_descriptions", {})
+        
+        if agent not in agent_descriptions:
+            agent = "math"  # 기본값
+        
+        return f"""
+        <html>
+            <head>
+                <title>🧙‍♂️ {agent_descriptions.get(agent, '도깨비')} - STEM 센터</title>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <style>
+                    body {{ font-family: Arial; max-width: 800px; margin: 50px auto; padding: 20px; 
+                           background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+                           background-size: 400% 400%; animation: gradient 15s ease infinite; color: white; }}
+                    @keyframes gradient {{
+                        0% {{ background-position: 0% 50%; }}
+                        50% {{ background-position: 100% 50%; }}
+                        100% {{ background-position: 0% 50%; }}
+                    }}
+                    .container {{ background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
+                               border-radius: 20px; padding: 30px; margin: 20px 0; }}
+                    .btn {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;
+                           text-decoration: none; padding: 12px 25px; border-radius: 8px; font-weight: bold;
+                           display: inline-block; margin: 10px 5px; transition: all 0.3s ease; }}
+                    .btn:hover {{ transform: scale(1.05); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3); color: white; }}
+                    .question-area {{ background: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 10px; margin: 20px 0; }}
+                    #response {{ background: rgba(0, 0, 0, 0.3); padding: 20px; border-radius: 10px; margin-top: 20px; display: none; }}
+                    input, textarea {{ width: 100%; padding: 10px; border: none; border-radius: 5px; margin: 10px 0; }}
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <h1>🧙‍♂️ {agent_descriptions.get(agent, '도깨비')} 체험</h1>
+                    <p>효진의 AI 도깨비마을 STEM 센터에 오신 것을 환영합니다!</p>
+                    
+                    <div class="question-area">
+                        <h3>💬 도깨비에게 질문하기</h3>
+                        <textarea id="questionInput" placeholder="궁금한 것을 물어보세요..." rows="3"></textarea>
+                        <button class="btn" onclick="askQuestion()">🚀 질문하기</button>
+                        <button class="btn" onclick="askSample()">📝 샘플 질문</button>
+                    </div>
+                    
+                    <div id="response">
+                        <h3>🧙‍♂️ 도깨비 응답:</h3>
+                        <div id="responseText"></div>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 30px;">
+                        <a href="/" class="btn">🔙 메인으로 돌아가기</a>
+                        <a href="/stem/" class="btn">🏪 STEM 센터 홈</a>
+                    </div>
+                </div>
+                
+                <script>
+                    const agentType = "{agent}";
+                    
+                    async function askQuestion() {{
+                        const question = document.getElementById('questionInput').value;
+                        if (!question.trim()) {{
+                            alert('질문을 입력해주세요!');
+                            return;
+                        }}
+                        
+                        document.getElementById('response').style.display = 'block';
+                        document.getElementById('responseText').innerHTML = '🔮 도깨비가 마법을 부리는 중...';
+                        
+                        try {{
+                            const response = await fetch('/stem/api/ask', {{
+                                method: 'POST',
+                                headers: {{'Content-Type': 'application/json'}},
+                                body: JSON.stringify({{question: question, agent_type: agentType}})
+                            }});
+                            const data = await response.json();
+                            document.getElementById('responseText').innerHTML = data.success ? data.response : '❌ ' + data.error;
+                        }} catch (error) {{
+                            document.getElementById('responseText').innerHTML = '❌ 마법이 실패했습니다: ' + error.message;
+                        }}
+                    }}
+                    
+                    function askSample() {{
+                        const samples = {{
+                            "math": "이차방정식의 해법을 설명해주세요",
+                            "physics": "뉴턴의 운동법칙을 설명해주세요", 
+                            "chemistry": "화학결합의 종류를 설명해주세요",
+                            "biology": "DNA의 구조와 기능을 설명해주세요",
+                            "engineering": "시스템 최적화 방법을 알려주세요",
+                            "assistant": "효율적인 업무 관리 방법을 알려주세요",
+                            "marketing": "브랜딩 전략을 수립하는 방법을 알려주세요",
+                            "startup": "스타트업 투자 유치 전략을 알려주세요"
+                        }};
+                        document.getElementById('questionInput').value = samples[agentType] || "안녕하세요!";
+                    }}
+                </script>
+            </body>
+        </html>
+        """
+
     @app.get("/stem/", response_class=HTMLResponse)
     async def stem_login_page(request: Request):
         """STEM 로그인 페이지"""
