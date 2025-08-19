@@ -1,25 +1,15 @@
-# HYOJIN.AI MVP - 도깨비마을장터 최적화 버전
-# 2025.08.19 - Render 배포 안정성 보장
+# 도깨비마을장터 BETA - 최소 안정 패키지
+# 2025.08.19 - Render 안정성 최우선
 
-# 핵심 웹 프레임워크
-fastapi==0.103.2
-uvicorn==0.23.2
-pydantic==2.4.2
-python-multipart==0.0.6
-jinja2==3.1.2
-aiofiles==23.2.1
+# 핵심 웹 프레임워크만
+fastapi==0.100.1
+uvicorn==0.23.0
+pydantic==2.3.0
 
-# 기본 라이브러리
+# 필수 기본 라이브러리
 requests==2.31.0
-email-validator==2.1.0
+jinja2==3.1.2
+aiofiles==23.1.0
 
-# 결제 및 인증
-stripe==6.7.0
-PyJWT==2.8.0
-
-# STEM 에이전트 (경량화)
-numpy==1.24.3
-pandas==2.0.3
-
-# 시스템 유틸리티
+# 기본 유틸리티
 python-dateutil==2.8.2
