@@ -13,8 +13,10 @@ import datetime
 import os
 import random
 
-# 템플릿 설정
-templates = Jinja2Templates(directory="templates/stem")
+# 템플릿 설정 (없으면 None)
+templates = None
+if os.path.exists("templates/stem"):
+    templates = Jinja2Templates(directory="templates/stem")
 
 
 class STEMRequest(BaseModel):
@@ -126,19 +128,64 @@ def setup_stem_routes(app: FastAPI):
     @app.get("/stem/", response_class=HTMLResponse)
     async def stem_login_page(request: Request):
         """STEM 로그인 페이지"""
-        return templates.TemplateResponse("token_login.html", {"request": request})
+        return """
+        <html>
+            <head><title>🧙‍♂️ 도깨비마을 STEM 서비스</title></head>
+            <body style="font-family: Arial; max-width: 800px; margin: 50px auto; padding: 20px;">
+                <h1>🏪 도깨비마을장터 BETA - STEM 서비스</h1>
+                <h2>🧙‍♂️ 촌장급 도깨비 전문가들</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 20px 0;">
+                    <div style="border: 2px solid #4CAF50; padding: 15px; border-radius: 10px;">
+                        <h3>🧮 수학촌장 도깨비</h3>
+                        <p>미적분, 통계, 대수 마법을 부리는 촌장급 도깨비</p>
+                        <button onclick="askAgent('math', '이차방정식을 풀어주세요')" style="background: #4CAF50; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer;">질문하기</button>
+                    </div>
+                    <div style="border: 2px solid #2196F3; padding: 15px; border-radius: 10px;">
+                        <h3>⚛️ 물리촌장 도깨비</h3>
+                        <p>역학, 전자기학 마법을 다루는 촌장급 도깨비</p>
+                        <button onclick="askAgent('physics', '뉴턴의 법칙을 설명해주세요')" style="background: #2196F3; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer;">질문하기</button>
+                    </div>
+                    <div style="border: 2px solid #FF9800; padding: 15px; border-radius: 10px;">
+                        <h3>🧪 화학촌장 도깨비</h3>
+                        <p>유기화학, 무기화학 연금술의 촌장급 도깨비</p>
+                        <button onclick="askAgent('chemistry', '화학결합을 설명해주세요')" style="background: #FF9800; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer;">질문하기</button>
+                    </div>
+                    <div style="border: 2px solid #9C27B0; padding: 15px; border-radius: 10px;">
+                        <h3>🧬 생물촌장 도깨비</h3>
+                        <p>분자생물학, 유전학 마법의 촌장급 도깨비</p>
+                        <button onclick="askAgent('biology', 'DNA 구조를 설명해주세요')" style="background: #9C27B0; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer;">질문하기</button>
+                    </div>
+                </div>
+                <div id="response" style="margin-top: 30px; padding: 20px; background: #f5f5f5; border-radius: 10px; display: none;">
+                    <h3>🧙‍♂️ 도깨비 응답:</h3>
+                    <div id="responseText"></div>
+                </div>
+                <script>
+                    async function askAgent(agent, question) {
+                        document.getElementById('response').style.display = 'block';
+                        document.getElementById('responseText').innerHTML = '🔮 도깨비가 마법을 부리는 중...';
+                        
+                        try {
+                            const response = await fetch('/stem/api/ask', {
+                                method: 'POST',
+                                headers: {'Content-Type': 'application/json'},
+                                body: JSON.stringify({agent: agent, question: question})
+                            });
+                            const data = await response.json();
+                            document.getElementById('responseText').innerHTML = data.response;
+                        } catch (error) {
+                            document.getElementById('responseText').innerHTML = '❌ 마법이 실패했습니다: ' + error.message;
+                        }
+                    }
+                </script>
+            </body>
+        </html>
+        """
 
     @app.get("/stem/dashboard", response_class=HTMLResponse)
     async def stem_dashboard(request: Request, token: Optional[str] = None):
         """STEM 대시보드"""
-        if not token:
-            return templates.TemplateResponse("token_login.html", {"request": request})
-
-        agent_info = stem_service.get_agent_info()
-        return templates.TemplateResponse(
-            "stem_dashboard.html",
-            {"request": request, "token": token, "agent_info": agent_info},
-        )
+        return await stem_login_page(request)  # 베타에서는 같은 페이지 사용
 
     @app.post("/stem/api/ask")
     async def stem_ask_question(request: STEMRequest):
@@ -162,10 +209,15 @@ def setup_stem_routes(app: FastAPI):
                 url=f"/stem/dashboard?token={subscription_token}", status_code=302
             )
         else:
-            return templates.TemplateResponse(
-                "token_login.html",
-                {"request": request, "error": "유효하지 않은 토큰입니다."},
-            )
+            return HTMLResponse("""
+                <html>
+                    <body style="font-family: Arial; max-width: 600px; margin: 50px auto; padding: 20px;">
+                        <h1>🏪 도깨비마을장터 BETA</h1>
+                        <h2>❌ 유효하지 않은 토큰입니다.</h2>
+                        <p><a href="/stem/">🔙 다시 시도하기</a></p>
+                    </body>
+                </html>
+            """)
 
     print("✅ STEM 라우트 설정 완료")
     print("📍 사용 가능한 STEM 엔드포인트:")
