@@ -7,16 +7,21 @@
 - 개발 환경 설정 가이드 추가
 - API 문서 작성
 - 배포 가이드 개선
+- 정적 파일 관리 시스템 최적화
 
 ### 🔧 기술적 개선
 - requirements.txt 주석 추가
 - gitignore 파일 헤더 개선
 - 배포 설정 파일 주석 추가
+- 배포 트리거 시스템 업데이트
 
 ### 📚 문서 추가
 - DEPLOYMENT_GUIDE.md
 - DEV_SETUP.md  
 - API_DOCS.md
+- PAYMENT_GUIDE.md
+- TEST_GUIDE.md
+- STATIC_DEPLOYMENT_GUIDE.md
 
 ---
 
