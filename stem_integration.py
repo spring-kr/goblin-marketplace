@@ -209,7 +209,8 @@ def setup_stem_routes(app: FastAPI):
                 url=f"/stem/dashboard?token={subscription_token}", status_code=302
             )
         else:
-            return HTMLResponse("""
+            return HTMLResponse(
+                """
                 <html>
                     <body style="font-family: Arial; max-width: 600px; margin: 50px auto; padding: 20px;">
                         <h1>🏪 도깨비마을장터 BETA</h1>
@@ -217,7 +218,8 @@ def setup_stem_routes(app: FastAPI):
                         <p><a href="/stem/">🔙 다시 시도하기</a></p>
                     </body>
                 </html>
-            """)
+            """
+            )
 
     print("✅ STEM 라우트 설정 완료")
     print("📍 사용 가능한 STEM 엔드포인트:")
