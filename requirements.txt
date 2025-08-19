@@ -1,28 +1,25 @@
-# HYOJIN.AI MVP 플랫폼 의존성 + STEM 에이전트
-# 업데이트: 2025.08.19 - 재배포 안정성 강화
+# HYOJIN.AI MVP - 도깨비마을장터 최적화 버전
+# 2025.08.19 - Render 배포 안정성 보장
 
-# 기본 시스템 도구 (호환성 보장)
-setuptools>=68.0.0
-wheel>=0.41.0
-
-# 핵심 FastAPI 스택 (안정화 버전)
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-pydantic==2.5.0
+# 핵심 웹 프레임워크
+fastapi==0.103.2
+uvicorn==0.23.2
+pydantic==2.4.2
 python-multipart==0.0.6
 jinja2==3.1.2
 aiofiles==23.2.1
 
-# 결제 및 인증
-stripe==7.8.0
+# 기본 라이브러리
 requests==2.31.0
 email-validator==2.1.0
+
+# 결제 및 인증
+stripe==6.7.0
 PyJWT==2.8.0
 
-# STEM 에이전트 의존성 (최소 필수만)
-matplotlib==3.8.2
-numpy==1.26.2
-pandas==2.1.4
+# STEM 에이전트 (경량화)
+numpy==1.24.3
+pandas==2.0.3
 
-# 추가 유틸리티
+# 시스템 유틸리티
 python-dateutil==2.8.2
