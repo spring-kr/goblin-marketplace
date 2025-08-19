@@ -11,7 +11,7 @@ from fastapi.staticfiles import StaticFiles
 import os
 
 # STEM 통합 임포트
-from stem_integration import setup_stem_routes
+from stem_integration import add_stem_routes
 
 # FastAPI 앱 생성
 app = FastAPI(
@@ -35,7 +35,7 @@ if os.path.exists(static_dir):
     app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 # STEM 라우트 설정
-setup_stem_routes(app)
+add_stem_routes(app)
 
 
 @app.get("/", response_class=HTMLResponse)
