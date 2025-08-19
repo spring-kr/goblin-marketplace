@@ -1,14 +1,14 @@
-# 도깨비마을장터 BETA - Python 3.8 완벽 호환
-# 2025.08.19 - ForwardRef 오류 완전 해결
+# 도깨비마을장터 BETA - Python 3.8.18 강제 고정
+# 2025.08.19 - Python 3.13 호환성 문제 해결
 
-# 핵심 웹 프레임워크 (Python 3.8 검증)
+# 핵심 웹 프레임워크 (Python 3.8.18 완벽 호환)
 fastapi==0.85.1
-uvicorn==0.20.0
+uvicorn[standard]==0.20.0
 pydantic==1.9.2
 
-# 기본 라이브러리 (안정 버전)
+# 기본 라이브러리 (Python 3.8 안정 버전)
 requests==2.28.1
 jinja2==3.0.3
 
-# 유틸리티
+# 유틸리티 (Python 3.8 호환)
 python-dateutil==2.8.2

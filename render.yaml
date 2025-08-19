@@ -1,12 +1,15 @@
-# Render 배포 설정
+# Render 배포 설정 - Python 3.8.18 강제 고정
 services:
   - type: web
     name: hyojin-ai-mvp
-    env: python
-    buildCommand: pip install -r requirements.txt
+    runtime: python
+    buildCommand: |
+      python --version
+      pip install --upgrade pip
+      pip install -r requirements.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHON_VERSION
-        value: 3.11.0
+        value: 3.8.18
       - key: PORT
         generateValue: true

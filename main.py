@@ -1,7 +1,7 @@
 """
 🎯 효진의 AI 도깨비마을 STEM 센터 BETA - 무료 체험 서비스
 8명의 촌장급 STEM 전문가 도깨비들과 함께하는 베타 서비스
-버전: v4.0.0 - STEM 베타 서비스 최적화
+버전: v4.1.0 - STEM 전용 최적화
 """
 
 from fastapi import FastAPI
@@ -15,9 +15,9 @@ from stem_integration import setup_stem_routes
 
 # FastAPI 앱 생성
 app = FastAPI(
-    title="� 효진의 AI 도깨비마을 STEM 센터",
+    title="🎯 효진의 AI 도깨비마을 STEM 센터",
     description="8명의 촌장급 STEM 전문가 도깨비들 + 무료 베타 체험",
-    version="4.0.0",
+    version="4.1.0",
 )
 
 # CORS 설정
@@ -48,7 +48,7 @@ async def root():
         return """
         <html>
             <body>
-                <h1>� 효진의 AI 도깨비마을 STEM 센터</h1>
+                <h1>🎯 효진의 AI 도깨비마을 STEM 센터</h1>
                 <p>8명의 촌장급 STEM 전문가 도깨비들이 무료로 서비스 중입니다!</p>
                 <a href="/stem">🧙‍♂️ STEM 서비스 이용하기</a>
             </body>
@@ -59,7 +59,7 @@ async def root():
 @app.get("/health")
 async def health_check():
     """헬스 체크"""
-    return {"status": "healthy", "version": "4.0.0", "service": "STEM 도깨비마을장터 BETA", "agents": 8}
+    return {"status": "healthy", "version": "4.1.0", "service": "STEM 도깨비마을장터 BETA", "agents": 8}
 
 
 @app.get("/demo/{service_id}", response_class=HTMLResponse)
@@ -108,9 +108,9 @@ async def all_agents():
 
     return f"""
     <html>
-        <head><title>� 효진의 AI 도깨비마을 STEM 센터</title></head>
+        <head><title>🎯 효진의 AI 도깨비마을 STEM 센터</title></head>
         <body style="font-family: Arial; max-width: 1000px; margin: 50px auto; padding: 20px;">
-            <h1>� 효진의 AI 도깨비마을 STEM 센터</h1>
+            <h1>🎯 효진의 AI 도깨비마을 STEM 센터</h1>
             <p>8명의 STEM 전문가 도깨비들을 무료로 체험해보세요!</p>
             {agents_html}
             <br><a href="/" style="background: #2196F3; color: white; padding: 10px 20px; 
@@ -123,6 +123,6 @@ async def all_agents():
 if __name__ == "__main__":
     import uvicorn
 
-    print("� 효진의 AI 도깨비마을 STEM 센터 시작 중...")
+    print("🎯 효진의 AI 도깨비마을 STEM 센터 시작 중...")
     print("🧙‍♂️ 8명의 STEM 전문가 도깨비들이 대기 중입니다!")
     uvicorn.run(app, host="0.0.0.0", port=8000)
