@@ -11,14 +11,14 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import os
 
-# STEM 통합 임포트
+# STEM 통합 임포트 - 컨텍스트 추적 시스템 포함
 from stem_integration_new import STEMIntegration
 
 # FastAPI 앱 생성
 app = FastAPI(
     title="🎯 AI 도깨비마을 STEM 센터",
-    description="16명의 전문가급 STEM 전문가 도깨비들 - 박사급 상담소",
-    version="5.0.0",
+    description="16명의 전문가급 STEM 전문가 도깨비들 - 박사급 상담소 (컨텍스트 추적 시스템)",
+    version="5.1.0",
 )
 
 # CORS 설정
