@@ -121,7 +121,8 @@ async def stem_service():
         with open("index_stem.html", "r", encoding="utf-8") as f:
             return f.read()
     except FileNotFoundError:
-        return HTMLResponse("""
+        return HTMLResponse(
+            """
         <html>
             <head><title>STEM 서비스 오류</title></head>
             <body>
@@ -130,7 +131,9 @@ async def stem_service():
                 <a href="/">홈으로 돌아가기</a>
             </body>
         </html>
-        """, status_code=404)
+        """,
+            status_code=404,
+        )
 
 
 @app.get("/agents", response_class=HTMLResponse)

@@ -330,3 +330,46 @@ class STEMIntegration:
 
 # 전역 인스턴스
 stem_ai = STEMIntegration()
+
+
+def add_stem_routes(app):
+    """FastAPI 앱에 STEM 라우트 추가"""
+    from fastapi import Request
+    from fastapi.responses import HTMLResponse
+    
+    @app.post("/stem/chat")
+    async def stem_chat(request: Request):
+        """STEM 도깨비와 채팅"""
+        try:
+            data = await request.json()
+            agent_type = data.get("agent_type")
+            question = data.get("question")
+            user_ip = request.client.host if request.client else "unknown"
+            
+            result = stem_ai.process_question(agent_type, question, user_ip)
+            return result
+        except Exception as e:
+            return {"success": False, "error": f"서버 오류: {str(e)}"}
+
+    @app.get("/stem/info")
+    async def stem_info():
+        """STEM 도깨비 정보 조회"""
+        return stem_ai.get_agent_info()
+
+    @app.get("/stem/stats")
+    async def stem_stats():
+        """STEM 사용 통계 조회"""
+        try:
+            from usage_tracker import usage_tracker
+            return usage_tracker.get_statistics()
+        except Exception as e:
+            return {"error": f"통계 조회 실패: {str(e)}"}
+
+    @app.get("/stem", response_class=HTMLResponse)
+    async def stem_page():
+        """STEM 도깨비 메인 페이지"""
+        try:
+            with open("index_stem.html", "r", encoding="utf-8") as f:
+                return f.read()
+        except FileNotFoundError:
+            return "<h1>STEM 페이지를 찾을 수 없습니다</h1>"
