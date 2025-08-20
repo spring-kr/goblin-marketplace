@@ -267,7 +267,7 @@ class STEMIntegration:
     def _generate_contextual_response(
         self, question: str, info: dict, personality: dict
     ) -> str:
-        """맥락을 고려한 자연스러운 응답 생성"""
+        """맥락을 고려한 자연스럽고 다양한 응답 생성"""
 
         # 질문 길이와 복잡도 분석
         question_length = len(question)
@@ -296,15 +296,196 @@ class STEMIntegration:
             ]
             return random.choice(responses)
 
-        # 전문 분야 키워드가 포함된 경우
-        if any(
-            expertise in question_lower
-            for expertise in personality.get("expertise", [])
-        ):
-            return self._generate_expert_response(question, info, personality)
+        # 질문 유형 및 키워드 분석을 통한 맞춤형 응답
+        return self._generate_intelligent_response(question, info, personality)
 
-        # 일반적인 질문에 대한 전문가적 관점 제시
-        return self._generate_general_expert_response(question, info, personality)
+    def _generate_intelligent_response(self, question: str, info: dict, personality: dict) -> str:
+        """질문 내용을 분석해서 지능적이고 다양한 응답 생성"""
+        
+        question_lower = question.lower()
+        
+        # 질문 유형별 분석
+        question_type = self._analyze_question_type(question_lower, info['field'])
+        
+        # 키워드 기반 구체적 응답 생성
+        specific_keywords = self._extract_specific_keywords(question_lower, info['field'])
+        
+        # 응답 스타일 결정 (매번 다르게)
+        response_style = random.choice(['detailed', 'practical', 'analytical', 'creative'])
+        
+        return self._create_varied_response(question, info, personality, question_type, specific_keywords, response_style)
+
+    def _analyze_question_type(self, question_lower: str, field: str) -> str:
+        """질문 유형 분석"""
+        
+        if any(word in question_lower for word in ['어떻게', 'how', '방법', '방식']):
+            return 'how_to'
+        elif any(word in question_lower for word in ['왜', 'why', '이유', '원인']):
+            return 'why'
+        elif any(word in question_lower for word in ['뭐', '무엇', 'what', '어떤']):
+            return 'what'
+        elif any(word in question_lower for word in ['언제', 'when', '시기', '타이밍']):
+            return 'when'
+        elif any(word in question_lower for word in ['어디', 'where', '장소', '위치']):
+            return 'where'
+        elif any(word in question_lower for word in ['추천', '제안', '권장', 'recommend']):
+            return 'recommendation'
+        elif any(word in question_lower for word in ['문제', '해결', '도움', 'problem', 'help']):
+            return 'problem_solving'
+        elif any(word in question_lower for word in ['시작', '처음', '초보', 'start', 'begin']):
+            return 'beginner'
+        elif any(word in question_lower for word in ['고급', '전문', '심화', 'advanced']):
+            return 'advanced'
+        else:
+            return 'general'
+
+    def _extract_specific_keywords(self, question_lower: str, field: str) -> list:
+        """분야별 구체적 키워드 추출"""
+        
+        field_keywords = {
+            "업무 관리": ["시간", "계획", "일정", "효율", "생산성", "목표", "우선순위", "스케줄"],
+            "개발": ["코딩", "프로그래밍", "앱", "웹", "데이터베이스", "API", "프레임워크", "언어"],
+            "창작": ["글쓰기", "디자인", "아이디어", "영감", "창의", "스토리", "콘텐츠", "블로그"],
+            "마케팅": ["광고", "브랜드", "고객", "판매", "홍보", "SNS", "마케팅", "브랜딩"],
+            "상담": ["스트레스", "고민", "걱정", "불안", "관계", "감정", "심리", "힐링"]
+        }
+        
+        found_keywords = []
+        for keyword in field_keywords.get(field, []):
+            if keyword in question_lower:
+                found_keywords.append(keyword)
+        
+        return found_keywords
+
+    def _create_varied_response(self, question: str, info: dict, personality: dict, 
+                               question_type: str, keywords: list, style: str) -> str:
+        """다양한 스타일의 응답 생성"""
+        
+        # 기본 인사
+        intro = f"{info['emoji']} {info['name']}입니다!"
+        
+        # 질문 분석 코멘트
+        analysis_comments = [
+            f"'{question}'에 대해 {personality['role']}로서 답변드리겠습니다.",
+            f"{info['field']} 전문가 관점에서 '{question}' 질문을 분석해보겠습니다.",
+            f"흥미로운 질문이네요! {info['field']} 분야에서 '{question}'에 대해 알려드리겠습니다.",
+            f"좋은 질문입니다! {personality['role']}로서 '{question}'에 대한 전문적 조언을 드리겠습니다."
+        ]
+        
+        analysis = random.choice(analysis_comments)
+        
+        # 스타일별 본문 생성
+        if style == 'detailed':
+            content = self._generate_detailed_content(question, info, personality, question_type, keywords)
+        elif style == 'practical':
+            content = self._generate_practical_content(question, info, personality, question_type, keywords)
+        elif style == 'analytical':
+            content = self._generate_analytical_content(question, info, personality, question_type, keywords)
+        else:  # creative
+            content = self._generate_creative_content(question, info, personality, question_type, keywords)
+        
+        # 마무리 멘트
+        closing_comments = [
+            f"더 구체적인 상황이나 추가 질문이 있으시면 {info['name']}에게 언제든 말씀해주세요!",
+            f"{info['field']} 관련해서 더 자세한 조언이 필요하시면 언제든 찾아주세요!",
+            f"이 조언이 도움이 되셨기를 바라며, 추가 상담은 언제든 환영입니다!",
+            f"{personality['role']}로서 더 도움이 될 수 있는 부분이 있다면 언제든 말씀해주세요!"
+        ]
+        
+        closing = random.choice(closing_comments)
+        
+        return f"{intro}\n\n{analysis}\n\n{content}\n\n{closing}"
+
+    def _generate_detailed_content(self, question: str, info: dict, personality: dict, 
+                                 question_type: str, keywords: list) -> str:
+        """상세한 설명 스타일의 응답 생성"""
+        
+        # 기존 함수들을 활용해서 다양한 내용 생성
+        detailed_solution = self._get_detailed_solution(question, info['field'])
+        practical_steps = self._get_practical_steps(question, info['field'])
+        
+        # 키워드 기반 맞춤형 분석
+        keyword_analysis = ""
+        if keywords:
+            keyword_analysis = f"특히 '{', '.join(keywords[:3])}'와 관련해서는 {info['field']} 분야에서 매우 중요한 요소들입니다. "
+        
+        return f"""📋 **전문가 상세 분석:**
+{keyword_analysis}{detailed_solution}
+
+� **체계적 실행 방법:**
+{practical_steps}
+
+� **{personality['role']} 전문 조언:**
+{question_type} 유형의 질문에 대해서는 {info['field']} 분야의 깊이 있는 이해와 체계적 접근이 필수입니다. 
+실제 현장에서는 이론적 지식과 실무 경험을 균형있게 활용하는 것이 성공의 열쇠입니다."""
+
+    def _generate_practical_content(self, question: str, info: dict, personality: dict, 
+                                  question_type: str, keywords: list) -> str:
+        """실용적인 접근 스타일의 응답 생성"""
+        
+        practical_steps = self._get_practical_steps(question, info['field'])
+        expert_tips = self._get_expert_tips(question, info['field'])
+        
+        # 실행 우선순위 제안
+        priority_guide = f"{question_type} 타입 질문의 경우, 우선적으로 기본기를 탄탄히 하는 것이 중요합니다."
+        
+        return f"""⚡ **즉시 실행 가능한 방법:**
+{practical_steps}
+
+�️ **실무 전문가 팁:**
+{expert_tips}
+
+🎯 **실행 우선순위 가이드:**
+{priority_guide} {personality['role']}의 경험으로는 '{question}'와 같은 경우 단계적 접근이 가장 효과적입니다.
+
+📈 **성과 향상 포인트:**
+{info['field']} 분야에서 이런 문제를 해결할 때는 지속가능한 방법론을 선택하는 것이 장기적으로 더 큰 성과를 가져옵니다."""
+
+    def _generate_analytical_content(self, question: str, info: dict, personality: dict, 
+                                   question_type: str, keywords: list) -> str:
+        """분석적 접근 스타일의 응답 생성"""
+        
+        detailed_solution = self._get_detailed_solution(question, info['field'])
+        deep_analysis = self._get_deep_analysis(question, info['field'])
+        
+        # 문제 구조 분석
+        structure_analysis = f"'{question}' 질문을 분해하면 {question_type} 특성과 {info['field']} 도메인 지식이 교차하는 복합적 문제입니다."
+        
+        return f"""🔬 **구조적 문제 분석:**
+{structure_analysis}
+
+🧮 **심층 분석 결과:**
+{deep_analysis}
+
+🏗️ **체계적 해결 프레임워크:**
+{detailed_solution}
+
+📊 **데이터 기반 접근법:**
+{personality['role']}로서 이 문제를 분석할 때는 정량적 지표와 정성적 평가를 모두 고려하여 
+{info['field']} 분야의 베스트 프랙티스에 기반한 솔루션을 제시하겠습니다."""
+
+    def _generate_creative_content(self, question: str, info: dict, personality: dict, 
+                                 question_type: str, keywords: list) -> str:
+        """창의적 접근 스타일의 응답 생성"""
+        
+        expert_tips = self._get_expert_tips(question, info['field'])
+        practical_steps = self._get_practical_steps(question, info['field'])
+        
+        # 창의적 관점 제시
+        creative_perspective = f"'{question}'를 {question_type} 관점에서 보면, 기존의 {info['field']} 접근법을 혁신적으로 재해석할 수 있습니다."
+        
+        return f"""🎨 **혁신적 사고 접근:**
+{creative_perspective}
+
+🔄 **새로운 관점의 솔루션:**
+{expert_tips}
+
+✨ **창의적 실행 방법:**
+{practical_steps}
+
+🌟 **미래 지향적 제안:**
+{personality['role']}로서 '{question}'에 대해 기존 틀을 벗어난 접근을 제안합니다. 
+{info['field']} 분야에서 트렌드를 앞서가는 혁신적 솔루션을 함께 만들어보세요!"""
 
     def _generate_expert_response(
         self, question: str, info: dict, personality: dict

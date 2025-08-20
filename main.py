@@ -1,23 +1,24 @@
 """
-🎯 AI 도깨비마을 STEM 센터 BETA - 무료 체험 서비스
-8명의 촌장급 STEM 전문가 도깨비들과 함께하는 베타 서비스
-버전: v4.1.0 - STEM 전용 최적화
+🎯 AI 도깨비마을 STEM 센터 - 전문가급 16도깨비 시스템
+16명의 전문가급 STEM 전문가 도깨비들과 함께하는 서비스
+버전: v5.0.0 - 전문가급 시스템
 """
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel
 import os
 
 # STEM 통합 임포트
-from stem_integration import add_stem_routes
+from stem_integration_new import STEMIntegration
 
 # FastAPI 앱 생성
 app = FastAPI(
     title="🎯 AI 도깨비마을 STEM 센터",
-    description="8명의 촌장급 STEM 전문가 도깨비들 + 무료 베타 체험",
-    version="4.1.0",
+    description="16명의 전문가급 STEM 전문가 도깨비들 - 박사급 상담소",
+    version="5.0.0",
 )
 
 # CORS 설정
@@ -34,8 +35,80 @@ static_dir = "static"
 if os.path.exists(static_dir):
     app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
-# STEM 라우트 설정
-add_stem_routes(app)
+# STEM 시스템 초기화
+stem_system = STEMIntegration()
+
+
+# 요청 모델 정의
+class STEMRequest(BaseModel):
+    agent_type: str
+    question: str
+
+
+# STEM 채팅 API
+@app.post("/stem/chat")
+async def stem_chat(request: STEMRequest, http_request: Request):
+    """STEM 도깨비들과의 채팅 API"""
+    try:
+        # 클라이언트 IP 가져오기 (안전한 방식)
+        client_ip = (
+            getattr(http_request.client, "host", "unknown")
+            if http_request.client
+            else "unknown"
+        )
+
+        # STEM 시스템으로 질문 처리
+        result = stem_system.process_question(
+            agent_type=request.agent_type, question=request.question, user_ip=client_ip
+        )
+
+        return result
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"서버 오류: {str(e)}")
+
+
+# 메인 페이지
+@app.get("/", response_class=HTMLResponse)
+async def main_page():
+    """메인 페이지 - STEM 전용 인터페이스"""
+    try:
+        # index_stem.html 파일이 있는지 확인
+        if os.path.exists("index_stem.html"):
+            with open("index_stem.html", "r", encoding="utf-8") as f:
+                return f.read()
+        else:
+            # 기본 HTML 반환
+            return """
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>🎯 AI 도깨비마을 STEM 센터</title>
+                <meta charset="utf-8">
+            </head>
+            <body>
+                <h1>🎯 AI 도깨비마을 STEM 센터</h1>
+                <p>16명의 전문가급 STEM 도깨비들이 기다리고 있습니다!</p>
+                <p><a href="/stem">STEM 센터 입장하기</a></p>
+            </body>
+            </html>
+            """
+    except Exception as e:
+        return f"<h1>오류: {str(e)}</h1>"
+
+
+# STEM 전용 페이지
+@app.get("/stem", response_class=HTMLResponse)
+async def stem_page():
+    """STEM 전용 페이지"""
+    try:
+        if os.path.exists("index_stem.html"):
+            with open("index_stem.html", "r", encoding="utf-8") as f:
+                return f.read()
+        else:
+            return "<h1>STEM 페이지를 찾을 수 없습니다.</h1>"
+    except Exception as e:
+        return f"<h1>오류: {str(e)}</h1>"
 
 
 # 서버 시작시 샘플 데이터 확인 및 생성
