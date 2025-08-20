@@ -263,14 +263,20 @@
             <div style="margin-top: 20px; padding: 15px; background: rgba(46, 204, 113, 0.2); border-radius: 10px;">
                 <small><strong>🏆 베타 테스터 혜택:</strong> 정식 출시 후 프리미엄 기능 1개월 무료 제공 예정!</small>
             </div>
-            
-            <!-- 관리자용 통계 대시보드 링크 -->
-            <div style="margin-top: 15px; text-align: center;">
-                <a href="/stem/stats/dashboard" style="color: rgba(255,255,255,0.7); font-size: 12px; text-decoration: none;">📊 관리자용 사용 통계</a>
-            </div>
         </div>
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- 히든 관리자 접근 (Ctrl + Shift + A) -->
+    <script>
+        document.addEventListener('keydown', function(event) {
+            // Ctrl + Shift + A 를 누르면 관리자 페이지로 이동
+            if (event.ctrlKey && event.shiftKey && event.key === 'A') {
+                event.preventDefault();
+                window.location.href = '/stem/stats/dashboard';
+            }
+        });
+    </script>
 </body>
 </html>

@@ -32,7 +32,9 @@ class STEMService:
         """STEM 서비스 초기화"""
         print("🚀 실제 AI 대화 능력 기반 STEM 에이전트 시작 중...")
 
-    async def process_question(self, question: str, agent_type: str, user_ip: Optional[str] = None) -> Dict[str, Any]:
+    async def process_question(
+        self, question: str, agent_type: str, user_ip: Optional[str] = None
+    ) -> Dict[str, Any]:
         """실제 AI 대화 능력으로 질문 처리"""
         try:
             # 에이전트별 정보
@@ -584,7 +586,7 @@ def add_stem_routes(app: FastAPI):
         try:
             # 사용자 IP 추출
             user_ip = client_request.client.host if client_request.client else "unknown"
-            
+
             result = await stem_service.process_question(
                 request.question, request.agent_type, user_ip
             )
@@ -622,12 +624,71 @@ def add_stem_routes(app: FastAPI):
             )
 
     @app.get("/stem/stats/dashboard")
-    async def stem_stats_dashboard():
-        """사용 통계 대시보드 페이지"""
+    async def stem_stats_dashboard(admin_key: Optional[str] = None):
+        """사용 통계 대시보드 페이지 - 관리자 인증 필요"""
+        
+        # 관리자 인증 확인
+        ADMIN_SECRET = "hyojin_admin_2024_secure"  # 실제로는 환경변수나 설정 파일에서 가져와야 함
+        
+        if admin_key != ADMIN_SECRET:
+            return HTMLResponse(
+                content="""
+                <!DOCTYPE html>
+                <html lang="ko">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>🔒 관리자 인증</title>
+                    <style>
+                        body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; 
+                               background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                               min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+                        .auth-container { background: rgba(255,255,255,0.95); border-radius: 20px; 
+                                         padding: 40px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                                         max-width: 400px; width: 100%; }
+                        .auth-form { margin: 20px 0; }
+                        .auth-input { width: 100%; padding: 15px; margin: 10px 0; border: 2px solid #ddd; 
+                                     border-radius: 10px; font-size: 16px; text-align: center; }
+                        .auth-btn { background: #4CAF50; color: white; padding: 15px 30px; border: none; 
+                                   border-radius: 10px; font-size: 16px; cursor: pointer; width: 100%; }
+                        .auth-btn:hover { background: #45a049; }
+                        .back-link { margin-top: 20px; }
+                        .back-link a { color: #666; text-decoration: none; }
+                    </style>
+                </head>
+                <body>
+                    <div class="auth-container">
+                        <h2>🔒 관리자 인증</h2>
+                        <p>통계 대시보드에 접근하려면 관리자 키가 필요합니다.</p>
+                        
+                        <form class="auth-form" onsubmit="authenticateAdmin(event)">
+                            <input type="password" id="adminKey" class="auth-input" 
+                                   placeholder="관리자 키를 입력하세요" required>
+                            <button type="submit" class="auth-btn">🔓 인증</button>
+                        </form>
+                        
+                        <div class="back-link">
+                            <a href="/stem">🔙 서비스로 돌아가기</a>
+                        </div>
+                    </div>
+                    
+                    <script>
+                        function authenticateAdmin(event) {
+                            event.preventDefault();
+                            const adminKey = document.getElementById('adminKey').value;
+                            window.location.href = `/stem/stats/dashboard?admin_key=${adminKey}`;
+                        }
+                    </script>
+                </body>
+                </html>
+                """,
+                status_code=401
+            )
+        
         try:
             stats = usage_tracker.get_statistics()
             recent_activity = usage_tracker.get_recent_activity(20)
-            
+
             # HTML 대시보드 생성
             stats_html = f"""
             <!DOCTYPE html>
@@ -677,7 +738,7 @@ def add_stem_routes(app: FastAPI):
                     <h1>📊 AI 도깨비마을 STEM 센터 - 실시간 사용 통계</h1>
                     <p style="text-align: center; color: #666;">베타 서비스 모니터링 대시보드 (30초마다 자동 업데이트)</p>
             """
-            
+
             if "message" in stats:
                 stats_html += f"""
                     <div style="text-align: center; padding: 50px;">
@@ -710,9 +771,11 @@ def add_stem_routes(app: FastAPI):
                     <div class="chart-section">
                         <h2>👥 에이전트별 사용량</h2>
                 """
-                
-                max_usage = max(stats['agent_usage'].values()) if stats['agent_usage'] else 1
-                for agent, count in stats['agent_usage'].items():
+
+                max_usage = (
+                    max(stats["agent_usage"].values()) if stats["agent_usage"] else 1
+                )
+                for agent, count in stats["agent_usage"].items():
                     width = (count / max_usage) * 100
                     stats_html += f"""
                         <div class="agent-bar" style="width: {width}%;">
@@ -720,39 +783,46 @@ def add_stem_routes(app: FastAPI):
                             <span class="agent-count">{count}회</span>
                         </div>
                     """
-                
+
                 stats_html += """
                     </div>
                     
                     <div class="chart-section">
                         <h2>📅 일별 사용량</h2>
                 """
-                
-                for date, count in stats['daily_usage'].items():
+
+                for date, count in stats["daily_usage"].items():
                     stats_html += f"""
                         <div class="recent-activity">
                             📅 {date}: <strong>{count}회 사용</strong>
                         </div>
                     """
-                
+
                 stats_html += """
                     </div>
                 """
-            
+
             # 최근 활동
             stats_html += """
                 <div class="chart-section">
                     <h2>🕐 최근 활동</h2>
             """
-            
+
             for activity in recent_activity[:10]:
                 if "error" not in activity:
                     agent_names = {
-                        "math": "🧮 수학", "physics": "⚛️ 물리학", "chemistry": "🧪 화학",
-                        "biology": "🧬 생물학", "engineering": "⚙️ 공학", "assistant": "🤖 업무",
-                        "marketing": "📈 마케팅", "startup": "🚀 창업"
+                        "math": "🧮 수학",
+                        "physics": "⚛️ 물리학",
+                        "chemistry": "🧪 화학",
+                        "biology": "🧬 생물학",
+                        "engineering": "⚙️ 공학",
+                        "assistant": "🤖 업무",
+                        "marketing": "📈 마케팅",
+                        "startup": "🚀 창업",
                     }
-                    agent_name = agent_names.get(activity.get('agent_type', ''), activity.get('agent_type', ''))
+                    agent_name = agent_names.get(
+                        activity.get("agent_type", ""), activity.get("agent_type", "")
+                    )
                     stats_html += f"""
                         <div class="recent-activity">
                             <strong>{activity.get('time', '')} - {agent_name}</strong><br>
@@ -760,7 +830,7 @@ def add_stem_routes(app: FastAPI):
                             {'✅ 성공' if activity.get('response_success') else '❌ 실패'}
                         </div>
                     """
-            
+
             stats_html += f"""
                     </div>
                     
@@ -776,9 +846,9 @@ def add_stem_routes(app: FastAPI):
             </body>
             </html>
             """
-            
+
             return HTMLResponse(content=stats_html)
-            
+
         except Exception as e:
             return HTMLResponse(
                 content=f"<h1>통계 대시보드 오류</h1><p>{str(e)}</p>",
