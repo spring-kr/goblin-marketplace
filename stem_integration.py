@@ -13,6 +13,9 @@ import datetime
 import os
 import random
 
+# 사용량 추적 시스템 임포트
+from usage_tracker import usage_tracker
+
 # 템플릿 설정 (없으면 None)
 templates = None
 if os.path.exists("templates/stem"):
@@ -29,7 +32,7 @@ class STEMService:
         """STEM 서비스 초기화"""
         print("🚀 실제 AI 대화 능력 기반 STEM 에이전트 시작 중...")
 
-    async def process_question(self, question: str, agent_type: str) -> Dict[str, Any]:
+    async def process_question(self, question: str, agent_type: str, user_ip: Optional[str] = None) -> Dict[str, Any]:
         """실제 AI 대화 능력으로 질문 처리"""
         try:
             # 에이전트별 정보
@@ -53,6 +56,8 @@ class STEMService:
             }
 
             if agent_type not in agent_info:
+                # 실패 로그 기록
+                usage_tracker.log_usage(agent_type, question, False, user_ip)
                 return {
                     "success": False,
                     "error": f"지원하지 않는 에이전트 타입: {agent_type}",
@@ -63,6 +68,9 @@ class STEMService:
             # 실제 AI 기반 답변 생성
             ai_response = self._generate_smart_response(question, agent_type, info)
 
+            # 성공 로그 기록
+            usage_tracker.log_usage(agent_type, question, True, user_ip)
+
             return {
                 "success": True,
                 "agent_type": agent_type,
@@ -72,6 +80,8 @@ class STEMService:
             }
 
         except Exception as e:
+            # 에러 로그 기록
+            usage_tracker.log_usage(agent_type, question, False, user_ip)
             return {"success": False, "error": f"처리 중 오류 발생: {str(e)}"}
 
     def _generate_smart_response(
@@ -569,11 +579,14 @@ def add_stem_routes(app: FastAPI):
         """
 
     @app.post("/stem/api/ask")
-    async def stem_ask(request: STEMRequest):
+    async def stem_ask(request: STEMRequest, client_request: Request):
         """STEM 질문 처리 API"""
         try:
+            # 사용자 IP 추출
+            user_ip = client_request.client.host if client_request.client else "unknown"
+            
             result = await stem_service.process_question(
-                request.question, request.agent_type
+                request.question, request.agent_type, user_ip
             )
             return JSONResponse(content=result)
         except Exception as e:
@@ -595,6 +608,182 @@ def add_stem_routes(app: FastAPI):
                 "timestamp": datetime.datetime.now().isoformat(),
             }
         )
+
+    @app.get("/stem/stats")
+    async def stem_statistics():
+        """STEM 서비스 사용 통계"""
+        try:
+            stats = usage_tracker.get_statistics()
+            return JSONResponse(content=stats)
+        except Exception as e:
+            return JSONResponse(
+                content={"error": f"통계 조회 오류: {str(e)}"},
+                status_code=500,
+            )
+
+    @app.get("/stem/stats/dashboard")
+    async def stem_stats_dashboard():
+        """사용 통계 대시보드 페이지"""
+        try:
+            stats = usage_tracker.get_statistics()
+            recent_activity = usage_tracker.get_recent_activity(20)
+            
+            # HTML 대시보드 생성
+            stats_html = f"""
+            <!DOCTYPE html>
+            <html lang="ko">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>📊 AI 도깨비마을 STEM 센터 - 사용 통계</title>
+                <style>
+                    body {{ font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; 
+                           background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                           min-height: 100vh; }}
+                    .container {{ max-width: 1200px; margin: 0 auto; 
+                                background: rgba(255,255,255,0.95); border-radius: 20px; 
+                                padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }}
+                    .stats-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+                                  gap: 20px; margin: 20px 0; }}
+                    .stat-card {{ background: linear-gradient(45deg, #4CAF50, #45a049); 
+                                 color: white; padding: 20px; border-radius: 15px; 
+                                 text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }}
+                    .stat-number {{ font-size: 2.5em; font-weight: bold; }}
+                    .stat-label {{ font-size: 1.1em; opacity: 0.9; }}
+                    .chart-section {{ background: #f5f5f5; padding: 20px; border-radius: 10px; margin: 20px 0; }}
+                    .agent-bar {{ background: #2196F3; height: 25px; margin: 5px 0; 
+                                border-radius: 12px; position: relative; }}
+                    .agent-label {{ position: absolute; left: 10px; top: 3px; color: white; font-weight: bold; }}
+                    .agent-count {{ position: absolute; right: 10px; top: 3px; color: white; }}
+                    .recent-activity {{ background: #fff3cd; padding: 15px; border-radius: 10px; 
+                                      margin: 10px 0; border-left: 5px solid #ffc107; }}
+                    h1, h2 {{ color: #333; text-align: center; }}
+                    .refresh-btn {{ background: #FF5722; color: white; padding: 10px 20px; 
+                                   border: none; border-radius: 5px; cursor: pointer; 
+                                   font-size: 16px; margin: 10px; }}
+                    .back-btn {{ background: #2196F3; color: white; padding: 15px 30px; 
+                               text-decoration: none; border-radius: 10px; display: inline-block; 
+                               margin: 20px 0; }}
+                </style>
+                <script>
+                    function refreshStats() {{
+                        location.reload();
+                    }}
+                    setInterval(refreshStats, 30000); // 30초마다 자동 새로고침
+                </script>
+            </head>
+            <body>
+                <div class="container">
+                    <h1>📊 AI 도깨비마을 STEM 센터 - 실시간 사용 통계</h1>
+                    <p style="text-align: center; color: #666;">베타 서비스 모니터링 대시보드 (30초마다 자동 업데이트)</p>
+            """
+            
+            if "message" in stats:
+                stats_html += f"""
+                    <div style="text-align: center; padding: 50px;">
+                        <h2>📈 {stats['message']}</h2>
+                        <p>사용자들이 질문을 시작하면 여기에 통계가 표시됩니다!</p>
+                    </div>
+                """
+            else:
+                # 주요 통계 카드들
+                stats_html += f"""
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">{stats['total_usage']}</div>
+                            <div class="stat-label">총 사용량</div>
+                        </div>
+                        <div class="stat-card" style="background: linear-gradient(45deg, #FF9800, #F57C00);">
+                            <div class="stat-number">{stats['success_rate']}%</div>
+                            <div class="stat-label">성공률</div>
+                        </div>
+                        <div class="stat-card" style="background: linear-gradient(45deg, #9C27B0, #7B1FA2);">
+                            <div class="stat-number">{stats['peak_hour']}시</div>
+                            <div class="stat-label">피크 시간</div>
+                        </div>
+                        <div class="stat-card" style="background: linear-gradient(45deg, #F44336, #D32F2F);">
+                            <div class="stat-number">{stats['average_question_length']}</div>
+                            <div class="stat-label">평균 질문 길이</div>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-section">
+                        <h2>👥 에이전트별 사용량</h2>
+                """
+                
+                max_usage = max(stats['agent_usage'].values()) if stats['agent_usage'] else 1
+                for agent, count in stats['agent_usage'].items():
+                    width = (count / max_usage) * 100
+                    stats_html += f"""
+                        <div class="agent-bar" style="width: {width}%;">
+                            <span class="agent-label">{agent}</span>
+                            <span class="agent-count">{count}회</span>
+                        </div>
+                    """
+                
+                stats_html += """
+                    </div>
+                    
+                    <div class="chart-section">
+                        <h2>📅 일별 사용량</h2>
+                """
+                
+                for date, count in stats['daily_usage'].items():
+                    stats_html += f"""
+                        <div class="recent-activity">
+                            📅 {date}: <strong>{count}회 사용</strong>
+                        </div>
+                    """
+                
+                stats_html += """
+                    </div>
+                """
+            
+            # 최근 활동
+            stats_html += """
+                <div class="chart-section">
+                    <h2>🕐 최근 활동</h2>
+            """
+            
+            for activity in recent_activity[:10]:
+                if "error" not in activity:
+                    agent_names = {
+                        "math": "🧮 수학", "physics": "⚛️ 물리학", "chemistry": "🧪 화학",
+                        "biology": "🧬 생물학", "engineering": "⚙️ 공학", "assistant": "🤖 업무",
+                        "marketing": "📈 마케팅", "startup": "🚀 창업"
+                    }
+                    agent_name = agent_names.get(activity.get('agent_type', ''), activity.get('agent_type', ''))
+                    stats_html += f"""
+                        <div class="recent-activity">
+                            <strong>{activity.get('time', '')} - {agent_name}</strong><br>
+                            질문: "{activity.get('question_preview', '')}"
+                            {'✅ 성공' if activity.get('response_success') else '❌ 실패'}
+                        </div>
+                    """
+            
+            stats_html += f"""
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <button class="refresh-btn" onclick="refreshStats()">🔄 수동 새로고침</button>
+                        <a href="/stem" class="back-btn">🔙 서비스로 돌아가기</a>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 20px; color: #666;">
+                        <p>마지막 업데이트: {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+            """
+            
+            return HTMLResponse(content=stats_html)
+            
+        except Exception as e:
+            return HTMLResponse(
+                content=f"<h1>통계 대시보드 오류</h1><p>{str(e)}</p>",
+                status_code=500,
+            )
 
     print("✅ 실제 AI 대화 능력 기반 STEM 라우트 추가 완료!")
     return app
