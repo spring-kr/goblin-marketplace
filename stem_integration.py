@@ -1,20 +1,15 @@
 """
-STEM 통합 AI 도깨비 시스템 - 원래 16개 도깨비 버전
-박사급 AI 도깨비들이 각 분야별로 전문적인 상담을 제공합니다.
+🎯 AI 도깨비마을 STEM 센터 - 실제 AI 대화 시스템
+진짜 AI처럼 자연스럽고 맥락적인 응답을 제공하는 16개 도깨비 시스템
 """
 
 import random
-import re
 from datetime import datetime
 from typing import Dict, Any, Optional
-from usage_tracker import UsageTracker
-
-# 사용량 추적기 초기화
-usage_tracker = UsageTracker()
 
 
 class STEMIntegration:
-    """원래 16개 박사급 AI 도깨비 시스템"""
+    """STEM 도깨비들과의 실제 AI 대화 시스템"""
 
     def __init__(self):
         self.system_name = "🏰 도깨비마을장터 박사급 AI 상담소"
@@ -24,6 +19,8 @@ class STEMIntegration:
     ) -> Dict[str, Any]:
         """실제 AI 대화 능력으로 질문 처리"""
         try:
+            from usage_tracker import usage_tracker
+
             # 원래 16개 도깨비 정보
             agent_info = {
                 "assistant": {
@@ -43,7 +40,7 @@ class STEMIntegration:
                 "growth": {"emoji": "🌱", "name": "성장 도깨비", "field": "성장"},
                 "hr": {"emoji": "👥", "name": "HR 도깨비", "field": "인사 관리"},
                 "marketing": {
-                    "emoji": "📈",
+                    "emoji": "📢",
                     "name": "마케팅 도깨비",
                     "field": "마케팅",
                 },
@@ -82,7 +79,7 @@ class STEMIntegration:
 
             # 도깨비별 전문 응답 생성
             info = agent_info[agent_type]
-            response = self._generate_smart_response(question, agent_type, info)
+            response = self._create_natural_ai_response(question, agent_type, info)
 
             # 성공 로그 기록
             usage_tracker.log_usage(agent_type, question, True, user_ip)
@@ -104,184 +101,284 @@ class STEMIntegration:
             usage_tracker.log_usage(agent_type, question, False, user_ip)
             return {"success": False, "error": f"처리 중 오류가 발생했습니다: {str(e)}"}
 
-    def _generate_smart_response(
+    def _create_natural_ai_response(
         self, question: str, agent_type: str, info: dict
     ) -> str:
-        """도깨비별 전문 응답 생성 - 실제 AI처럼 자연스럽게"""
-        
-        # 실제 AI 대화처럼 자연스럽고 맥락적인 응답 생성
-        return self._create_natural_ai_response(question, agent_type, info)
-
-    def _generate_smart_response(
-        self, question: str, agent_type: str, info: dict
-    ) -> str:
-        """도깨비별 전문 응답 생성 - 실제 AI처럼 자연스럽게"""
-        
-        # 실제 AI 대화처럼 자연스럽고 맥락적인 응답 생성
-        return self._create_natural_ai_response(question, agent_type, info)
-
-    def _create_natural_ai_response(self, question: str, agent_type: str, info: dict) -> str:
         """실제 AI처럼 자연스럽고 맥락적인 응답 생성"""
-        
+
         # 도깨비별 전문 분야와 성격 정의
         agent_personalities = {
             "assistant": {
                 "role": "효율적이고 체계적인 업무 관리 전문가",
                 "style": "실용적이고 구체적인 조언",
-                "expertise": ["시간관리", "업무효율", "생산성", "계획수립", "조직관리"]
+                "expertise": ["시간관리", "업무효율", "생산성", "계획수립", "조직관리"],
             },
             "builder": {
-                "role": "창의적이고 실용적인 개발 전문가", 
+                "role": "창의적이고 실용적인 개발 전문가",
                 "style": "기술적이면서도 이해하기 쉬운 설명",
-                "expertise": ["프로그래밍", "웹개발", "앱개발", "시스템설계", "기술아키텍처"]
+                "expertise": [
+                    "프로그래밍",
+                    "웹개발",
+                    "앱개발",
+                    "시스템설계",
+                    "기술아키텍처",
+                ],
             },
             "counselor": {
                 "role": "따뜻하고 공감능력이 뛰어난 상담 전문가",
                 "style": "경청하고 공감하며 따뜻한 조언",
-                "expertise": ["심리상담", "갈등해결", "스트레스관리", "인간관계", "감정관리"]
+                "expertise": [
+                    "심리상담",
+                    "갈등해결",
+                    "스트레스관리",
+                    "인간관계",
+                    "감정관리",
+                ],
             },
             "creative": {
                 "role": "영감이 넘치고 창의적인 아이디어 전문가",
                 "style": "독창적이고 흥미로운 아이디어 제시",
-                "expertise": ["창작", "디자인", "브랜딩", "콘텐츠기획", "아이디어발상"]
+                "expertise": ["창작", "디자인", "브랜딩", "콘텐츠기획", "아이디어발상"],
             },
             "data_analyst": {
                 "role": "논리적이고 분석적인 데이터 전문가",
                 "style": "근거와 데이터를 바탕으로 한 객관적 분석",
-                "expertise": ["데이터분석", "통계", "시각화", "예측모델링", "비즈니스인텔리전스"]
+                "expertise": [
+                    "데이터분석",
+                    "통계",
+                    "시각화",
+                    "예측모델링",
+                    "비즈니스인텔리전스",
+                ],
             },
             "fortune": {
                 "role": "신비롭고 지혜로운 운세 전문가",
                 "style": "신비로우면서도 희망적인 메시지",
-                "expertise": ["운세", "점성술", "타로", "풍수", "운명해석"]
+                "expertise": ["운세", "점성술", "타로", "풍수", "운명해석"],
             },
             "growth": {
                 "role": "동기부여가 넘치는 성장 전문가",
                 "style": "격려하고 동기부여하는 긍정적 조언",
-                "expertise": ["자기계발", "목표설정", "습관형성", "동기부여", "성장전략"]
+                "expertise": [
+                    "자기계발",
+                    "목표설정",
+                    "습관형성",
+                    "동기부여",
+                    "성장전략",
+                ],
             },
             "hr": {
                 "role": "사람 중심의 인사 관리 전문가",
                 "style": "배려 깊고 공정한 인사 관리 조언",
-                "expertise": ["채용", "인사평가", "조직문화", "리더십", "팀관리"]
+                "expertise": ["채용", "인사평가", "조직문화", "리더십", "팀관리"],
             },
             "marketing": {
                 "role": "트렌드에 민감한 마케팅 전문가",
                 "style": "창의적이고 실행 가능한 마케팅 전략",
-                "expertise": ["브랜드마케팅", "디지털마케팅", "고객분석", "마케팅전략", "광고기획"]
+                "expertise": [
+                    "브랜드마케팅",
+                    "디지털마케팅",
+                    "고객분석",
+                    "마케팅전략",
+                    "광고기획",
+                ],
             },
             "medical": {
                 "role": "신뢰할 수 있는 의료 정보 전문가",
                 "style": "정확하고 신중한 의학 정보 제공",
-                "expertise": ["건강관리", "질병예방", "의학정보", "건강검진", "생활습관"]
+                "expertise": [
+                    "건강관리",
+                    "질병예방",
+                    "의학정보",
+                    "건강검진",
+                    "생활습관",
+                ],
             },
             "sales": {
                 "role": "열정적이고 설득력 있는 영업 전문가",
                 "style": "적극적이고 성과지향적인 영업 조언",
-                "expertise": ["영업전략", "고객관계", "협상기술", "매출관리", "세일즈"]
+                "expertise": ["영업전략", "고객관계", "협상기술", "매출관리", "세일즈"],
             },
             "seo": {
                 "role": "검색엔진에 정통한 SEO 전문가",
                 "style": "기술적이면서도 실무적인 SEO 조언",
-                "expertise": ["검색최적화", "키워드분석", "웹사이트최적화", "구글SEO", "콘텐츠SEO"]
+                "expertise": [
+                    "검색최적화",
+                    "키워드분석",
+                    "웹사이트최적화",
+                    "구글SEO",
+                    "콘텐츠SEO",
+                ],
             },
             "shopping": {
                 "role": "합리적이고 트렌드에 민감한 쇼핑 전문가",
                 "style": "실용적이고 경제적인 구매 조언",
-                "expertise": ["제품비교", "가격분석", "쇼핑팁", "소비패턴", "구매가이드"]
+                "expertise": [
+                    "제품비교",
+                    "가격분석",
+                    "쇼핑팁",
+                    "소비패턴",
+                    "구매가이드",
+                ],
             },
             "startup": {
                 "role": "도전정신이 강한 창업 전문가",
                 "style": "현실적이면서도 꿈을 응원하는 창업 조언",
-                "expertise": ["창업전략", "비즈니스모델", "투자유치", "스타트업경영", "사업계획"]
+                "expertise": [
+                    "창업전략",
+                    "비즈니스모델",
+                    "투자유치",
+                    "스타트업경영",
+                    "사업계획",
+                ],
             },
             "village_chief": {
                 "role": "경험이 풍부하고 지혜로운 리더",
                 "style": "포용력 있고 균형잡힌 종합적 조언",
-                "expertise": ["리더십", "조직관리", "갈등조정", "의사결정", "커뮤니티관리"]
+                "expertise": [
+                    "리더십",
+                    "조직관리",
+                    "갈등조정",
+                    "의사결정",
+                    "커뮤니티관리",
+                ],
             },
             "writing": {
                 "role": "문장력이 뛰어난 글쓰기 전문가",
                 "style": "명확하고 품격 있는 문서 작성 조언",
-                "expertise": ["문서작성", "글쓰기", "논문작성", "보고서", "콘텐츠라이팅"]
-            }
+                "expertise": [
+                    "문서작성",
+                    "글쓰기",
+                    "논문작성",
+                    "보고서",
+                    "콘텐츠라이팅",
+                ],
+            },
         }
-        
-        personality = agent_personalities.get(agent_type, {
-            "role": "전문가",
-            "style": "도움이 되는 조언",
-            "expertise": ["전문상담"]
-        })
-        
+
+        personality = agent_personalities.get(
+            agent_type,
+            {"role": "전문가", "style": "도움이 되는 조언", "expertise": ["전문상담"]},
+        )
+
         # 질문 분석 및 맥락적 응답 생성
         return self._generate_contextual_response(question, info, personality)
 
-    def _generate_contextual_response(self, question: str, info: dict, personality: dict) -> str:
+    def _generate_contextual_response(
+        self, question: str, info: dict, personality: dict
+    ) -> str:
         """맥락을 고려한 자연스러운 응답 생성"""
-        
+
         # 질문 길이와 복잡도 분석
         question_length = len(question)
-        
+        question_lower = question.lower()
+
         # 인사말 처리
-        greetings = ["안녕", "안녕하세요", "하이", "헬로", "hi", "hello"]
-        if any(greeting in question.lower() for greeting in greetings) and question_length < 20:
-            return f"{info['emoji']} 안녕하세요! {info['name']}입니다! 어떤 {info['field']} 관련 도움이 필요하신가요? 궁금한 것이 있으시면 언제든 말씀해주세요!"
-        
+        greetings = ["안녕", "하이", "헬로", "hi", "hello"]
+        if (
+            any(greeting in question_lower for greeting in greetings)
+            and question_length < 20
+        ):
+            responses = [
+                f"{info['emoji']} 안녕하세요! {info['name']}입니다! 어떤 {info['field']} 관련 도움이 필요하신가요?",
+                f"{info['emoji']} 반갑습니다! {info['name']}가 인사드려요. {info['field']} 전문가로서 최선을 다해 도와드리겠습니다!",
+                f"{info['emoji']} 안녕하세요! {info['field']} 전문가 {info['name']}입니다. 무엇을 도와드릴까요?",
+            ]
+            return random.choice(responses)
+
         # 감사 표현 처리
         thanks = ["고마워", "감사", "고맙", "thanks", "thank"]
-        if any(thank in question.lower() for thank in thanks):
-            return f"{info['emoji']} 별말씀을요! {info['name']}로서 도움이 되었다니 정말 기쁩니다. 앞으로도 {info['field']} 관련해서 궁금한 것이 있으시면 언제든 찾아주세요!"
-        
+        if any(thank in question_lower for thank in thanks):
+            responses = [
+                f"{info['emoji']} 별말씀을요! {info['name']}로서 도움이 되었다니 정말 기쁩니다!",
+                f"{info['emoji']} 천만에요! {info['field']} 관련해서 언제든 찾아주세요!",
+                f"{info['emoji']} 도움이 되어서 다행이에요! {info['name']}는 항상 여기 있습니다!",
+            ]
+            return random.choice(responses)
+
         # 전문 분야 키워드가 포함된 경우
-        if any(expertise in question.lower() for expertise in personality.get("expertise", [])):
+        if any(
+            expertise in question_lower
+            for expertise in personality.get("expertise", [])
+        ):
             return self._generate_expert_response(question, info, personality)
-        
+
         # 일반적인 질문에 대한 전문가적 관점 제시
         return self._generate_general_expert_response(question, info, personality)
 
-    def _generate_expert_response(self, question: str, info: dict, personality: dict) -> str:
-        """전문 분야 관련 응답 생성"""
-        
+    def _generate_expert_response(
+        self, question: str, info: dict, personality: dict
+    ) -> str:
+        """전문 분야 관련 응답 생성 - 더 길고 구체적인 응답"""
+
+        specific_solution = self._get_detailed_solution(question, info["field"])
+        practical_steps = self._get_practical_steps(question, info["field"])
+        expert_tips = self._get_expert_tips(question, info["field"])
+
         return f"""{info['emoji']} {info['name']}입니다!
 
-'{question}'에 대해 {personality['role']}로서 답변드리겠습니다.
+'{question}'에 대해 {personality['role']}로서 전문적이고 상세한 답변을 드리겠습니다.
 
-🎯 **전문가 분석:**
-질문하신 내용은 제가 가장 잘 다룰 수 있는 {info['field']} 분야네요. {personality['style']}를 제공해드리겠습니다.
+🎯 **심층 전문가 분석:**
+질문하신 내용은 {info['field']} 분야에서 매우 중요한 주제입니다. {personality['style']}와 함께 실무에서 바로 적용할 수 있는 구체적인 방법론을 제시해드리겠습니다.
 
-💡 **맞춤 솔루션:**
-{self._get_specific_solution(question, info['field'])}
+💡 **상세 솔루션:**
+{specific_solution}
 
-✨ **추가 조언:**
-더 구체적인 상황이나 세부사항을 알려주시면, 더욱 정확하고 실용적인 조언을 드릴 수 있습니다!
+📋 **단계별 실행 방안:**
+{practical_steps}
 
-🚀 **다음 단계:**
-궁금한 점이 더 있으시면 언제든 말씀해주세요!"""
+⭐ **전문가 노하우:**
+{expert_tips}
 
-    def _generate_general_expert_response(self, question: str, info: dict, personality: dict) -> str:
-        """일반적인 질문에 대한 전문가 관점 응답"""
-        
+🔍 **심화 분석:**
+{self._get_deep_analysis(question, info["field"])}
+
+✨ **성공 사례 및 주의사항:**
+{self._get_success_cases_and_warnings(info["field"])}
+
+🚀 **다음 단계 로드맵:**
+이 조언을 바탕으로 단계적으로 실행해보시고, 진행 과정에서 궁금한 점이나 구체적인 상황에 대한 추가 조언이 필요하시면 언제든 말씀해주세요. {info['field']} 전문가로서 더욱 세밀한 가이드를 제공해드리겠습니다!"""
+
+    def _generate_general_expert_response(
+        self, question: str, info: dict, personality: dict
+    ) -> str:
+        """일반적인 질문에 대한 전문가 관점 응답 - 더 길고 구체적인 응답"""
+
+        field_analysis = self._get_comprehensive_analysis(question, info["field"])
+        strategic_approach = self._get_strategic_approach(question, info["field"])
+        implementation_guide = self._get_implementation_guide(info["field"])
+
         return f"""{info['emoji']} {info['name']}입니다!
 
-'{question}'에 대해 {info['field']} 전문가 관점에서 답변드리겠습니다.
+'{question}'에 대해 {info['field']} 전문가로서 종합적이고 심층적인 관점을 제공해드리겠습니다.
 
-🔍 **전문가 시각:**
-{personality['role']}로서 이 문제를 바라보면, {info['field']} 관점에서 접근해볼 수 있을 것 같습니다.
+🔍 **전문가 종합 진단:**
+{personality['role']}로서 이 문제를 다각도로 분석해보면, {info['field']} 영역에서 고려해야 할 핵심 요소들이 여러 가지 있습니다.
 
-💭 **종합적 고려사항:**
-• 현재 상황의 정확한 파악이 중요합니다
-• {info['field']} 원칙을 적용한 체계적 접근
-• 실행 가능한 구체적 방안 모색
+💭 **전략적 접근 방법:**
+{strategic_approach}
 
-🎯 **제안사항:**
-{self._get_field_specific_advice(question, info['field'])}
+📊 **세부 분석:**
+{field_analysis}
 
-📞 **추가 상담:**
-더 자세한 상황을 알려주시면 {info['field']} 전문성을 바탕으로 더 구체적인 도움을 드릴 수 있습니다!"""
+🛠️ **실행 가이드:**
+{implementation_guide}
+
+⚡ **즉시 적용 가능한 방법:**
+{self._get_immediate_actions(info["field"])}
+
+🎯 **장기적 전략:**
+{self._get_long_term_strategy(info["field"])}
+
+📞 **전문 상담 안내:**
+{info['field']} 분야의 특성상 개별 상황에 따라 접근 방법이 달라질 수 있습니다. 구체적인 상황이나 추가적인 배경 정보를 알려주시면, {personality['role']}로서 더욱 정밀하고 맞춤형 솔루션을 제공해드릴 수 있습니다. 
+
+언제든 세부적인 질문이나 후속 상담이 필요하시면 {info['name']}를 찾아주세요!"""
 
     def _get_specific_solution(self, question: str, field: str) -> str:
         """분야별 구체적 솔루션 제공"""
-        
+
         solutions = {
             "업무 관리": "효율적인 시간 관리와 우선순위 설정을 통해 생산성을 극대화하고, 체계적인 업무 프로세스를 구축하세요.",
             "개발": "문제를 단계별로 분해하고, 적절한 기술 스택을 선택하여 확장 가능한 솔루션을 설계해보세요.",
@@ -298,14 +395,17 @@ class STEMIntegration:
             "쇼핑": "신중한 비교검토를 통해 가성비를 따져보고, 실제 필요성을 고려한 합리적 소비를 하세요.",
             "창업": "시장 검증을 통해 실제 고객 문제를 해결하는 솔루션을 개발하고, 점진적으로 사업을 확장하세요.",
             "마을 관리": "모든 구성원의 의견을 듣고 조율하여, 공동체 전체의 이익을 고려한 균형잡힌 의사결정을 하세요.",
-            "문서 작성": "명확한 구조와 논리적 흐름을 갖추고, 독자의 입장에서 이해하기 쉽게 작성하세요."
+            "문서 작성": "명확한 구조와 논리적 흐름을 갖추고, 독자의 입장에서 이해하기 쉽게 작성하세요.",
         }
-        
-        return solutions.get(field, "전문적인 관점에서 체계적으로 접근하고, 실행 가능한 방안을 단계별로 수립해보세요.")
+
+        return solutions.get(
+            field,
+            "전문적인 관점에서 체계적으로 접근하고, 실행 가능한 방안을 단계별로 수립해보세요.",
+        )
 
     def _get_field_specific_advice(self, question: str, field: str) -> str:
         """분야별 맞춤 조언 제공"""
-        
+
         advice = {
             "업무 관리": "시간 관리 매트릭스를 활용해 중요도와 긴급도를 분류하고, 집중 시간을 확보하세요.",
             "개발": "MVP(최소 실행 제품)부터 시작해서 사용자 피드백을 받으며 반복 개선해나가세요.",
@@ -322,153 +422,241 @@ class STEMIntegration:
             "쇼핑": "가격 비교 사이트를 활용하고, 리뷰와 평점을 꼼꼼히 확인한 후 구매하세요.",
             "창업": "린 스타트업 방법론을 적용해 빠른 실험과 학습을 통해 사업 모델을 검증하세요.",
             "마을 관리": "투명한 소통 채널을 구축하고, 정기적인 의견 수렴을 통해 민주적으로 운영하세요.",
-            "문서 작성": "5W1H 원칙에 따라 정보를 정리하고, 단락별 핵심 메시지를 명확히 하세요."
+            "문서 작성": "5W1H 원칙에 따라 정보를 정리하고, 단락별 핵심 메시지를 명확히 하세요.",
+        }
+
+        return advice.get(
+            field, "전문 지식을 바탕으로 단계적이고 실용적인 접근 방법을 찾아보세요."
+        )
+
+    def _get_detailed_solution(self, question: str, field: str) -> str:
+        """분야별 상세 솔루션 제공"""
+        
+        detailed_solutions = {
+            "업무 관리": """
+📊 **시간 관리 체계 구축:**
+• 아이젠하워 매트릭스를 활용한 업무 우선순위 분류
+• 25분 집중 + 5분 휴식 포모도로 기법 적용
+• 일일/주간/월간 목표 설정 및 검토 시스템 구축
+
+⚡ **생산성 극대화 전략:**
+• 2분 룰: 2분 내 처리 가능한 업무는 즉시 완료
+• 배치 처리: 유사한 업무들을 특정 시간대에 몰아서 처리
+• 깊은 작업 시간 확보: 하루 중 가장 집중력이 높은 시간대 활용
+
+🔄 **업무 프로세스 최적화:**
+• 반복 업무의 자동화 및 템플릿화
+• 업무 위임 및 분산 체계 구축
+• 정기적인 업무 프로세스 리뷰 및 개선""",
+            
+            "개발": """
+🏗️ **아키텍처 설계 원칙:**
+• SOLID 원칙을 적용한 확장 가능한 구조 설계
+• 마이크로서비스 vs 모놀리식 아키텍처 선택 기준
+• API 설계 시 RESTful 원칙 및 GraphQL 고려사항
+
+💻 **개발 방법론:**
+• 애자일/스크럼을 통한 반복적 개발 프로세스
+• TDD(테스트 주도 개발)로 안정적인 코드 작성
+• CI/CD 파이프라인 구축으로 배포 자동화
+
+🔧 **기술 스택 선택:**
+• 프로젝트 요구사항에 맞는 최적 기술 조합
+• 성능, 확장성, 유지보수성을 고려한 기술 선택
+• 팀의 기술 역량과 학습 곡선 고려""",
+            
+            "창작": """
+🎨 **창작 프로세스:**
+• 브레인스토밍 → 아이디어 정리 → 프로토타입 → 피드백 → 개선
+• 다양한 창작 기법: 마인드맵, 스토리보드, 무드보드 활용
+• 창작 일지 작성으로 아이디어와 영감 기록 관리
+
+💡 **영감 발굴 전략:**
+• 다양한 분야의 작품 감상 및 분석
+• 일상 관찰과 경험을 통한 소재 발굴
+• 타 분야와의 융합을 통한 새로운 관점 창출
+
+🚀 **완성도 향상:**
+• 초안 완성 후 충분한 휴지기를 거친 객관적 검토
+• 다양한 관점의 피드백 수집 및 반영
+• 지속적인 수정과 개선을 통한 품질 향상"""
         }
         
-        return advice.get(field, "전문 지식을 바탕으로 단계적이고 실용적인 접근 방법을 찾아보세요.")
-        """박사급 비서 도깨비 전문 응답 - 실제 AI 대화"""
-        # 질문 키워드 분석으로 맞춤 응답
-        question_lower = question.lower()
+        return detailed_solutions.get(field, f"{field} 분야의 전문적이고 체계적인 접근 방법을 통해 문제를 해결하고 목표를 달성할 수 있습니다.")
+
+    def _get_practical_steps(self, question: str, field: str) -> str:
+        """실용적 단계별 실행 방안"""
         
-        # 일정/시간 관리 관련
-        if any(keyword in question_lower for keyword in ['일정', '스케줄', '계획', '시간', '관리']):
-            return f"{info['emoji']} 안녕하세요! {info['name']}입니다.\n\n'{question}' 관련 시간 관리 전문 조언을 드리겠습니다.\n\n⏰ **효율적 시간 관리법:**\n• 중요도×긴급도 매트릭스로 우선순위 설정\n• 25분 집중 + 5분 휴식 포모도로 기법\n• 하루 20% 버퍼 타임 확보\n\n📅 **일정 최적화:**\n• 비슷한 업무는 배치 처리\n• 에너지 높은 시간대에 어려운 업무\n• 주간/월간 정기 리뷰 실시\n\n🎯 **즉시 실행 팁:**\n오늘부터 가장 중요한 업무 3개만 선정해보세요!"
+        steps = {
+            "업무 관리": """
+1️⃣ **1단계: 현재 상황 분석 (1주)**
+   • 현재 업무 패턴 및 시간 사용 분석
+   • 업무 우선순위 및 중요도 평가
+   • 방해 요소 및 비효율 구간 파악
+
+2️⃣ **2단계: 시스템 구축 (2주)**
+   • 개인 업무 관리 도구 선택 및 설정
+   • 일일/주간 계획 수립 루틴 확립
+   • 업무 분류 체계 및 우선순위 기준 설정
+
+3️⃣ **3단계: 실행 및 모니터링 (4주)**
+   • 새로운 업무 방식 적용 및 습관화
+   • 주간 단위 성과 측정 및 분석
+   • 필요에 따른 방법론 조정 및 개선""",
+            
+            "개발": """
+1️⃣ **1단계: 요구사항 분석 및 설계**
+   • 프로젝트 목표 및 성공 기준 명확화
+   • 기능 요구사항 및 비기능 요구사항 정의
+   • 시스템 아키텍처 및 기술 스택 결정
+
+2️⃣ **2단계: MVP 개발**
+   • 핵심 기능 우선순위 선정
+   • 프로토타입 개발 및 초기 테스트
+   • 사용자 피드백 수집 및 검증
+
+3️⃣ **3단계: 반복 개발 및 개선**
+   • 스프린트 단위 기능 추가 및 개선
+   • 지속적인 테스트 및 품질 관리
+   • 성능 최적화 및 확장성 개선""",
+            
+            "창작": """
+1️⃣ **1단계: 아이디어 발굴 및 구체화**
+   • 창작 주제 및 방향성 설정
+   • 레퍼런스 조사 및 영감 수집
+   • 초기 컨셉 스케치 및 아이디어 정리
+
+2️⃣ **2단계: 창작 실행**
+   • 상세 기획 및 스토리보드 작성
+   • 단계별 창작 과정 실행
+   • 중간 점검 및 방향성 조정
+
+3️⃣ **3단계: 완성 및 발표**
+   • 최종 검토 및 품질 개선
+   • 발표 및 배포 준비
+   • 피드백 수집 및 향후 계획 수립"""
+        }
         
-        # 회의/소통 관련
-        elif any(keyword in question_lower for keyword in ['회의', '미팅', '소통', '커뮤니케이션', '발표']):
-            return f"{info['emoji']} {info['name']}가 회의 효율성 전문가로 답변드립니다!\n\n'{question}' 관련 소통 최적화 방안입니다.\n\n💬 **효과적 회의 운영:**\n• 명확한 목적과 아젠다 사전 공유\n• 시간 한계 설정 (최대 1시간)\n• 액션 아이템과 담당자 명시\n\n🎯 **참여도 극대화:**\n• 모든 참석자 발언 기회 제공\n• 결정사항 실시간 기록\n• 회의 후 24시간 내 요약 공유\n\n� **성과 측정:**\n회의 만족도와 실행률을 정기 체크하세요!"
+        return steps.get(field, f"{field} 분야의 체계적인 단계별 접근을 통해 목표를 달성하세요.")
+
+    def _get_expert_tips(self, question: str, field: str) -> str:
+        """전문가 노하우 및 팁"""
         
-        # 업무 효율/생산성 관련
-        elif any(keyword in question_lower for keyword in ['업무', '생산성', '효율', '성과', '목표']):
-            return f"{info['emoji']} {info['name']}가 생산성 전문가로 조언드립니다!\n\n'{question}'에 대한 업무 효율성 향상 방안입니다.\n\n⚡ **생산성 부스터:**\n• 2분 룰: 2분 내 가능한 일은 즉시 처리\n• 멀티태스킹 금지, 한 번에 하나씩\n• 업무 환경 최적화 (정리정돈 필수)\n\n🧠 **에너지 관리:**\n• 개인별 황금 시간대 파악 활용\n• 어려운 업무는 컨디션 좋을 때\n• 정기적 휴식으로 지속 가능한 리듬\n\n� **성과 추적:**\n주간 단위 업무 완료율과 품질 점검하세요!"
+        tips = {
+            "업무 관리": """
+🔥 **실전 노하우:**
+• 메일 확인은 하루 3회로 제한하여 집중력 유지
+• 15분 룰: 복잡한 업무도 15분간 시작해보면 저항감 극복
+• 에너지 레벨에 맞는 업무 배치 (오전=창작업무, 오후=단순업무)
+
+⚠️ **주의사항:**
+• 완벽주의 함정에 빠지지 말고 80% 완성도에서 다음 단계로
+• 멀티태스킹보다는 집중적인 단일 작업이 더 효율적
+• 번아웃 방지를 위한 적절한 휴식과 여유 시간 확보""",
+            
+            "개발": """
+🔥 **개발 노하우:**
+• 코드 리뷰를 통한 지속적인 품질 향상
+• 문서화는 미래의 나와 팀을 위한 투자
+• 라이브러리 선택 시 커뮤니티 활성도와 유지보수 상태 고려
+
+⚠️ **피해야 할 함정:**
+• 과도한 최적화보다는 가독성과 유지보수성 우선
+• 새로운 기술 도입 시 충분한 검증 과정 필요
+• 기술 부채 누적 방지를 위한 정기적인 리팩토링""",
+            
+            "창작": """
+🔥 **창작 노하우:**
+• 아이디어 고갈 시에는 기존 작품의 재해석이나 조합 시도
+• 창작 블록 극복법: 환경 변화, 산책, 다른 활동으로 전환
+• 비판적 시각과 창작 모드를 분리하여 창의성 보호
+
+⚠️ **창작 함정:**
+• 첫 작품부터 완벽을 추구하지 말고 완성에 집중
+• 타인의 평가에 과도하게 의존하지 말고 자신만의 기준 확립
+• 영감 대기보다는 규칙적인 창작 습관으로 실력 향상"""
+        }
         
-        # 일반적인 업무 관리 질문
-        else:
-            return f"{info['emoji']} 안녕하세요! {info['name']}입니다.\n\n'{question}'에 대해 업무 관리 전문가로서 조언드리겠습니다.\n\n📋 **종합 분석:**\n체계적인 업무 관리가 성공의 핵심입니다.\n\n✅ **핵심 원칙:**\n• 명확한 목표 설정과 우선순위 관리\n• 시간과 에너지 자원의 최적 배분\n• 지속적인 개선과 피드백 반영\n\n💡 **맞춤 솔루션:**\n구체적인 상황을 더 알려주시면 더 정확한 조언을 드릴 수 있습니다!\n\n🚀 **시작 제안:**\n오늘부터 작은 습관 하나씩 개선해보세요."
+        return tips.get(field, f"{field} 분야에서 성공하기 위한 전문가만의 실전 노하우를 적용해보세요.")
 
-    def _builder_expert_response(self, question: str, info: dict) -> str:
-        """빌더 도깨비 전문 응답"""
-        responses = [
-            f"{info['emoji']} 안녕하세요! {info['name']}입니다.\n\n개발 관련 질문에 전문적으로 답변드리겠습니다:\n\n💻 **기술 분석:**\n'{question}'에 대한 개발 솔루션을 제시하겠습니다.\n\n🛠️ **권장 기술스택:**\n• 프론트엔드: React/Vue.js\n• 백엔드: Python/Node.js\n• 데이터베이스: PostgreSQL/MongoDB\n\n🚀 **구현 방안:**\nMVP부터 시작해서 단계적으로 확장하세요!",
-            f"{info['emoji']} {info['name']}가 개발 솔루션을 제공합니다!\n\n🔧 **아키텍처 설계:**\n'{question}'에 최적화된 시스템 구조를 설계했습니다.\n\n📱 **개발 로드맵:**\n• 1단계: 프로토타입 개발\n• 2단계: 핵심 기능 구현\n• 3단계: 확장성 고려\n\n⚡ **성능 최적화:**\n확장 가능하고 유지보수가 쉬운 코드로 구현하겠습니다!",
-        ]
-        return random.choice(responses)
+    def _get_deep_analysis(self, question: str, field: str) -> str:
+        """심화 분석"""
+        
+        analysis = {
+            "업무 관리": "업무 관리의 핵심은 시간이 아닌 에너지 관리입니다. 개인의 생체리듬과 에너지 패턴을 파악하여 중요한 업무를 고에너지 시간대에 배치하고, 루틴 업무는 저에너지 시간대에 처리하는 것이 효율성을 극대화하는 비결입니다.",
+            "개발": "성공적인 개발 프로젝트의 핵심은 기술적 완성도보다는 사용자 문제 해결에 있습니다. 기술 스택 선택과 아키텍처 설계 시 현재 요구사항뿐만 아니라 미래 확장 가능성을 고려한 균형점을 찾는 것이 중요합니다.",
+            "창작": "진정한 창작은 기존의 것을 완전히 새롭게 만드는 것이 아니라, 기존 요소들의 새로운 조합과 개인적 해석을 통해 독창성을 발현하는 것입니다. 모방에서 시작하여 점진적으로 자신만의 스타일을 발전시키는 것이 효과적입니다."
+        }
+        
+        return analysis.get(field, f"{field} 분야의 본질적 이해를 바탕으로 한 전문적 접근이 필요합니다.")
 
-    def _counselor_expert_response(self, question: str, info: dict) -> str:
-        """상담 도깨비 전문 응답"""
-        responses = [
-            f"{info['emoji']} 안녕하세요! {info['name']}입니다.\n\n마음의 고민을 함께 나누겠습니다:\n\n💭 **상황 이해:**\n'{question}'에 대해 깊이 공감하며 들어드렸습니다.\n\n🤗 **심리적 지원:**\n• 감정 인정과 수용\n• 긍정적 관점 전환\n• 실행 가능한 해결책\n\n🌈 **희망 메시지:**\n어려운 시기도 성장의 기회가 될 수 있습니다!",
-            f"{info['emoji']} {info['name']}가 따뜻하게 상담해드립니다.\n\n💝 **공감과 이해:**\n'{question}'에 담긴 마음을 충분히 이해합니다.\n\n🔍 **문제 분석:**\n• 핵심 이슈 파악\n• 감정 상태 점검\n• 해결 방향 모색\n\n✨ **변화의 시작:**\n작은 변화부터 시작해보세요. 응원하겠습니다!",
-        ]
-        return random.choice(responses)
+    def _get_success_cases_and_warnings(self, field: str) -> str:
+        """성공 사례 및 주의사항"""
+        
+        cases = {
+            "업무 관리": """
+✅ **성공 사례:** 글로벌 기업 CEO들이 공통적으로 사용하는 '시간 블록킹' 기법으로 하루를 미리 계획된 블록으로 나누어 관리
+⚠️ **주의사항:** 과도한 계획으로 인한 스트레스보다는 80% 계획 + 20% 여유 공간 확보가 현실적""",
+            
+            "개발": """
+✅ **성공 사례:** 넷플릭스의 마이크로서비스 아키텍처로 확장성과 안정성을 동시에 확보한 사례
+⚠️ **주의사항:** 복잡한 아키텍처보다는 현재 팀 규모와 요구사항에 적합한 단순한 구조가 더 효과적일 수 있음""",
+            
+            "창작": """
+✅ **성공 사례:** 픽사의 스토리텔링 방법론으로 기술적 혁신과 감정적 공감을 결합한 작품 창작
+⚠️ **주의사항:** 트렌드만 따라가는 창작보다는 개인의 고유한 관점과 경험을 바탕으로 한 진정성 있는 작품이 더 오래 기억됨"""
+        }
+        
+        return cases.get(field, f"{field} 분야의 실제 성공 사례를 참고하되, 개별 상황에 맞는 적용이 중요합니다.")
 
-    def _creative_expert_response(self, question: str, info: dict) -> str:
-        """창작 도깨비 전문 응답"""
-        responses = [
-            f"{info['emoji']} 안녕하세요! {info['name']}입니다.\n\n창작 영감을 불러일으켜드리겠습니다:\n\n🎭 **창작 아이디어:**\n'{question}'에서 무한한 가능성을 발견했습니다!\n\n🌟 **영감 포인트:**\n• 독창적 관점 제시\n• 감성적 스토리텔링\n• 시각적 임팩트 강화\n\n🎨 **실행 방법:**\n창의성과 체계성을 조화롭게 결합해보세요!",
-            f"{info['emoji']} {info['name']}가 창작 여정을 함께합니다!\n\n💡 **브레인스토밍:**\n'{question}'을 통해 새로운 아이디어를 발굴했습니다.\n\n🎪 **창작 전략:**\n• 오리지널리티 확보\n• 타겟 오디언스 고려\n• 트렌드와 개성의 균형\n\n🚀 **창작 팁:**\n완벽함보다 진정성이 더 강력한 힘을 발휘합니다!",
-        ]
-        return random.choice(responses)
+    def _get_comprehensive_analysis(self, question: str, field: str) -> str:
+        """종합적 분석"""
+        
+        return f"{field} 분야에서 제기된 문제는 단순히 기술적 해결책만으로는 완전한 해결이 어려우며, 인간적 요소, 환경적 요인, 그리고 장기적 관점을 모두 고려한 통합적 접근이 필요합니다."
 
-    def _data_analyst_expert_response(self, question: str, info: dict) -> str:
-        """데이터분석 도깨비 전문 응답"""
-        responses = [
-            f"{info['emoji']} 안녕하세요! {info['name']}입니다.\n\n데이터 기반 통찰력을 제공하겠습니다:\n\n📈 **데이터 분석:**\n'{question}'에 대한 정량적 분석 결과입니다.\n\n🔍 **핵심 인사이트:**\n• 패턴 인식 및 트렌드 분석\n• 예측 모델링\n• 의사결정 지원 데이터\n\n📊 **활용 방안:**\n데이터를 통해 확실한 성과를 만들어보세요!",
-            f"{info['emoji']} {info['name']}가 데이터로 답변드립니다!\n\n🧮 **통계적 접근:**\n'{question}'을 수치와 그래프로 분석했습니다.\n\n📋 **분석 결과:**\n• 상관관계 분석\n• 성과 지표 측정\n• ROI 계산\n\n⚡ **실행력:**\n데이터 기반 의사결정으로 성공 확률을 높이세요!",
-        ]
-        return random.choice(responses)
+    def _get_strategic_approach(self, question: str, field: str) -> str:
+        """전략적 접근법"""
+        
+        approaches = {
+            "업무 관리": "개인의 업무 스타일과 조직 문화를 조화시키면서, 단기 효율성과 장기 지속가능성의 균형을 맞추는 전략적 접근",
+            "개발": "비즈니스 요구사항과 기술적 제약사항을 고려한 점진적 개발 전략으로, 위험을 최소화하면서 가치 창출을 극대화",
+            "창작": "개인의 창작 철학과 시장의 요구를 균형있게 반영하여, 예술적 완성도와 대중적 어필을 동시에 추구하는 전략"
+        }
+        
+        return approaches.get(field, f"{field} 분야의 특성을 고려한 맞춤형 전략적 접근이 필요합니다.")
 
-    def _fortune_expert_response(self, question: str, info: dict) -> str:
-        """운세 도깨비 전문 응답"""
-        responses = [
-            f"{info['emoji']} 안녕하세요! {info['name']}입니다.\n\n운명의 실을 들여다보겠습니다:\n\n🌙 **운세 해석:**\n'{question}'에 대한 우주의 메시지를 전달합니다.\n\n⭐ **길운 포인트:**\n• 긍정적 에너지 흐름\n• 기회의 타이밍\n• 주의해야 할 요소\n\n🍀 **행운 팁:**\n마음가짐을 밝게 하면 좋은 일이 찾아올 것입니다!",
-            f"{info['emoji']} {info['name']}가 신비로운 답변을 드립니다!\n\n🔮 **미래 전망:**\n'{question}'에 숨겨진 운명의 신호를 읽었습니다.\n\n✨ **운세 조언:**\n• 행운의 색깔과 숫자\n• 피해야 할 시기\n• 성공을 위한 방향\n\n🌟 **희망 메시지:**\n당신의 노력과 운이 만나는 순간이 다가옵니다!",
-        ]
-        return random.choice(responses)
+    def _get_implementation_guide(self, field: str) -> str:
+        """구현 가이드"""
+        
+        guides = {
+            "업무 관리": "현재 업무 패턴 분석 → 개선 포인트 식별 → 단계적 변화 적용 → 효과 측정 → 지속적 개선의 순환 구조로 실행",
+            "개발": "요구사항 정의 → 프로토타입 개발 → 사용자 검증 → 반복 개선 → 확장의 애자일 방식으로 점진적 구현",
+            "창작": "아이디어 발굴 → 컨셉 구체화 → 시안 제작 → 피드백 반영 → 최종 완성의 반복적 창작 프로세스로 진행"
+        }
+        
+        return guides.get(field, f"{field} 분야의 체계적인 구현 방법론을 적용하여 단계적으로 진행하세요.")
 
-    def _growth_expert_response(self, question: str, info: dict) -> str:
-        """성장 도깨비 전문 응답"""
-        responses = [
-            f"{info['emoji']} 안녕하세요! {info['name']}입니다.\n\n성장의 길을 함께 걸어가겠습니다:\n\n🌱 **성장 분석:**\n'{question}'에서 발전 가능성을 발견했습니다.\n\n📈 **성장 전략:**\n• 단계별 목표 설정\n• 역량 강화 방법\n• 지속 가능한 발전\n\n🏆 **성공 비결:**\n꾸준함이 최고의 성장 동력입니다!",
-            f"{info['emoji']} {info['name']}가 성장 여정을 안내합니다!\n\n🚀 **성장 로드맵:**\n'{question}'을 통해 맞춤형 성장 계획을 세웠습니다.\n\n💪 **역량 개발:**\n• 강점 극대화\n• 약점 보완\n• 새로운 기회 창출\n\n⭐ **동기부여:**\n매일 조금씩 성장하는 당신이 될 수 있습니다!",
-        ]
-        return random.choice(responses)
+    def _get_immediate_actions(self, field: str) -> str:
+        """즉시 실행 가능한 방법"""
+        
+        actions = {
+            "업무 관리": "오늘부터 시작: ① 하루 가장 중요한 업무 3개 선정 ② 집중 시간 1시간 확보 ③ 업무 종료 시 다음날 계획 5분 투자",
+            "개발": "지금 바로 시작: ① 프로젝트 요구사항 한 줄 정리 ② 가장 단순한 기능부터 구현 ③ 15분 내 실행 가능한 프로토타입 제작",
+            "창작": "당장 실행: ① 스마트폰으로 일상의 흥미로운 순간 사진 촬영 ② 10분간 자유로운 스케치나 글쓰기 ③ 좋아하는 작품 하나 선정하여 분석"
+        }
+        
+        return actions.get(field, f"{field} 분야에서 지금 당장 시작할 수 있는 작은 행동부터 시작해보세요.")
 
-    def _hr_expert_response(self, question: str, info: dict) -> str:
-        """HR 도깨비 전문 응답"""
-        responses = [
-            f"{info['emoji']} 안녕하세요! {info['name']}입니다.\n\n인사 관리 전문 조언을 드리겠습니다:\n\n👥 **인사 전략:**\n'{question}'에 대한 HR 솔루션을 제시합니다.\n\n🎯 **핵심 포인트:**\n• 인재 채용 및 육성\n• 조직 문화 개선\n• 성과 관리 시스템\n\n💼 **실행 방안:**\n사람 중심의 경영으로 조직을 강화하세요!",
-            f"{info['emoji']} {info['name']}가 인사 전문가로 답변드립니다!\n\n🏢 **조직 진단:**\n'{question}'을 통해 조직의 건강도를 체크했습니다.\n\n📊 **HR 솔루션:**\n• 직원 만족도 향상\n• 업무 효율성 증대\n• 리더십 개발\n\n🌟 **기대 효과:**\n행복한 직장이 최고의 성과를 만들어냅니다!",
-        ]
-        return random.choice(responses)
-
-    def _marketing_expert_response(self, question: str, info: dict) -> str:
-        """마케팅 도깨비 전문 응답"""
-        responses = [
-            f"{info['emoji']} 안녕하세요! {info['name']}입니다.\n\n마케팅 전략을 수립해드리겠습니다:\n\n📊 **시장 분석:**\n'{question}'에 대한 마케팅 인사이트를 제공합니다.\n\n🎯 **전략 포인트:**\n• 타겟 고객 세분화\n• 차별화된 포지셔닝\n• 효과적인 채널 믹스\n\n🚀 **실행 계획:**\n데이터 기반 마케팅으로 ROI를 극대화하세요!",
-            f"{info['emoji']} {info['name']}가 마케팅 솔루션을 제공합니다!\n\n📈 **성장 전략:**\n'{question}'을 통해 브랜드 성장 방안을 도출했습니다.\n\n💡 **마케팅 믹스:**\n• 제품/서비스 최적화\n• 가격 전략 수립\n• 프로모션 기획\n\n⭐ **성공 팁:**\n고객의 마음을 움직이는 것이 최고의 마케팅입니다!",
-        ]
-        return random.choice(responses)
-
-    def _medical_expert_response(self, question: str, info: dict) -> str:
-        """의료 도깨비 전문 응답"""
-        responses = [
-            f"{info['emoji']} 안녕하세요! {info['name']}입니다.\n\n건강 관련 정보를 제공해드리겠습니다:\n\n⚕️ **건강 체크:**\n'{question}'에 대한 의학적 관점을 설명드립니다.\n\n🩺 **주요 포인트:**\n• 증상 이해 및 원인 분석\n• 예방법 및 관리법\n• 전문의 상담 권유\n\n⚠️ **중요 안내:**\n정확한 진단은 반드시 의료진과 상담하세요!",
-            f"{info['emoji']} {info['name']}가 건강 정보를 안내합니다!\n\n💊 **의학적 조언:**\n'{question}'에 대한 일반적인 의학 정보를 제공합니다.\n\n🏥 **건강 관리:**\n• 생활습관 개선 방법\n• 정기 건강검진 중요성\n• 응급상황 대처법\n\n💝 **건강 메시지:**\n건강한 생활이 최고의 치료법입니다!",
-        ]
-        return random.choice(responses)
-
-    def _sales_expert_response(self, question: str, info: dict) -> str:
-        """영업 도깨비 전문 응답"""
-        responses = [
-            f"{info['emoji']} 안녕하세요! {info['name']}입니다.\n\n영업 성과 향상 전략을 제시하겠습니다:\n\n💼 **영업 분석:**\n'{question}'에 대한 세일즈 솔루션을 제공합니다.\n\n🎯 **성공 포인트:**\n• 고객 니즈 파악\n• 신뢰 관계 구축\n• 가치 제안 강화\n\n📈 **실행 전략:**\n고객 중심 사고로 매출을 극대화하세요!",
-            f"{info['emoji']} {info['name']}가 영업 노하우를 전수합니다!\n\n🤝 **관계 구축:**\n'{question}'을 통해 고객과의 연결점을 찾았습니다.\n\n💰 **매출 증대:**\n• 영업 프로세스 최적화\n• 성과 측정 시스템\n• 팀워크 강화\n\n🏆 **성공 비법:**\n진정성 있는 서비스가 최고의 영업력입니다!",
-        ]
-        return random.choice(responses)
-
-    def _seo_expert_response(self, question: str, info: dict) -> str:
-        """SEO 도깨비 전문 응답"""
-        responses = [
-            f"{info['emoji']} 안녕하세요! {info['name']}입니다.\n\n검색 최적화 전략을 제공하겠습니다:\n\n🔍 **SEO 분석:**\n'{question}'에 대한 검색엔진 최적화 방안입니다.\n\n📈 **핵심 전략:**\n• 키워드 최적화\n• 콘텐츠 품질 향상\n• 백링크 구축\n\n⚡ **실행 계획:**\n구글 상위 노출로 트래픽을 증가시키세요!",
-            f"{info['emoji']} {info['name']}가 SEO 비법을 알려드립니다!\n\n🌐 **웹 최적화:**\n'{question}'을 바탕으로 검색 순위 향상 방법을 제시합니다.\n\n🎯 **최적화 포인트:**\n• 기술적 SEO 개선\n• 사용자 경험 향상\n• 모바일 최적화\n\n🚀 **성과 예측:**\n체계적인 SEO로 유기적 트래픽을 늘려보세요!",
-        ]
-        return random.choice(responses)
-
-    def _shopping_expert_response(self, question: str, info: dict) -> str:
-        """쇼핑 도깨비 전문 응답"""
-        responses = [
-            f"{info['emoji']} 안녕하세요! {info['name']}입니다.\n\n스마트한 쇼핑 가이드를 제공하겠습니다:\n\n🛍️ **쇼핑 분석:**\n'{question}'에 대한 최적의 구매 조언을 드립니다.\n\n💡 **쇼핑 팁:**\n• 가격 비교 및 할인 정보\n• 제품 품질 평가\n• 구매 타이밍 최적화\n\n💰 **절약 방법:**\n현명한 소비로 만족도를 극대화하세요!",
-            f"{info['emoji']} {info['name']}가 쇼핑 컨설팅을 해드립니다!\n\n🏪 **구매 전략:**\n'{question}'에 맞는 최고의 쇼핑 솔루션을 찾았습니다.\n\n🎁 **추천 포인트:**\n• 브랜드별 특성 분석\n• 리뷰 및 평점 검토\n• 애프터서비스 고려\n\n✨ **만족 보장:**\n합리적인 소비가 진정한 행복을 가져다줍니다!",
-        ]
-        return random.choice(responses)
-
-    def _startup_expert_response(self, question: str, info: dict) -> str:
-        """스타트업 도깨비 전문 응답"""
-        responses = [
-            f"{info['emoji']} 안녕하세요! {info['name']}입니다.\n\n창업 성공 전략을 제시하겠습니다:\n\n🚀 **스타트업 분석:**\n'{question}'에 대한 창업 로드맵을 제공합니다.\n\n💡 **핵심 포인트:**\n• 시장 검증 및 PMF\n• 팀 빌딩 및 문화\n• 자금 조달 전략\n\n🏆 **성공 비결:**\n고객 문제 해결에 집중하면 성공합니다!",
-            f"{info['emoji']} {info['name']}가 창업 멘토링을 제공합니다!\n\n💼 **비즈니스 모델:**\n'{question}'을 통해 지속 가능한 사업 구조를 설계했습니다.\n\n📊 **실행 계획:**\n• MVP 개발 및 테스트\n• 마케팅 전략 수립\n• 성장 지표 관리\n\n🌟 **창업 정신:**\n실패를 두려워하지 말고 계속 도전하세요!",
-        ]
-        return random.choice(responses)
-
-    def _village_chief_expert_response(self, question: str, info: dict) -> str:
-        """이장 도깨비 전문 응답"""
-        responses = [
-            f"{info['emoji']} 안녕하세요! {info['name']}입니다.\n\n마을 관리 전문가로서 조언드리겠습니다:\n\n🏘️ **커뮤니티 분석:**\n'{question}'에 대한 종합적인 관리 방안을 제시합니다.\n\n👥 **관리 포인트:**\n• 주민 소통 및 화합\n• 인프라 개선 계획\n• 지속 가능한 발전\n\n🌟 **리더십 철학:**\n모든 구성원이 행복한 공동체를 만들어가겠습니다!",
-            f"{info['emoji']} {info['name']}가 현명한 해결책을 제시합니다!\n\n🎯 **통합 관리:**\n'{question}'을 바탕으로 전체적인 운영 방안을 수립했습니다.\n\n📋 **실행 계획:**\n• 효율적 자원 배분\n• 갈등 조정 및 해결\n• 미래 비전 수립\n\n🤝 **협력 정신:**\n함께 만들어가는 것이 가장 강력한 힘입니다!",
-        ]
-        return random.choice(responses)
-
-    def _writing_expert_response(self, question: str, info: dict) -> str:
-        """박사급 문서 작성 도깨비 전문 응답"""
-        responses = [
-            f"{info['emoji']} 안녕하세요! {info['name']}입니다.\n\n전문적인 문서 작성을 도와드리겠습니다:\n\n📝 **문서 분석:**\n'{question}'에 대한 고품질 문서 작성 가이드를 제공합니다.\n\n✏️ **작성 포인트:**\n• 논리적 구조 설계\n• 명확한 표현 기법\n• 독자 맞춤 스타일\n\n📚 **품질 향상:**\n체계적인 글쓰기로 전문성을 보여주세요!",
-            f"{info['emoji']} {info['name']}가 문서 작성 전문가로 도움드립니다!\n\n📖 **라이팅 전략:**\n'{question}'에 맞는 효과적인 글쓰기 방법을 안내합니다.\n\n🎯 **핵심 기법:**\n• 목적에 맞는 톤앤매너\n• 설득력 있는 논증\n• 가독성 최적화\n\n⭐ **문서 완성도:**\n완벽한 문서로 원하는 결과를 얻으실 수 있습니다!",
-        ]
-        return random.choice(responses)
-
-    def _general_expert_response(self, question: str, info: dict) -> str:
-        """일반 전문가 응답 (새로운 도깨비 타입용)"""
-        return f"{info['emoji']} 안녕하세요! {info['name']}입니다.\n\n'{question}'에 대해 {info['field']} 전문가로서 도움을 드리겠습니다.\n\n🔍 **전문 분석:**\n해당 분야의 깊이 있는 지식을 바탕으로 맞춤형 솔루션을 제공하겠습니다.\n\n💡 **실용적 조언:**\n이론과 실무를 결합한 실행 가능한 방안을 제시하겠습니다.\n\n✨ **기대 효과:**\n전문적인 접근으로 최적의 결과를 만들어보세요!"
+    def _get_long_term_strategy(self, field: str) -> str:
+        """장기적 전략"""
+        
+        strategies = {
+            "업무 관리": "6개월 목표: 개인 맞춤형 업무 시스템 완성 / 1년 목표: 업무 효율성 50% 향상 및 워라밸 확립 / 3년 목표: 전문성 기반 업무 자동화 시스템 구축",
+            "개발": "6개월: 핵심 기능 완성 및 사용자 검증 / 1년: 확장성 있는 플랫폼 구축 / 3년: 업계 표준이 되는 솔루션 개발",
+            "창작": "6개월: 개인 스타일 확립 / 1년: 대표작 완성 및 인지도 구축 / 3년: 창작 영역 확장 및 영향력 있는 작가로 성장"
+        }
+        
+        return strategies.get(field, f"{field} 분야에서의 장기적 성장과 발전을 위한 단계별 전략을 수립하여 실행하세요.")
 
     def get_agent_info(self) -> Dict[str, Any]:
         """도깨비 정보 반환 (프론트엔드용)"""
@@ -489,7 +677,11 @@ class STEMIntegration:
             "fortune": {"emoji": "🔮", "name": "운세 도깨비", "field": "운세"},
             "growth": {"emoji": "🌱", "name": "성장 도깨비", "field": "성장"},
             "hr": {"emoji": "👥", "name": "HR 도깨비", "field": "인사 관리"},
-            "marketing": {"emoji": "📈", "name": "마케팅 도깨비", "field": "마케팅"},
+            "marketing": {
+                "emoji": "📢",
+                "name": "마케팅 도깨비",
+                "field": "마케팅",
+            },
             "medical": {"emoji": "🏥", "name": "의료 도깨비", "field": "의료"},
             "sales": {"emoji": "💰", "name": "영업 도깨비", "field": "영업"},
             "seo": {"emoji": "🔍", "name": "SEO 도깨비", "field": "검색 최적화"},
@@ -527,7 +719,7 @@ def add_stem_routes(app):
     """FastAPI 앱에 STEM 라우트 추가"""
     from fastapi import Request
     from fastapi.responses import HTMLResponse
-    
+
     @app.post("/stem/chat")
     async def stem_chat(request: Request):
         """STEM 도깨비와 채팅"""
@@ -536,7 +728,7 @@ def add_stem_routes(app):
             agent_type = data.get("agent_type")
             question = data.get("question")
             user_ip = request.client.host if request.client else "unknown"
-            
+
             result = stem_ai.process_question(agent_type, question, user_ip)
             return result
         except Exception as e:
@@ -552,6 +744,7 @@ def add_stem_routes(app):
         """STEM 사용 통계 조회"""
         try:
             from usage_tracker import usage_tracker
+
             return usage_tracker.get_statistics()
         except Exception as e:
             return {"error": f"통계 조회 실패: {str(e)}"}

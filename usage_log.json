@@ -3214,5 +3214,17 @@
     "user_ip": "127.0.0.1",
     "weekday": "Wednesday",
     "hour": 13
+  },
+  {
+    "timestamp": "2025-08-20T13:58:31.477809",
+    "date": "2025-08-20",
+    "time": "13:58:31",
+    "agent_type": "creative",
+    "question_length": 10,
+    "question_preview": "블로그 글쓰기 도움",
+    "response_success": true,
+    "user_ip": "127.0.0.1",
+    "weekday": "Wednesday",
+    "hour": 13
   }
 ]
