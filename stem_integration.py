@@ -9,6 +9,7 @@ from typing import Dict, Any, Optional
 import hashlib
 import json
 import os
+from fortune_analysis import FortuneAnalysis
 
 
 class STEMIntegration:
@@ -42,6 +43,34 @@ class STEMIntegration:
         """사용자-에이전트별 대화 키 생성"""
         key = f"{user_ip}_{agent_type}"
         return hashlib.md5(key.encode()).hexdigest()[:16]
+
+    def _get_practical_advice(self, question: str, field: str) -> str:
+        """실용적 조언"""
+        question_lower = question.lower()
+
+        advice_bank = {
+            "연애운": [
+                "자연스러운 모습으로 대화에 임하세요. 긴장은 오히려 역효과를 낳을 수 있습니다.",
+                "상대방의 이야기에 귀 기울이고, 적절한 리액션을 보이세요.",
+                "첫인상이 중요하니, 단정하고 좋은 이미지를 준비하세요.",
+            ],
+            "사업운": [
+                "철저한 준비로 기회를 놓치지 마세요. 특히 관련 자료 검토가 중요합니다.",
+                "직감도 중요하지만, 데이터를 기반으로 한 판단이 필요합니다.",
+                "주변의 조언을 귀담아 들으세요. 새로운 관점을 발견할 수 있습니다.",
+            ],
+            "건강운": [
+                "규칙적인 생활 리듬을 유지하세요. 특히 수면 시간이 중요합니다.",
+                "가벼운 운동으로 시작해서 점진적으로 강도를 높이세요.",
+                "스트레스 관리에 특별한 주의를 기울이세요.",
+            ],
+        }
+
+        for key, advices in advice_bank.items():
+            if key in question_lower:
+                return random.choice(advices)
+
+        return f"현재 상황에서 {field} 전문가로서 추천드리는 실천 방안입니다."
 
     def _analyze_follow_up_intent(self, question: str, previous_topics: list) -> dict:
         """후속 질문 의도 분석"""
@@ -78,54 +107,75 @@ class STEMIntegration:
 
     def _get_fortune_response(self, question: str, agent_profile: dict) -> str:
         """운세 도깨비 전용 응답 생성 로직"""
-        fortune_types = {
-            "연애운": {
-                "aspects": ["현재 연애 기운", "미래의 인연", "관계의 발전 방향"],
-                "predictions": [
-                    "새로운 만남의 기회가 찾아올",
-                    "기존 인연이 더욱 깊어질",
-                    "잠시 인연을 돌아보며 성찰이 필요할",
-                ],
-                "advices": [
-                    "자신을 더 사랑하고 가꾸는 시간을 가지세요",
-                    "상대방의 마음을 더 깊이 이해하려 노력해보세요",
-                    "긍정적인 에너지로 새로운 인연을 맞이할 준비를 하세요",
-                ],
-            },
-            "사업운": {
-                "aspects": ["사업의 흐름", "투자 시기", "동업 관계"],
-                "predictions": [
-                    "새로운 기회가 열릴",
-                    "안정적인 성장이 예상되는",
-                    "신중한 판단이 필요한",
-                ],
-                "advices": [
-                    "철저한 준비로 기회를 놓치지 마세요",
-                    "장기적 관점에서 전략을 세워보세요",
-                    "신뢰할 수 있는 파트너와 협력하세요",
-                ],
-            },
-        }
-
         question_lower = question.lower()
-        fortune_type = "general"
-        for ftype in fortune_types:
-            if ftype in question:
-                fortune_type = ftype
-                break
+        current_time = datetime.now()
+        fortune_analyzer = FortuneAnalysis()
 
-        if fortune_type in fortune_types:
-            data = fortune_types[fortune_type]
-            aspect = random.choice(data["aspects"])
-            prediction = random.choice(data["predictions"])
-            advice = random.choice(data["advices"])
-
-            pattern = agent_profile["response_patterns"].get(
-                fortune_type, agent_profile["response_patterns"]["general"]
+        # 연애운 관련 키워드 확인
+        love_keywords = ["소개팅", "미팅", "연애", "사랑", "데이트", "커플", "인연"]
+        if any(keyword in question_lower for keyword in love_keywords):
+            analysis = fortune_analyzer.get_love_fortune(current_time)
+            fortune_message = fortune_analyzer.generate_fortune_advice(
+                "연애운", analysis
             )
-            return pattern.format(aspect=aspect, prediction=prediction, advice=advice)
 
-        return f"귀하의 운세를 살펴보니, 긍정적인 변화의 기운이 감지됩니다. 이 시기를 잘 활용하시기 바랍니다."
+            return f"""🔮 운세 도깨비의 연애운 분석입니다.
+
+✨ **운세 분석:**
+{fortune_message}
+
+💫 **조언:**
+{self._get_practical_advice(question, "연애운")}
+
+⏰ **시간 정보:**
+현재 시간대가 {analysis['time_fortune']} 시기입니다.
+{"주말이라 여유로운 분위기가 기대됩니다." if analysis['is_weekend'] else "평일의 활기찬 에너지가 도움이 될 것입니다."}\n"""
+
+        # 사업운 관련 키워드 확인
+        business_keywords = ["사업", "투자", "계약", "미팅", "협상", "거래"]
+        if any(keyword in question_lower for keyword in business_keywords):
+            analysis = fortune_analyzer.get_business_fortune(current_time)
+            fortune_message = fortune_analyzer.generate_fortune_advice(
+                "사업운", analysis
+            )
+
+            return f"""🔮 운세 도깨비의 사업운 분석입니다.
+
+✨ **운세 분석:**
+{fortune_message}
+
+💫 **조언:**
+{self._get_practical_advice(question, "사업운")}
+
+⏰ **시기 분석:**
+{analysis['time_fortune']}이며, 특히 {analysis['prosperity_element']} 기운이 강한 날입니다.\n"""
+            aspect = random.choice(data["aspects"])
+            point = random.choice(data["points"])
+
+            # 예측 생성
+            prediction = random.choice(data["predictions"]).format(
+                time=time, location=location, aspect=aspect, point=point
+            )
+
+            # 조언과 주의사항 선택
+            advice = random.choice(data["advices"])
+            warning = random.choice(data["warnings"])
+
+            # 타로카드나 별자리 요소 추가
+            tarot_cards = ["연인", "별", "태양", "월", "운명의 수레바퀴"]
+            zodiac_signs = ["물병자리", "천칭자리", "쌍둥이자리"]
+
+            fortune_message = (
+                f"🔮 소개팅 운세를 타로카드 '{random.choice(tarot_cards)}'와 "
+                f"'{random.choice(zodiac_signs)}'의 움직임으로 살펴보았습니다.\n\n"
+                f"✨ {prediction}\n"
+                f"💫 조언: {advice}\n"
+                f"⚠️ 주의: {warning}"
+            )
+
+            return fortune_message
+
+        return "아직 그 운세는 준비 중입니다. 연애운, 사업운, 학업운 등 구체적인 분야를 말씀해 주시면 더 정확한 답변을 드릴 수 있습니다."
 
     def process_question(
         self, agent_type: str, question: str, user_ip: Optional[str] = None
@@ -152,47 +202,113 @@ class STEMIntegration:
                 question, previous_topics
             )
 
-            # 원래 16개 도깨비 정보
+            # 16개 도깨비 정보 - 전문성과 능력 추가
             agent_info = {
                 "assistant": {
                     "emoji": "🤖",
                     "name": "박사급 비서 도깨비",
                     "field": "업무 관리",
+                    "expertise": ["시간관리", "업무효율", "생산성", "조직관리"],
                 },
-                "builder": {"emoji": "💻", "name": "빌더 도깨비", "field": "개발"},
-                "counselor": {"emoji": "💬", "name": "상담 도깨비", "field": "상담"},
-                "creative": {"emoji": "🎨", "name": "창작 도깨비", "field": "창작"},
+                "builder": {
+                    "emoji": "💻",
+                    "name": "빌더 도깨비",
+                    "field": "개발",
+                    "expertise": ["프로그래밍", "시스템설계", "기술구현", "개발관리"],
+                },
+                "counselor": {
+                    "emoji": "💬",
+                    "name": "상담 도깨비",
+                    "field": "상담",
+                    "expertise": ["심리상담", "관계개선", "스트레스관리", "성장상담"],
+                },
+                "creative": {
+                    "emoji": "🎨",
+                    "name": "창작 도깨비",
+                    "field": "창작",
+                    "expertise": [
+                        "콘텐츠기획",
+                        "창의발상",
+                        "아이디어개발",
+                        "스토리텔링",
+                    ],
+                },
                 "data_analyst": {
                     "emoji": "📊",
                     "name": "데이터분석 도깨비",
                     "field": "데이터 분석",
+                    "expertise": ["데이터마이닝", "통계분석", "예측모델링", "시각화"],
                 },
-                "fortune": {"emoji": "🔮", "name": "운세 도깨비", "field": "운세"},
-                "growth": {"emoji": "🌱", "name": "성장 도깨비", "field": "성장"},
-                "hr": {"emoji": "👥", "name": "HR 도깨비", "field": "인사 관리"},
+                "fortune": {
+                    "emoji": "🔮",
+                    "name": "운세 도깨비",
+                    "field": "운세",
+                    "expertise": ["운세", "점성술", "타로", "사주", "풍수"],
+                },
+                "growth": {
+                    "emoji": "🌱",
+                    "name": "성장 도깨비",
+                    "field": "성장",
+                    "expertise": ["자기계발", "역량강화", "목표달성", "습관형성"],
+                },
+                "hr": {
+                    "emoji": "👥",
+                    "name": "HR 도깨비",
+                    "field": "인사 관리",
+                    "expertise": ["인재채용", "조직문화", "인사제도", "성과관리"],
+                },
                 "marketing": {
                     "emoji": "📢",
                     "name": "마케팅 도깨비",
                     "field": "마케팅",
+                    "expertise": ["브랜딩", "콘텐츠마케팅", "디지털마케팅", "성과분석"],
                 },
-                "medical": {"emoji": "🏥", "name": "의료 도깨비", "field": "의료"},
-                "sales": {"emoji": "💰", "name": "영업 도깨비", "field": "영업"},
-                "seo": {"emoji": "🔍", "name": "SEO 도깨비", "field": "검색 최적화"},
-                "shopping": {"emoji": "🛒", "name": "쇼핑 도깨비", "field": "쇼핑"},
+                "medical": {
+                    "emoji": "🏥",
+                    "name": "의료 도깨비",
+                    "field": "의료",
+                    "expertise": ["건강관리", "질병예방", "의료정보", "생활건강"],
+                },
+                "sales": {
+                    "emoji": "💰",
+                    "name": "영업 도깨비",
+                    "field": "영업",
+                    "expertise": ["세일즈전략", "협상기술", "고객관리", "실적관리"],
+                },
+                "seo": {
+                    "emoji": "🔍",
+                    "name": "SEO 도깨비",
+                    "field": "검색 최적화",
+                    "expertise": [
+                        "키워드분석",
+                        "컨텐츠최적화",
+                        "순위개선",
+                        "트래픽분석",
+                    ],
+                },
+                "shopping": {
+                    "emoji": "🛒",
+                    "name": "쇼핑 도깨비",
+                    "field": "쇼핑",
+                    "expertise": ["상품추천", "가격분석", "트렌드분석", "구매전략"],
+                },
                 "startup": {
                     "emoji": "🚀",
                     "name": "스타트업 도깨비",
                     "field": "창업전략",
+                    "expertise": ["사업기획", "시장분석", "자금조달", "성장전략"],
                 },
                 "village_chief": {
                     "emoji": "👑",
                     "name": "이장 도깨비",
                     "field": "마을 관리",
+                    "expertise": ["커뮤니티관리", "문제해결", "의사결정", "리더십"],
                 },
                 "writing": {
                     "emoji": "✍️",
                     "name": "박사급 문서 작성 도깨비",
                     "field": "문서 작성",
+                    "expertise": ["문서작성", "기술문서", "보고서", "콘텐츠기획"],
                 },
             }
 
@@ -217,7 +333,17 @@ class STEMIntegration:
 
             # 운세 도깨비인 경우 특별 처리
             if agent_type == "fortune":
-                response = self._get_fortune_response(question, info)
+                try:
+                    response = self._get_fortune_response(question, info)
+                except Exception as e:
+                    # 운세 응답 생성 실패 시 일반 응답으로 폴백
+                    response = self._create_contextual_ai_response(
+                        question,
+                        agent_type,
+                        info,
+                        previous_conversations,
+                        follow_up_analysis,
+                    )
             else:
                 response = self._create_contextual_ai_response(
                     question,
@@ -296,6 +422,54 @@ class STEMIntegration:
 
         return "일반상담"
 
+    def _analyze_question(self, question: str, agent_type: str, info: dict) -> dict:
+        """질문 분석 및 관련 정보 추출"""
+        question_lower = question.lower()
+
+        # 현재 시간 정보
+        current_time = datetime.now()
+        month = current_time.month
+        hour = current_time.hour
+        weekday = current_time.weekday()
+
+        # 운세와 관련된 키워드 분석
+        fortune_types = ["연애운", "사업운", "금전운", "건강운"]
+        detected_fortune = next((f for f in fortune_types if f in question_lower), None)
+
+        analysis = {
+            "main_points": [],
+            "keywords": [],
+            "concerns": [],
+            "context_hints": [],
+            "timing": {
+                "month": month,
+                "hour": hour,
+                "weekday": weekday,
+                "season": self._get_current_season(current_time),
+            },
+            "fortune_type": detected_fortune,
+        }
+
+        # 전문 분야별 키워드 추출
+        for expertise in info["expertise"]:
+            if expertise.lower() in question_lower:
+                analysis["keywords"].append(expertise)
+
+        # 문맥 힌트 추출
+        context_indicators = {
+            "시간": ["언제", "시간", "날짜", "기간", "시기"],
+            "장소": ["어디서", "장소", "위치", "곳"],
+            "방법": ["어떻게", "방법", "단계", "절차"],
+            "원인": ["왜", "이유", "원인", "때문에"],
+            "결과": ["결과", "영향", "효과", "어떻게 될지"],
+        }
+
+        for context_type, indicators in context_indicators.items():
+            if any(ind in question_lower for ind in indicators):
+                analysis["context_hints"].append(context_type)
+
+        return analysis
+
     def _create_contextual_ai_response(
         self,
         question: str,
@@ -304,15 +478,86 @@ class STEMIntegration:
         previous_conversations: list,
         follow_up_analysis: dict,
     ) -> str:
-        """컨텍스트를 고려한 AI 응답 생성"""
+        """실제 AI처럼 맥락을 고려한 전문적인 응답 생성"""
 
-        # 후속 질문인지 확인
-        if follow_up_analysis["is_follow_up"] and follow_up_analysis["depth_level"] > 1:
-            return self._create_follow_up_response(
-                question, agent_type, info, previous_conversations, follow_up_analysis
+        # 질문과 맥락 분석
+        analysis = self._analyze_question(question, agent_type, info)
+        expertise_points = self._get_expertise_insights(question, info["expertise"])
+
+        # 응답 구성 요소 준비
+        response_parts = []
+
+        # 1. 인사 및 전문성 기반 도입부
+        greeting = f"{info['emoji']} 안녕하세요, {info['name']}입니다."
+        expertise_intro = f"{info['field']} 분야 전문가로서 답변드리겠습니다."
+        response_parts.extend([greeting, expertise_intro])
+
+        # 2. 이전 대화 맥락 참조 (있는 경우)
+        if previous_conversations and follow_up_analysis["is_follow_up"]:
+            last_topic = previous_conversations[-1].get("topic", "")
+            if last_topic:
+                response_parts.append(f"\n💭 이전 {last_topic}에 대한 논의를 참고하여,")
+
+        # 3. 전문 분야별 분석
+        if expertise_points:
+            response_parts.append("\n🔍 **전문가 분석:**")
+            for point in expertise_points:
+                response_parts.append(f"- {point}")
+
+        # 4. 시간/상황 맥락 고려
+        current_time = datetime.now()
+        time_context = self._get_timing_advice(question, info["field"])
+        if time_context:
+            response_parts.append(f"\n⏰ **시기적 관점:**\n{time_context}")
+
+        # 5. 실용적 조언 제공
+        practical_advice = self._get_practical_advice(question, info["field"])
+        if practical_advice:
+            response_parts.append(f"\n💡 **실천 방안:**\n{practical_advice}")
+
+        # 6. 전문 분야 특화 조언
+        if "expertise" in info:
+            field_specific = self._get_specialized_expert_advice(
+                question, info["field"]
             )
-        else:
-            return self._create_natural_ai_response(question, agent_type, info)
+            if field_specific:
+                response_parts.append(
+                    f"\n✨ **{info['field']} 전문가 조언:**\n{field_specific}"
+                )
+
+        # 7. 심화 내용 (follow-up 분석 기반)
+        if follow_up_analysis["depth_level"] > 1:
+            deep_analysis = self._get_deep_analysis(question, info["field"])
+            if deep_analysis:
+                response_parts.append(f"\n📚 **심화 분석:**\n{deep_analysis}")
+
+        # 8. 마무리 및 후속 안내
+        if follow_up_analysis["depth_level"] < 3:
+            response_parts.append(
+                "\n💫 더 자세한 내용이 필요하시다면 추가로 문의해 주세요."
+            )
+
+        # 맥락별 맞춤 답변
+        if "시간" in analysis["context_hints"]:
+            response_parts.append(self._get_timing_advice(question, info["field"]))
+        if "방법" in analysis["context_hints"]:
+            response_parts.append(self._get_method_advice(question, info["field"]))
+        if "원인" in analysis["context_hints"]:
+            response_parts.append(self._get_cause_analysis(question, info["field"]))
+
+        # 실전 조언
+        practical_advice = self._get_practical_advice(question, info["field"])
+        if practical_advice:
+            response_parts.append("\n💡 **실용적인 조언:**")
+            response_parts.append(practical_advice)
+
+        # 마무리 및 후속 안내
+        if follow_up_analysis["is_follow_up"]:
+            response_parts.append(
+                "\n다음 단계에서 더 구체적인 내용을 다룰 수 있습니다."
+            )
+
+        return "\n".join(filter(None, response_parts))
 
     def _create_follow_up_response(
         self,
@@ -385,6 +630,219 @@ class STEMIntegration:
 - 성과 측정이나 개선 방법에 대한 추가 상담 가능
 
 {info['field']} 전문가로서 {depth}단계 심화 상담을 제공했습니다. 더 궁금한 점이나 구체적인 상황이 있으시면 언제든 말씀해주세요!"""
+
+    def _get_expertise_insights(self, question: str, expertise_list: list) -> list:
+        """전문 분야별 통찰력 있는 분석 제공"""
+        insights = []
+        question_lower = question.lower()
+
+        # 전문성별 분석 포인트
+        for expertise in expertise_list:
+            if expertise.lower() in question_lower:
+                insights.extend(self._generate_expertise_points(expertise))
+
+        return (
+            insights
+            if insights
+            else ["문의하신 내용에 대해 전문적 관점에서 검토해보았습니다."]
+        )
+
+    def _generate_expertise_points(self, expertise: str) -> list:
+        """각 전문 분야별 분석 포인트 생성"""
+        expertise_insights = {
+            "시간관리": [
+                "현재 시간 활용 패턴 분석 결과",
+                "효율적인 시간 배분 전략",
+                "우선순위 설정 방안",
+            ],
+            "업무효율": [
+                "작업 프로세스 최적화 방안",
+                "생산성 향상을 위한 도구 활용법",
+                "업무 집중도 개선 전략",
+            ],
+            "프로그래밍": [
+                "코드 구조 최적화 방안",
+                "성능 개선 포인트",
+                "유지보수성 향상 전략",
+            ],
+            "심리상담": ["심리적 요인 분석", "행동 패턴 이해", "감정 대처 전략"],
+        }
+
+        return expertise_insights.get(expertise, [f"{expertise} 관련 전문적 분석"])
+
+    def _get_specialized_expert_advice(self, question: str, field: str) -> str:
+        """각 분야별 특화된 전문가 조언"""
+        question_lower = question.lower()
+
+        field_advice = {
+            "업무 관리": [
+                "업무의 우선순위를 명확히 정하고 시간 관리에 집중하세요.",
+                "중요한 업무는 집중력이 높은 시간대에 배치하세요.",
+                "정기적인 업무 리뷰로 효율성을 높이세요.",
+            ],
+            "개발": [
+                "코드 리뷰와 테스트를 철저히 진행하세요.",
+                "새로운 기술 트렌드를 주기적으로 학습하세요.",
+                "문서화를 습관화하여 유지보수성을 높이세요.",
+            ],
+            "상담": [
+                "경청과 공감을 통해 신뢰 관계를 구축하세요.",
+                "객관적 시각을 유지하면서 해결책을 모색하세요.",
+                "정서적 지지와 실질적 조언의 균형을 맞추세요.",
+            ],
+            "창작": [
+                "다양한 영감의 원천을 탐색하고 기록하세요.",
+                "규칙적인 창작 루틴을 만들어 보세요.",
+                "피드백을 수용하고 지속적으로 발전하세요.",
+            ],
+            "데이터 분석": [
+                "데이터의 품질과 신뢰성을 먼저 확인하세요.",
+                "가설 검증을 통해 인사이트를 도출하세요.",
+                "시각화를 통해 결과를 효과적으로 전달하세요.",
+            ],
+            "성장": [
+                "구체적이고 측정 가능한 목표를 설정하세요.",
+                "정기적인 자기 평가를 통해 발전 방향을 점검하세요.",
+                "멘토링과 네트워킹을 활용하세요.",
+            ],
+            "인사 관리": [
+                "공정하고 투명한 인사 제도를 운영하세요.",
+                "직원들의 성장과 발전을 지원하세요.",
+                "조직 문화 개선에 지속적인 관심을 가지세요.",
+            ],
+            "마케팅": [
+                "타겟 고객의 니즈를 깊이 있게 분석하세요.",
+                "데이터 기반의 마케팅 전략을 수립하세요.",
+                "지속적인 성과 측정과 최적화를 진행하세요.",
+            ],
+            "의료": [
+                "예방적 건강 관리에 중점을 두세요.",
+                "최신 의료 정보를 정기적으로 업데이트하세요.",
+                "환자와의 신뢰 관계 구축을 중요시하세요.",
+            ],
+        }
+
+        if field in field_advice:
+            return random.choice(field_advice[field])
+
+        return f"{field} 분야의 전문성을 바탕으로 한 맞춤 조언입니다."
+
+    def _get_timing_advice(self, question: str, field: str) -> str:
+        """시기/타이밍 관련 조언"""
+        current_time = datetime.now()
+        season = self._get_current_season(current_time)
+
+        timing_advice = {
+            "업무 관리": f"\n⏰ **시간 관련 조언:**\n현재 {season}을 고려할 때, 이 시기는 {self._get_productivity_timing(current_time)}입니다.",
+            "상담": f"\n⏰ **시기별 조언:**\n{season}의 특성을 고려하면, 지금은 {self._get_counseling_timing(current_time)}시기입니다.",
+            "개발": f"\n⏰ **프로젝트 타이밍:**\n{season} 개발 주기를 고려할 때, {self._get_development_timing(current_time)}",
+        }
+
+        return timing_advice.get(
+            field,
+            f"\n⏰ **시기 분석:**\n현재 시점은 {field}에 있어 {self._get_general_timing(current_time)}입니다.",
+        )
+
+    def _get_current_season(self, current_time: datetime) -> str:
+        month = current_time.month
+        if 3 <= month <= 5:
+            return "봄철"
+        elif 6 <= month <= 8:
+            return "여름철"
+        elif 9 <= month <= 11:
+            return "가을철"
+        else:
+            return "겨울철"
+
+    def _get_productivity_timing(self, current_time: datetime) -> str:
+        hour = current_time.hour
+        if 9 <= hour <= 11:
+            return "집중력이 가장 높은 황금시간대"
+        elif 14 <= hour <= 16:
+            return "창의적 업무에 적합한 시간대"
+        else:
+            return "루틴 업무 처리에 적합한 시간대"
+
+    def _get_counseling_timing(self, current_time: datetime) -> str:
+        hour = current_time.hour
+        weekday = current_time.weekday()
+
+        if weekday < 5:  # 평일
+            if 10 <= hour <= 12:
+                return "마음이 안정된 상태에서 깊은 대화가 가능한"
+            elif 15 <= hour <= 17:
+                return "하루의 경험을 정리하기 좋은"
+            else:
+                return "일상적인 고민 상담에 적합한"
+        else:  # 주말
+            return "여유로운 마음으로 깊은 대화가 가능한"
+
+    def _get_development_timing(self, current_time: datetime) -> str:
+        month = current_time.month
+        if month in [3, 4, 9, 10]:  # 봄, 가을
+            return "새로운 프로젝트 시작에 적합한 시기입니다"
+        elif month in [6, 7, 8]:  # 여름
+            return "기존 프로젝트 안정화와 유지보수에 집중하기 좋은 시기입니다"
+        elif month in [11, 12]:  # 연말
+            return "한 해의 프로젝트를 마무리하고 새로운 계획을 세우기 좋은 시기입니다"
+        else:  # 겨울 (1, 2월)
+            return "신규 기술 학습과 연구에 집중하기 좋은 시기입니다"
+
+    def _get_general_timing(self, current_time: datetime) -> str:
+        hour = current_time.hour
+        weekday = current_time.weekday()
+
+        timing_matrix = {
+            "morning": "새로운 시작과 계획에 적합한",
+            "afternoon": "실행과 진행에 최적화된",
+            "evening": "정리와 회고에 좋은",
+            "weekend": "여유로운 관점에서 접근하기 좋은",
+        }
+
+        if weekday >= 5:  # 주말
+            return timing_matrix["weekend"]
+        elif 5 <= hour <= 11:  # 아침
+            return timing_matrix["morning"]
+        elif 12 <= hour <= 17:  # 오후
+            return timing_matrix["afternoon"]
+        else:  # 저녁
+            return timing_matrix["evening"]
+
+    def _get_method_advice(self, question: str, field: str) -> str:
+        """방법론적 조언"""
+        return f"\n📝 **구체적인 방법:**\n{field} 분야의 전문적 방법론에 따르면, 다음 단계들을 추천드립니다."
+
+    def _get_cause_analysis(self, question: str, field: str) -> str:
+        """원인 분석"""
+        return f"\n🔍 **원인 분석:**\n{field} 관점에서 볼 때, 다음과 같은 요인들이 영향을 미치고 있습니다."
+
+    def _get_practical_advice(self, question: str, field: str) -> str:
+        """실용적 조언"""
+        question_lower = question.lower()
+
+        advice_bank = {
+            "연애운": [
+                "자연스러운 모습으로 대화에 임하세요. 긴장은 오히려 역효과를 낳을 수 있습니다.",
+                "상대방의 이야기에 귀 기울이고, 적절한 리액션을 보이세요.",
+                "첫인상이 중요하니, 단정하고 좋은 이미지를 준비하세요.",
+            ],
+            "사업운": [
+                "철저한 준비로 기회를 놓치지 마세요. 특히 관련 자료 검토가 중요합니다.",
+                "직감도 중요하지만, 데이터를 기반으로 한 판단이 필요합니다.",
+                "주변의 조언을 귀담아 들으세요. 새로운 관점을 발견할 수 있습니다.",
+            ],
+            "건강운": [
+                "규칙적인 생활 리듬을 유지하세요. 특히 수면 시간이 중요합니다.",
+                "가벼운 운동으로 시작해서 점진적으로 강도를 높이세요.",
+                "스트레스 관리에 특별한 주의를 기울이세요.",
+            ],
+        }
+
+        for key, advices in advice_bank.items():
+            if key in question_lower:
+                return random.choice(advices)
+
+        return f"현재 상황에서 {field} 전문가로서 추천드리는 실천 방안입니다."
 
     def _create_natural_ai_response(
         self, question: str, agent_type: str, info: dict
