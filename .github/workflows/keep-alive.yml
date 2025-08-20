@@ -1,0 +1,32 @@
+name: Keep Render Alive
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"  # every 10 minutes
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping /health endpoint
+        env:
+          PING_URL: ${{ secrets.PING_URL }}
+        run: |
+          if [ -z "$PING_URL" ]; then
+            echo "PING_URL secret not set. Skipping.";
+            exit 0;
+          fi
+          BASE="$PING_URL"
+          # ensure no trailing slash
+          BASE="${BASE%/}"
+          for i in 1 2 3; do
+            CODE=$(curl -s -o /dev/null -w "%{http_code}" "$BASE/health")
+            echo "Attempt $i -> HTTP $CODE"
+            if [ "$CODE" -ge 200 ] && [ "$CODE" -lt 400 ]; then
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "Health checks failed"
+          exit 1
