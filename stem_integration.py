@@ -626,10 +626,12 @@ def add_stem_routes(app: FastAPI):
     @app.get("/stem/stats/dashboard")
     async def stem_stats_dashboard(admin_key: Optional[str] = None):
         """사용 통계 대시보드 페이지 - 관리자 인증 필요"""
-        
+
         # 관리자 인증 확인
-        ADMIN_SECRET = "hyojin_admin_2024_secure"  # 실제로는 환경변수나 설정 파일에서 가져와야 함
-        
+        ADMIN_SECRET = (
+            "hyojin_admin_2024_secure"  # 실제로는 환경변수나 설정 파일에서 가져와야 함
+        )
+
         if admin_key != ADMIN_SECRET:
             return HTMLResponse(
                 content="""
@@ -682,9 +684,9 @@ def add_stem_routes(app: FastAPI):
                 </body>
                 </html>
                 """,
-                status_code=401
+                status_code=401,
             )
-        
+
         try:
             stats = usage_tracker.get_statistics()
             recent_activity = usage_tracker.get_recent_activity(20)

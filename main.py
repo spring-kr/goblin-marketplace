@@ -37,6 +37,30 @@ if os.path.exists(static_dir):
 # STEM 라우트 설정
 add_stem_routes(app)
 
+# 서버 시작시 샘플 데이터 확인 및 생성
+@app.on_event("startup")
+async def startup_event():
+    """서버 시작시 실행되는 이벤트"""
+    try:
+        # 사용량 로그 확인
+        from usage_tracker import usage_tracker
+        stats = usage_tracker.get_statistics()
+        
+        # 데이터가 없으면 샘플 데이터 생성
+        if stats.get('total_usage', 0) == 0:
+            print("🔄 사용량 데이터가 없어 샘플 데이터를 생성합니다...")
+            try:
+                from generate_test_data import generate_test_data
+                generate_test_data()
+                print("✅ 샘플 데이터 생성 완료!")
+            except Exception as e:
+                print(f"⚠️ 샘플 데이터 생성 실패: {e}")
+        else:
+            print(f"📊 기존 사용량 데이터 {stats['total_usage']}개 발견")
+            
+    except Exception as e:
+        print(f"⚠️ 시작 이벤트 처리 중 오류: {e}")
+
 
 @app.get("/", response_class=HTMLResponse)
 async def root():
