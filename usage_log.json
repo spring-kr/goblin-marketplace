@@ -3226,5 +3226,101 @@
     "user_ip": "127.0.0.1",
     "weekday": "Wednesday",
     "hour": 13
+  },
+  {
+    "timestamp": "2025-08-20T14:39:16.291750",
+    "date": "2025-08-20",
+    "time": "14:39:16",
+    "agent_type": "수학도깨비",
+    "question_length": 13,
+    "question_preview": "미적분 기초를 알려주세요",
+    "response_success": false,
+    "user_ip": "127.0.0.1",
+    "weekday": "Wednesday",
+    "hour": 14
+  },
+  {
+    "timestamp": "2025-08-20T14:39:27.036251",
+    "date": "2025-08-20",
+    "time": "14:39:27",
+    "agent_type": "수학도깨비",
+    "question_length": 13,
+    "question_preview": "미적분 기초를 알려주세요",
+    "response_success": false,
+    "user_ip": "127.0.0.1",
+    "weekday": "Wednesday",
+    "hour": 14
+  },
+  {
+    "timestamp": "2025-08-20T14:40:09.350576",
+    "date": "2025-08-20",
+    "time": "14:40:09",
+    "agent_type": "assistant",
+    "question_length": 25,
+    "question_preview": "안녕하세요. 간단한 업무 조언을 부탁드립니다.",
+    "response_success": true,
+    "user_ip": "127.0.0.1",
+    "weekday": "Wednesday",
+    "hour": 14
+  },
+  {
+    "timestamp": "2025-08-20T14:40:18.431547",
+    "date": "2025-08-20",
+    "time": "14:40:18",
+    "agent_type": "assistant",
+    "question_length": 21,
+    "question_preview": "업무 효율성을 높이는 방법을 알려주세요",
+    "response_success": true,
+    "user_ip": "127.0.0.1",
+    "weekday": "Wednesday",
+    "hour": 14
+  },
+  {
+    "timestamp": "2025-08-20T14:50:03.717677",
+    "date": "2025-08-20",
+    "time": "14:50:03",
+    "agent_type": "startup",
+    "question_length": 16,
+    "question_preview": "창업 전략에 대해서 알려주세요",
+    "response_success": true,
+    "user_ip": "127.0.0.1",
+    "weekday": "Wednesday",
+    "hour": 14
+  },
+  {
+    "timestamp": "2025-08-20T14:50:31.397327",
+    "date": "2025-08-20",
+    "time": "14:50:31",
+    "agent_type": "startup",
+    "question_length": 16,
+    "question_preview": "창업 전략에 대해서 알려주세요",
+    "response_success": true,
+    "user_ip": "127.0.0.1",
+    "weekday": "Wednesday",
+    "hour": 14
+  },
+  {
+    "timestamp": "2025-08-20T14:50:44.046948",
+    "date": "2025-08-20",
+    "time": "14:50:44",
+    "agent_type": "startup",
+    "question_length": 16,
+    "question_preview": "창업 전략에 대해서 알려주세요",
+    "response_success": true,
+    "user_ip": "127.0.0.1",
+    "weekday": "Wednesday",
+    "hour": 14
+  },
+  {
+    "timestamp": "2025-08-20T14:50:44.069940",
+    "date": "2025-08-20",
+    "time": "14:50:44",
+    "agent_type": "startup",
+    "question_length": 12,
+    "question_preview": "구조를 짜는게 힘들어요",
+    "response_success": true,
+    "user_ip": "127.0.0.1",
+    "weekday": "Wednesday",
+    "hour": 14
   }
 ]

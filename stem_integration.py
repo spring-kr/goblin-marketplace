@@ -6,6 +6,9 @@
 import random
 from datetime import datetime
 from typing import Dict, Any, Optional
+import hashlib
+import json
+import os
 
 
 class STEMIntegration:
@@ -13,13 +16,79 @@ class STEMIntegration:
 
     def __init__(self):
         self.system_name = "🏰 도깨비마을장터 박사급 AI 상담소"
+        # 대화 기록 저장을 위한 딕셔너리 (간단한 메모리 저장)
+        self.conversation_history = {}
+        self.context_file = "conversation_context.json"
+        self._load_conversation_history()
+
+    def _load_conversation_history(self):
+        """대화 기록 로드"""
+        try:
+            if os.path.exists(self.context_file):
+                with open(self.context_file, 'r', encoding='utf-8') as f:
+                    self.conversation_history = json.load(f)
+        except Exception:
+            self.conversation_history = {}
+
+    def _save_conversation_history(self):
+        """대화 기록 저장"""
+        try:
+            with open(self.context_file, 'w', encoding='utf-8') as f:
+                json.dump(self.conversation_history, f, ensure_ascii=False, indent=2)
+        except Exception:
+            pass
+
+    def _get_conversation_key(self, user_ip: str, agent_type: str) -> str:
+        """사용자-에이전트별 대화 키 생성"""
+        key = f"{user_ip}_{agent_type}"
+        return hashlib.md5(key.encode()).hexdigest()[:16]
+
+    def _analyze_follow_up_intent(self, question: str, previous_topics: list) -> dict:
+        """후속 질문 의도 분석"""
+        question_lower = question.lower()
+        
+        follow_up_indicators = {
+            "more_detail": ["구체적으로", "더 자세히", "세부적으로", "상세하게", "더 알려주세요", "자세히 설명"],
+            "example": ["예시", "사례", "실제", "예를 들어", "구체적인 예", "실습"],
+            "how_to": ["어떻게", "방법", "단계", "절차", "프로세스"],
+            "advanced": ["고급", "심화", "전문적", "더 깊이", "고도화"],
+            "practical": ["실무", "현실적", "실제로", "바로", "실행"],
+            "tools": ["도구", "툴", "프로그램", "소프트웨어", "앱"],
+            "troubleshooting": ["문제", "해결", "오류", "안될때", "실패"]
+        }
+        
+        detected_intent = "general"
+        for intent, keywords in follow_up_indicators.items():
+            if any(keyword in question_lower for keyword in keywords):
+                detected_intent = intent
+                break
+        
+        return {
+            "intent": detected_intent,
+            "is_follow_up": len(previous_topics) > 0,
+            "depth_level": len(previous_topics) + 1
+        }
 
     def process_question(
         self, agent_type: str, question: str, user_ip: Optional[str] = None
     ) -> Dict[str, Any]:
-        """실제 AI 대화 능력으로 질문 처리"""
+        """실제 AI 대화 능력으로 질문 처리 - 컨텍스트 추적 포함"""
         try:
             from usage_tracker import usage_tracker
+
+            # 사용자 IP가 없으면 기본값 설정
+            if not user_ip:
+                user_ip = "unknown"
+
+            # 대화 기록 키 생성
+            conversation_key = self._get_conversation_key(user_ip, agent_type)
+            
+            # 이전 대화 기록 가져오기
+            previous_conversations = self.conversation_history.get(conversation_key, [])
+            previous_topics = [conv.get("topic", "") for conv in previous_conversations[-3:]]  # 최근 3개만
+            
+            # 후속 질문 의도 분석
+            follow_up_analysis = self._analyze_follow_up_intent(question, previous_topics)
 
             # 원래 16개 도깨비 정보
             agent_info = {
@@ -48,7 +117,7 @@ class STEMIntegration:
                 "sales": {"emoji": "💰", "name": "영업 도깨비", "field": "영업"},
                 "seo": {"emoji": "🔍", "name": "SEO 도깨비", "field": "검색 최적화"},
                 "shopping": {"emoji": "🛒", "name": "쇼핑 도깨비", "field": "쇼핑"},
-                "startup": {"emoji": "🚀", "name": "스타트업 도깨비", "field": "창업"},
+                "startup": {"emoji": "🚀", "name": "스타트업 도깨비", "field": "창업전략"},
                 "village_chief": {
                     "emoji": "👑",
                     "name": "이장 도깨비",
@@ -77,9 +146,32 @@ class STEMIntegration:
                     "error": "질문이 너무 짧습니다. 최소 2글자 이상 입력해주세요.",
                 }
 
-            # 도깨비별 전문 응답 생성
+            # 도깨비별 전문 응답 생성 (컨텍스트 포함)
             info = agent_info[agent_type]
-            response = self._create_natural_ai_response(question, agent_type, info)
+            response = self._create_contextual_ai_response(
+                question, agent_type, info, previous_conversations, follow_up_analysis
+            )
+
+            # 현재 대화를 기록에 추가
+            current_conversation = {
+                "timestamp": datetime.now().isoformat(),
+                "question": question,
+                "topic": self._extract_topic(question),
+                "intent": follow_up_analysis["intent"],
+                "depth": follow_up_analysis["depth_level"]
+            }
+            
+            if conversation_key not in self.conversation_history:
+                self.conversation_history[conversation_key] = []
+            
+            self.conversation_history[conversation_key].append(current_conversation)
+            
+            # 최근 10개 대화만 유지
+            if len(self.conversation_history[conversation_key]) > 10:
+                self.conversation_history[conversation_key] = self.conversation_history[conversation_key][-10:]
+            
+            # 대화 기록 저장
+            self._save_conversation_history()
 
             # 성공 로그 기록
             usage_tracker.log_usage(agent_type, question, True, user_ip)
@@ -94,12 +186,110 @@ class STEMIntegration:
                 },
                 "response": response,
                 "timestamp": datetime.now().isoformat(),
+                "context": {
+                    "is_follow_up": follow_up_analysis["is_follow_up"],
+                    "depth_level": follow_up_analysis["depth_level"],
+                    "intent": follow_up_analysis["intent"]
+                }
             }
 
         except Exception as e:
             # 에러 로그 기록
             usage_tracker.log_usage(agent_type, question, False, user_ip)
             return {"success": False, "error": f"처리 중 오류가 발생했습니다: {str(e)}"}
+
+    def _extract_topic(self, question: str) -> str:
+        """질문에서 주제 추출"""
+        # 간단한 주제 추출 로직
+        question_lower = question.lower()
+        
+        topic_keywords = {
+            "시간관리": ["시간", "일정", "스케줄", "계획"],
+            "업무효율": ["효율", "생산성", "업무", "일"],
+            "기술": ["개발", "프로그래밍", "코딩", "기술"],
+            "마케팅": ["마케팅", "광고", "홍보", "브랜드"],
+            "건강": ["건강", "운동", "의료", "병원"],
+            "창작": ["창작", "디자인", "글쓰기", "아이디어"],
+            "상담": ["상담", "고민", "스트레스", "관계"]
+        }
+        
+        for topic, keywords in topic_keywords.items():
+            if any(keyword in question_lower for keyword in keywords):
+                return topic
+        
+        return "일반상담"
+
+    def _create_contextual_ai_response(
+        self, question: str, agent_type: str, info: dict, previous_conversations: list, follow_up_analysis: dict
+    ) -> str:
+        """컨텍스트를 고려한 AI 응답 생성"""
+        
+        # 후속 질문인지 확인
+        if follow_up_analysis["is_follow_up"] and follow_up_analysis["depth_level"] > 1:
+            return self._create_follow_up_response(question, agent_type, info, previous_conversations, follow_up_analysis)
+        else:
+            return self._create_natural_ai_response(question, agent_type, info)
+
+    def _create_follow_up_response(
+        self, question: str, agent_type: str, info: dict, previous_conversations: list, follow_up_analysis: dict
+    ) -> str:
+        """후속 질문에 대한 심화 응답 생성"""
+        
+        # 이전 주제들 파악
+        previous_topics = [conv.get("topic", "") for conv in previous_conversations[-3:]]
+        main_topic = previous_topics[-1] if previous_topics else "일반상담"
+        
+        intent = follow_up_analysis["intent"]
+        depth = follow_up_analysis["depth_level"]
+        
+        # 기존 함수들을 활용한 심화 응답
+        detailed_solution = self._get_detailed_solution(question, info["field"])
+        practical_steps = self._get_practical_steps(question, info["field"])
+        expert_tips = self._get_expert_tips(question, info["field"])
+        deep_analysis = self._get_deep_analysis(question, info["field"])
+        
+        # 의도별 맞춤 응답
+        if intent == "more_detail":
+            intro = f"{info['emoji']} 더 구체적으로 설명드리겠습니다! ({depth}단계 심화)"
+            focus = "🔍 **세부 분석:**"
+        elif intent == "example":
+            intro = f"{info['emoji']} 실제 사례로 설명드리겠습니다!"
+            focus = "📚 **구체적 사례:**"
+        elif intent == "how_to":
+            intro = f"{info['emoji']} 단계별 방법을 자세히 알려드리겠습니다!"
+            focus = "📋 **상세 실행 방법:**"
+        elif intent == "practical":
+            intro = f"{info['emoji']} 실무에 바로 적용할 수 있는 방법을 알려드리겠습니다!"
+            focus = "⚡ **실무 적용법:**"
+        elif intent == "advanced":
+            intro = f"{info['emoji']} 고급 수준의 내용을 다뤄보겠습니다!"
+            focus = "🎓 **전문가 수준:**"
+        else:
+            intro = f"{info['emoji']} 더 깊이 있게 설명드리겠습니다!"
+            focus = "💡 **심화 내용:**"
+        
+        return f"""{intro}
+
+이전에 {main_topic}에 대해 기본적인 내용을 말씀드렸는데, 이제 더욱 구체적이고 실용적인 부분을 다뤄보겠습니다.
+
+{focus}
+{detailed_solution}
+
+🛠️ **심화 실행 방법:**
+{practical_steps}
+
+⭐ **전문가 노하우 (레벨 {depth}):**
+{expert_tips}
+
+� **깊이 있는 분석:**
+{deep_analysis}
+
+💬 **다음 단계 제안:**
+- 더 구체적인 상황을 알려주시면 맞춤형 조언 제공
+- 실제 적용 중 어려움이 있으면 문제 해결 방법 안내
+- 성과 측정이나 개선 방법에 대한 추가 상담 가능
+
+{info['field']} 전문가로서 {depth}단계 심화 상담을 제공했습니다. 더 궁금한 점이나 구체적인 상황이 있으시면 언제든 말씀해주세요!"""
 
     def _create_natural_ai_response(
         self, question: str, agent_type: str, info: dict
@@ -267,7 +457,7 @@ class STEMIntegration:
     def _generate_contextual_response(
         self, question: str, info: dict, personality: dict
     ) -> str:
-        """맥락을 고려한 자연스럽고 다양한 응답 생성"""
+        """맥락을 고려한 자연스러운 응답 생성"""
 
         # 질문 길이와 복잡도 분석
         question_length = len(question)
@@ -296,196 +486,15 @@ class STEMIntegration:
             ]
             return random.choice(responses)
 
-        # 질문 유형 및 키워드 분석을 통한 맞춤형 응답
-        return self._generate_intelligent_response(question, info, personality)
+        # 전문 분야 키워드가 포함된 경우
+        if any(
+            expertise in question_lower
+            for expertise in personality.get("expertise", [])
+        ):
+            return self._generate_expert_response(question, info, personality)
 
-    def _generate_intelligent_response(self, question: str, info: dict, personality: dict) -> str:
-        """질문 내용을 분석해서 지능적이고 다양한 응답 생성"""
-        
-        question_lower = question.lower()
-        
-        # 질문 유형별 분석
-        question_type = self._analyze_question_type(question_lower, info['field'])
-        
-        # 키워드 기반 구체적 응답 생성
-        specific_keywords = self._extract_specific_keywords(question_lower, info['field'])
-        
-        # 응답 스타일 결정 (매번 다르게)
-        response_style = random.choice(['detailed', 'practical', 'analytical', 'creative'])
-        
-        return self._create_varied_response(question, info, personality, question_type, specific_keywords, response_style)
-
-    def _analyze_question_type(self, question_lower: str, field: str) -> str:
-        """질문 유형 분석"""
-        
-        if any(word in question_lower for word in ['어떻게', 'how', '방법', '방식']):
-            return 'how_to'
-        elif any(word in question_lower for word in ['왜', 'why', '이유', '원인']):
-            return 'why'
-        elif any(word in question_lower for word in ['뭐', '무엇', 'what', '어떤']):
-            return 'what'
-        elif any(word in question_lower for word in ['언제', 'when', '시기', '타이밍']):
-            return 'when'
-        elif any(word in question_lower for word in ['어디', 'where', '장소', '위치']):
-            return 'where'
-        elif any(word in question_lower for word in ['추천', '제안', '권장', 'recommend']):
-            return 'recommendation'
-        elif any(word in question_lower for word in ['문제', '해결', '도움', 'problem', 'help']):
-            return 'problem_solving'
-        elif any(word in question_lower for word in ['시작', '처음', '초보', 'start', 'begin']):
-            return 'beginner'
-        elif any(word in question_lower for word in ['고급', '전문', '심화', 'advanced']):
-            return 'advanced'
-        else:
-            return 'general'
-
-    def _extract_specific_keywords(self, question_lower: str, field: str) -> list:
-        """분야별 구체적 키워드 추출"""
-        
-        field_keywords = {
-            "업무 관리": ["시간", "계획", "일정", "효율", "생산성", "목표", "우선순위", "스케줄"],
-            "개발": ["코딩", "프로그래밍", "앱", "웹", "데이터베이스", "API", "프레임워크", "언어"],
-            "창작": ["글쓰기", "디자인", "아이디어", "영감", "창의", "스토리", "콘텐츠", "블로그"],
-            "마케팅": ["광고", "브랜드", "고객", "판매", "홍보", "SNS", "마케팅", "브랜딩"],
-            "상담": ["스트레스", "고민", "걱정", "불안", "관계", "감정", "심리", "힐링"]
-        }
-        
-        found_keywords = []
-        for keyword in field_keywords.get(field, []):
-            if keyword in question_lower:
-                found_keywords.append(keyword)
-        
-        return found_keywords
-
-    def _create_varied_response(self, question: str, info: dict, personality: dict, 
-                               question_type: str, keywords: list, style: str) -> str:
-        """다양한 스타일의 응답 생성"""
-        
-        # 기본 인사
-        intro = f"{info['emoji']} {info['name']}입니다!"
-        
-        # 질문 분석 코멘트
-        analysis_comments = [
-            f"'{question}'에 대해 {personality['role']}로서 답변드리겠습니다.",
-            f"{info['field']} 전문가 관점에서 '{question}' 질문을 분석해보겠습니다.",
-            f"흥미로운 질문이네요! {info['field']} 분야에서 '{question}'에 대해 알려드리겠습니다.",
-            f"좋은 질문입니다! {personality['role']}로서 '{question}'에 대한 전문적 조언을 드리겠습니다."
-        ]
-        
-        analysis = random.choice(analysis_comments)
-        
-        # 스타일별 본문 생성
-        if style == 'detailed':
-            content = self._generate_detailed_content(question, info, personality, question_type, keywords)
-        elif style == 'practical':
-            content = self._generate_practical_content(question, info, personality, question_type, keywords)
-        elif style == 'analytical':
-            content = self._generate_analytical_content(question, info, personality, question_type, keywords)
-        else:  # creative
-            content = self._generate_creative_content(question, info, personality, question_type, keywords)
-        
-        # 마무리 멘트
-        closing_comments = [
-            f"더 구체적인 상황이나 추가 질문이 있으시면 {info['name']}에게 언제든 말씀해주세요!",
-            f"{info['field']} 관련해서 더 자세한 조언이 필요하시면 언제든 찾아주세요!",
-            f"이 조언이 도움이 되셨기를 바라며, 추가 상담은 언제든 환영입니다!",
-            f"{personality['role']}로서 더 도움이 될 수 있는 부분이 있다면 언제든 말씀해주세요!"
-        ]
-        
-        closing = random.choice(closing_comments)
-        
-        return f"{intro}\n\n{analysis}\n\n{content}\n\n{closing}"
-
-    def _generate_detailed_content(self, question: str, info: dict, personality: dict, 
-                                 question_type: str, keywords: list) -> str:
-        """상세한 설명 스타일의 응답 생성"""
-        
-        # 기존 함수들을 활용해서 다양한 내용 생성
-        detailed_solution = self._get_detailed_solution(question, info['field'])
-        practical_steps = self._get_practical_steps(question, info['field'])
-        
-        # 키워드 기반 맞춤형 분석
-        keyword_analysis = ""
-        if keywords:
-            keyword_analysis = f"특히 '{', '.join(keywords[:3])}'와 관련해서는 {info['field']} 분야에서 매우 중요한 요소들입니다. "
-        
-        return f"""📋 **전문가 상세 분석:**
-{keyword_analysis}{detailed_solution}
-
-� **체계적 실행 방법:**
-{practical_steps}
-
-� **{personality['role']} 전문 조언:**
-{question_type} 유형의 질문에 대해서는 {info['field']} 분야의 깊이 있는 이해와 체계적 접근이 필수입니다. 
-실제 현장에서는 이론적 지식과 실무 경험을 균형있게 활용하는 것이 성공의 열쇠입니다."""
-
-    def _generate_practical_content(self, question: str, info: dict, personality: dict, 
-                                  question_type: str, keywords: list) -> str:
-        """실용적인 접근 스타일의 응답 생성"""
-        
-        practical_steps = self._get_practical_steps(question, info['field'])
-        expert_tips = self._get_expert_tips(question, info['field'])
-        
-        # 실행 우선순위 제안
-        priority_guide = f"{question_type} 타입 질문의 경우, 우선적으로 기본기를 탄탄히 하는 것이 중요합니다."
-        
-        return f"""⚡ **즉시 실행 가능한 방법:**
-{practical_steps}
-
-�️ **실무 전문가 팁:**
-{expert_tips}
-
-🎯 **실행 우선순위 가이드:**
-{priority_guide} {personality['role']}의 경험으로는 '{question}'와 같은 경우 단계적 접근이 가장 효과적입니다.
-
-📈 **성과 향상 포인트:**
-{info['field']} 분야에서 이런 문제를 해결할 때는 지속가능한 방법론을 선택하는 것이 장기적으로 더 큰 성과를 가져옵니다."""
-
-    def _generate_analytical_content(self, question: str, info: dict, personality: dict, 
-                                   question_type: str, keywords: list) -> str:
-        """분석적 접근 스타일의 응답 생성"""
-        
-        detailed_solution = self._get_detailed_solution(question, info['field'])
-        deep_analysis = self._get_deep_analysis(question, info['field'])
-        
-        # 문제 구조 분석
-        structure_analysis = f"'{question}' 질문을 분해하면 {question_type} 특성과 {info['field']} 도메인 지식이 교차하는 복합적 문제입니다."
-        
-        return f"""🔬 **구조적 문제 분석:**
-{structure_analysis}
-
-🧮 **심층 분석 결과:**
-{deep_analysis}
-
-🏗️ **체계적 해결 프레임워크:**
-{detailed_solution}
-
-📊 **데이터 기반 접근법:**
-{personality['role']}로서 이 문제를 분석할 때는 정량적 지표와 정성적 평가를 모두 고려하여 
-{info['field']} 분야의 베스트 프랙티스에 기반한 솔루션을 제시하겠습니다."""
-
-    def _generate_creative_content(self, question: str, info: dict, personality: dict, 
-                                 question_type: str, keywords: list) -> str:
-        """창의적 접근 스타일의 응답 생성"""
-        
-        expert_tips = self._get_expert_tips(question, info['field'])
-        practical_steps = self._get_practical_steps(question, info['field'])
-        
-        # 창의적 관점 제시
-        creative_perspective = f"'{question}'를 {question_type} 관점에서 보면, 기존의 {info['field']} 접근법을 혁신적으로 재해석할 수 있습니다."
-        
-        return f"""🎨 **혁신적 사고 접근:**
-{creative_perspective}
-
-🔄 **새로운 관점의 솔루션:**
-{expert_tips}
-
-✨ **창의적 실행 방법:**
-{practical_steps}
-
-🌟 **미래 지향적 제안:**
-{personality['role']}로서 '{question}'에 대해 기존 틀을 벗어난 접근을 제안합니다. 
-{info['field']} 분야에서 트렌드를 앞서가는 혁신적 솔루션을 함께 만들어보세요!"""
+        # 일반적인 질문에 대한 전문가적 관점 제시
+        return self._generate_general_expert_response(question, info, personality)
 
     def _generate_expert_response(
         self, question: str, info: dict, personality: dict
@@ -612,7 +621,7 @@ class STEMIntegration:
 
     def _get_detailed_solution(self, question: str, field: str) -> str:
         """분야별 상세 솔루션 제공"""
-        
+
         detailed_solutions = {
             "업무 관리": """
 📊 **시간 관리 체계 구축:**
@@ -629,7 +638,6 @@ class STEMIntegration:
 • 반복 업무의 자동화 및 템플릿화
 • 업무 위임 및 분산 체계 구축
 • 정기적인 업무 프로세스 리뷰 및 개선""",
-            
             "개발": """
 🏗️ **아키텍처 설계 원칙:**
 • SOLID 원칙을 적용한 확장 가능한 구조 설계
@@ -645,7 +653,6 @@ class STEMIntegration:
 • 프로젝트 요구사항에 맞는 최적 기술 조합
 • 성능, 확장성, 유지보수성을 고려한 기술 선택
 • 팀의 기술 역량과 학습 곡선 고려""",
-            
             "창작": """
 🎨 **창작 프로세스:**
 • 브레인스토밍 → 아이디어 정리 → 프로토타입 → 피드백 → 개선
@@ -660,14 +667,52 @@ class STEMIntegration:
 🚀 **완성도 향상:**
 • 초안 완성 후 충분한 휴지기를 거친 객관적 검토
 • 다양한 관점의 피드백 수집 및 반영
-• 지속적인 수정과 개선을 통한 품질 향상"""
+• 지속적인 수정과 개선을 통한 품질 향상""",
+            "창업전략": """
+🚀 **MVP 기반 린 스타트업 전략:**
+• 최소기능제품(MVP) 개발로 빠른 시장 검증 - 3개월 내 출시 목표
+• 구축-측정-학습 사이클로 2주마다 고객 피드백 반영
+• 피벗(Pivot) vs 인내(Persevere) 판단 기준: 핵심지표 3개월 추이 분석
+
+💰 **수익모델 및 단위경제학:**
+• LTV(고객생애가치) ÷ CAC(고객획득비용) ≥ 3 달성이 최우선
+• 수익모델 다각화: 구독(SaaS), 수수료(플랫폼), 프리미엄(프리미엄)
+• 캐시플로우 브레이크이븐 포인트 18개월 내 달성 계획
+
+📊 **시장 검증 및 진입 전략:**
+• TAM $10B - SAM $1B - SOM $100M 시장 규모 분석
+• 초기 타겟: 1000명의 열성고객(Early Adopter) 확보가 성공의 열쇠
+• 네트워크 효과 설계: 사용자 증가가 서비스 가치 향상으로 이어지는 구조
+
+🎯 **투자 유치 및 자금 계획:**
+• 시드투자: 제품개발 + 초기팀 구성 (6-12개월 런웨이)
+• 시리즈A: 시장 적합성 증명 후 확장 자금 (ARR $1M 달성 후)
+• 피치덱 핵심: 문제-솔루션-시장규모-트랙션-팀-재무계획 6요소""",
+            "스타트업경영": """
+🚀 **MVP 기반 린 스타트업 전략:**
+• 최소기능제품(MVP) 개발로 빠른 시장 검증 - 3개월 내 출시 목표
+• 구축-측정-학습 사이클로 2주마다 고객 피드백 반영
+• 피벗(Pivot) vs 인내(Persevere) 판단 기준: 핵심지표 3개월 추이 분석
+
+💰 **수익모델 및 단위경제학:**
+• LTV(고객생애가치) ÷ CAC(고객획득비용) ≥ 3 달성이 최우선
+• 수익모델 다각화: 구독(SaaS), 수수료(플랫폼), 프리미엄(프리미엄)
+• 캐시플로우 브레이크이븐 포인트 18개월 내 달성 계획
+
+📊 **시장 검증 및 진입 전략:**
+• TAM $10B - SAM $1B - SOM $100M 시장 규모 분석
+• 초기 타겟: 1000명의 열성고객(Early Adopter) 확보가 성공의 열쇠
+• 네트워크 효과 설계: 사용자 증가가 서비스 가치 향상으로 이어지는 구조""",
         }
-        
-        return detailed_solutions.get(field, f"{field} 분야의 전문적이고 체계적인 접근 방법을 통해 문제를 해결하고 목표를 달성할 수 있습니다.")
+
+        return detailed_solutions.get(
+            field,
+            f"{field} 분야의 전문적이고 체계적인 접근 방법을 통해 문제를 해결하고 목표를 달성할 수 있습니다.",
+        )
 
     def _get_practical_steps(self, question: str, field: str) -> str:
         """실용적 단계별 실행 방안"""
-        
+
         steps = {
             "업무 관리": """
 1️⃣ **1단계: 현재 상황 분석 (1주)**
@@ -684,7 +729,6 @@ class STEMIntegration:
    • 새로운 업무 방식 적용 및 습관화
    • 주간 단위 성과 측정 및 분석
    • 필요에 따른 방법론 조정 및 개선""",
-            
             "개발": """
 1️⃣ **1단계: 요구사항 분석 및 설계**
    • 프로젝트 목표 및 성공 기준 명확화
@@ -700,7 +744,6 @@ class STEMIntegration:
    • 스프린트 단위 기능 추가 및 개선
    • 지속적인 테스트 및 품질 관리
    • 성능 최적화 및 확장성 개선""",
-            
             "창작": """
 1️⃣ **1단계: 아이디어 발굴 및 구체화**
    • 창작 주제 및 방향성 설정
@@ -715,14 +758,46 @@ class STEMIntegration:
 3️⃣ **3단계: 완성 및 발표**
    • 최종 검토 및 품질 개선
    • 발표 및 배포 준비
-   • 피드백 수집 및 향후 계획 수립"""
+   • 피드백 수집 및 향후 계획 수립""",
+            "창업전략": """
+1️⃣ **1단계: 아이디어 검증 및 시장 조사 (1-2개월)**
+   • 고객 문제 발굴 및 페인 포인트 명확화
+   • 100명 이상 타겟 고객 인터뷰 실시
+   • 경쟁사 분석 및 차별화 포인트 도출
+
+2️⃣ **2단계: MVP 개발 및 초기 검증 (3-4개월)**
+   • 핵심 기능만 포함한 MVP 설계 및 개발
+   • 베타 사용자 50-100명 확보 및 피드백 수집
+   • 초기 비즈니스 모델 설계 및 수익화 방안 수립
+
+3️⃣ **3단계: 시장 진입 및 초기 성장 (6-12개월)**
+   • 제품-시장 적합성(PMF) 달성을 위한 지속적 개선
+   • 초기 1000명 사용자 확보 및 재구매율 30% 이상 달성
+   • 시드 투자 유치 및 팀 확장 (개발 2명, 마케팅 1명)""",
+            "스타트업경영": """
+1️⃣ **1단계: 아이디어 검증 및 시장 조사 (1-2개월)**
+   • 고객 문제 발굴 및 페인 포인트 명확화
+   • 100명 이상 타겟 고객 인터뷰 실시
+   • 경쟁사 분석 및 차별화 포인트 도출
+
+2️⃣ **2단계: MVP 개발 및 초기 검증 (3-4개월)**
+   • 핵심 기능만 포함한 MVP 설계 및 개발
+   • 베타 사용자 50-100명 확보 및 피드백 수집
+   • 초기 비즈니스 모델 설계 및 수익화 방안 수립
+
+3️⃣ **3단계: 시장 진입 및 초기 성장 (6-12개월)**
+   • 제품-시장 적합성(PMF) 달성을 위한 지속적 개선
+   • 초기 1000명 사용자 확보 및 재구매율 30% 이상 달성
+   • 시드 투자 유치 및 팀 확장 (개발 2명, 마케팅 1명)""",
         }
-        
-        return steps.get(field, f"{field} 분야의 체계적인 단계별 접근을 통해 목표를 달성하세요.")
+
+        return steps.get(
+            field, f"{field} 분야의 체계적인 단계별 접근을 통해 목표를 달성하세요."
+        )
 
     def _get_expert_tips(self, question: str, field: str) -> str:
         """전문가 노하우 및 팁"""
-        
+
         tips = {
             "업무 관리": """
 🔥 **실전 노하우:**
@@ -734,7 +809,6 @@ class STEMIntegration:
 • 완벽주의 함정에 빠지지 말고 80% 완성도에서 다음 단계로
 • 멀티태스킹보다는 집중적인 단일 작업이 더 효율적
 • 번아웃 방지를 위한 적절한 휴식과 여유 시간 확보""",
-            
             "개발": """
 🔥 **개발 노하우:**
 • 코드 리뷰를 통한 지속적인 품질 향상
@@ -745,7 +819,6 @@ class STEMIntegration:
 • 과도한 최적화보다는 가독성과 유지보수성 우선
 • 새로운 기술 도입 시 충분한 검증 과정 필요
 • 기술 부채 누적 방지를 위한 정기적인 리팩토링""",
-            
             "창작": """
 🔥 **창작 노하우:**
 • 아이디어 고갈 시에는 기존 작품의 재해석이나 조합 시도
@@ -755,89 +828,128 @@ class STEMIntegration:
 ⚠️ **창작 함정:**
 • 첫 작품부터 완벽을 추구하지 말고 완성에 집중
 • 타인의 평가에 과도하게 의존하지 말고 자신만의 기준 확립
-• 영감 대기보다는 규칙적인 창작 습관으로 실력 향상"""
+• 영감 대기보다는 규칙적인 창작 습관으로 실력 향상""",
+            "창업전략": """
+🔥 **창업 성공 노하우:**
+• 고객과의 직접 대화가 모든 가정보다 중요 - 매주 최소 10명 고객 인터뷰
+• 실패 빠르게, 학습 빠르게: 3개월 내 결과 안 나오면 피벗 고려
+• 창업자 시간의 80%는 고객 개발과 제품 개발에만 투자
+
+⚠️ **창업 함정:**
+• '아이디어가 좋으면 성공한다' 착각 - 실행력과 지속력이 90%
+• 완벽한 제품 만들기 전에 시장 출시 - 고객이 원하는 걸 만들어야 함
+• 초기 자금을 마케팅보다는 제품 개발과 팀 구성에 집중""",
+            "스타트업경영": """
+🔥 **창업 성공 노하우:**
+• 고객과의 직접 대화가 모든 가정보다 중요 - 매주 최소 10명 고객 인터뷰
+• 실패 빠르게, 학습 빠르게: 3개월 내 결과 안 나오면 피벗 고려
+• 창업자 시간의 80%는 고객 개발과 제품 개발에만 투자
+
+⚠️ **창업 함정:**
+• '아이디어가 좋으면 성공한다' 착각 - 실행력과 지속력이 90%
+• 완벽한 제품 만들기 전에 시장 출시 - 고객이 원하는 걸 만들어야 함
+• 초기 자금을 마케팅보다는 제품 개발과 팀 구성에 집중""",
         }
-        
-        return tips.get(field, f"{field} 분야에서 성공하기 위한 전문가만의 실전 노하우를 적용해보세요.")
+
+        return tips.get(
+            field,
+            f"{field} 분야에서 성공하기 위한 전문가만의 실전 노하우를 적용해보세요.",
+        )
 
     def _get_deep_analysis(self, question: str, field: str) -> str:
         """심화 분석"""
-        
+
         analysis = {
             "업무 관리": "업무 관리의 핵심은 시간이 아닌 에너지 관리입니다. 개인의 생체리듬과 에너지 패턴을 파악하여 중요한 업무를 고에너지 시간대에 배치하고, 루틴 업무는 저에너지 시간대에 처리하는 것이 효율성을 극대화하는 비결입니다.",
             "개발": "성공적인 개발 프로젝트의 핵심은 기술적 완성도보다는 사용자 문제 해결에 있습니다. 기술 스택 선택과 아키텍처 설계 시 현재 요구사항뿐만 아니라 미래 확장 가능성을 고려한 균형점을 찾는 것이 중요합니다.",
-            "창작": "진정한 창작은 기존의 것을 완전히 새롭게 만드는 것이 아니라, 기존 요소들의 새로운 조합과 개인적 해석을 통해 독창성을 발현하는 것입니다. 모방에서 시작하여 점진적으로 자신만의 스타일을 발전시키는 것이 효과적입니다."
+            "창작": "진정한 창작은 기존의 것을 완전히 새롭게 만드는 것이 아니라, 기존 요소들의 새로운 조합과 개인적 해석을 통해 독창성을 발현하는 것입니다. 모방에서 시작하여 점진적으로 자신만의 스타일을 발전시키는 것이 효과적입니다.",
+            "창업전략": "성공적인 창업의 핵심은 '고객이 정말 돈을 지불하고 싶어하는 문제'를 해결하는 것입니다. 기술이나 아이디어가 아무리 뛰어나도 시장에서 검증되지 않으면 의미가 없습니다. MVP를 통한 빠른 시장 검증과 고객 피드백 기반의 지속적 개선이 성공의 열쇠입니다.",
+            "스타트업경영": "성공적인 창업의 핵심은 '고객이 정말 돈을 지불하고 싶어하는 문제'를 해결하는 것입니다. 기술이나 아이디어가 아무리 뛰어나도 시장에서 검증되지 않으면 의미가 없습니다. MVP를 통한 빠른 시장 검증과 고객 피드백 기반의 지속적 개선이 성공의 열쇠입니다.",
         }
-        
-        return analysis.get(field, f"{field} 분야의 본질적 이해를 바탕으로 한 전문적 접근이 필요합니다.")
+
+        return analysis.get(
+            field, f"{field} 분야의 본질적 이해를 바탕으로 한 전문적 접근이 필요합니다."
+        )
 
     def _get_success_cases_and_warnings(self, field: str) -> str:
         """성공 사례 및 주의사항"""
-        
+
         cases = {
             "업무 관리": """
 ✅ **성공 사례:** 글로벌 기업 CEO들이 공통적으로 사용하는 '시간 블록킹' 기법으로 하루를 미리 계획된 블록으로 나누어 관리
 ⚠️ **주의사항:** 과도한 계획으로 인한 스트레스보다는 80% 계획 + 20% 여유 공간 확보가 현실적""",
-            
             "개발": """
 ✅ **성공 사례:** 넷플릭스의 마이크로서비스 아키텍처로 확장성과 안정성을 동시에 확보한 사례
 ⚠️ **주의사항:** 복잡한 아키텍처보다는 현재 팀 규모와 요구사항에 적합한 단순한 구조가 더 효과적일 수 있음""",
-            
             "창작": """
 ✅ **성공 사례:** 픽사의 스토리텔링 방법론으로 기술적 혁신과 감정적 공감을 결합한 작품 창작
-⚠️ **주의사항:** 트렌드만 따라가는 창작보다는 개인의 고유한 관점과 경험을 바탕으로 한 진정성 있는 작품이 더 오래 기억됨"""
+⚠️ **주의사항:** 트렌드만 따라가는 창작보다는 개인의 고유한 관점과 경험을 바탕으로 한 진정성 있는 작품이 더 오래 기억됨""",
         }
-        
-        return cases.get(field, f"{field} 분야의 실제 성공 사례를 참고하되, 개별 상황에 맞는 적용이 중요합니다.")
+
+        return cases.get(
+            field,
+            f"{field} 분야의 실제 성공 사례를 참고하되, 개별 상황에 맞는 적용이 중요합니다.",
+        )
 
     def _get_comprehensive_analysis(self, question: str, field: str) -> str:
         """종합적 분석"""
-        
+
         return f"{field} 분야에서 제기된 문제는 단순히 기술적 해결책만으로는 완전한 해결이 어려우며, 인간적 요소, 환경적 요인, 그리고 장기적 관점을 모두 고려한 통합적 접근이 필요합니다."
 
     def _get_strategic_approach(self, question: str, field: str) -> str:
         """전략적 접근법"""
-        
+
         approaches = {
             "업무 관리": "개인의 업무 스타일과 조직 문화를 조화시키면서, 단기 효율성과 장기 지속가능성의 균형을 맞추는 전략적 접근",
             "개발": "비즈니스 요구사항과 기술적 제약사항을 고려한 점진적 개발 전략으로, 위험을 최소화하면서 가치 창출을 극대화",
-            "창작": "개인의 창작 철학과 시장의 요구를 균형있게 반영하여, 예술적 완성도와 대중적 어필을 동시에 추구하는 전략"
+            "창작": "개인의 창작 철학과 시장의 요구를 균형있게 반영하여, 예술적 완성도와 대중적 어필을 동시에 추구하는 전략",
         }
-        
-        return approaches.get(field, f"{field} 분야의 특성을 고려한 맞춤형 전략적 접근이 필요합니다.")
+
+        return approaches.get(
+            field, f"{field} 분야의 특성을 고려한 맞춤형 전략적 접근이 필요합니다."
+        )
 
     def _get_implementation_guide(self, field: str) -> str:
         """구현 가이드"""
-        
+
         guides = {
             "업무 관리": "현재 업무 패턴 분석 → 개선 포인트 식별 → 단계적 변화 적용 → 효과 측정 → 지속적 개선의 순환 구조로 실행",
             "개발": "요구사항 정의 → 프로토타입 개발 → 사용자 검증 → 반복 개선 → 확장의 애자일 방식으로 점진적 구현",
-            "창작": "아이디어 발굴 → 컨셉 구체화 → 시안 제작 → 피드백 반영 → 최종 완성의 반복적 창작 프로세스로 진행"
+            "창작": "아이디어 발굴 → 컨셉 구체화 → 시안 제작 → 피드백 반영 → 최종 완성의 반복적 창작 프로세스로 진행",
         }
-        
-        return guides.get(field, f"{field} 분야의 체계적인 구현 방법론을 적용하여 단계적으로 진행하세요.")
+
+        return guides.get(
+            field,
+            f"{field} 분야의 체계적인 구현 방법론을 적용하여 단계적으로 진행하세요.",
+        )
 
     def _get_immediate_actions(self, field: str) -> str:
         """즉시 실행 가능한 방법"""
-        
+
         actions = {
             "업무 관리": "오늘부터 시작: ① 하루 가장 중요한 업무 3개 선정 ② 집중 시간 1시간 확보 ③ 업무 종료 시 다음날 계획 5분 투자",
             "개발": "지금 바로 시작: ① 프로젝트 요구사항 한 줄 정리 ② 가장 단순한 기능부터 구현 ③ 15분 내 실행 가능한 프로토타입 제작",
-            "창작": "당장 실행: ① 스마트폰으로 일상의 흥미로운 순간 사진 촬영 ② 10분간 자유로운 스케치나 글쓰기 ③ 좋아하는 작품 하나 선정하여 분석"
+            "창작": "당장 실행: ① 스마트폰으로 일상의 흥미로운 순간 사진 촬영 ② 10분간 자유로운 스케치나 글쓰기 ③ 좋아하는 작품 하나 선정하여 분석",
         }
-        
-        return actions.get(field, f"{field} 분야에서 지금 당장 시작할 수 있는 작은 행동부터 시작해보세요.")
+
+        return actions.get(
+            field,
+            f"{field} 분야에서 지금 당장 시작할 수 있는 작은 행동부터 시작해보세요.",
+        )
 
     def _get_long_term_strategy(self, field: str) -> str:
         """장기적 전략"""
-        
+
         strategies = {
             "업무 관리": "6개월 목표: 개인 맞춤형 업무 시스템 완성 / 1년 목표: 업무 효율성 50% 향상 및 워라밸 확립 / 3년 목표: 전문성 기반 업무 자동화 시스템 구축",
             "개발": "6개월: 핵심 기능 완성 및 사용자 검증 / 1년: 확장성 있는 플랫폼 구축 / 3년: 업계 표준이 되는 솔루션 개발",
-            "창작": "6개월: 개인 스타일 확립 / 1년: 대표작 완성 및 인지도 구축 / 3년: 창작 영역 확장 및 영향력 있는 작가로 성장"
+            "창작": "6개월: 개인 스타일 확립 / 1년: 대표작 완성 및 인지도 구축 / 3년: 창작 영역 확장 및 영향력 있는 작가로 성장",
         }
-        
-        return strategies.get(field, f"{field} 분야에서의 장기적 성장과 발전을 위한 단계별 전략을 수립하여 실행하세요.")
+
+        return strategies.get(
+            field,
+            f"{field} 분야에서의 장기적 성장과 발전을 위한 단계별 전략을 수립하여 실행하세요.",
+        )
 
     def get_agent_info(self) -> Dict[str, Any]:
         """도깨비 정보 반환 (프론트엔드용)"""

@@ -68,10 +68,10 @@ async def stem_chat(request: STEMRequest, http_request: Request):
         raise HTTPException(status_code=500, detail=f"서버 오류: {str(e)}")
 
 
-# 메인 페이지
+# 메인 페이지 - 모든 경로를 STEM 시스템으로 통합
 @app.get("/", response_class=HTMLResponse)
 async def main_page():
-    """메인 페이지 - STEM 전용 인터페이스"""
+    """메인 페이지 - STEM 전용 인터페이스 (최신 전문가 시스템)"""
     try:
         # index_stem.html 파일이 있는지 확인
         if os.path.exists("index_stem.html"):
@@ -138,32 +138,14 @@ async def startup_event():
         print(f"⚠️ 시작 이벤트 처리 중 오류: {e}")
 
 
-@app.get("/", response_class=HTMLResponse)
-async def root():
-    """메인 페이지 - STEM 베타 서비스 소개"""
-    try:
-        with open("index_stem.html", "r", encoding="utf-8") as f:
-            return f.read()
-    except FileNotFoundError:
-        return """
-        <html>
-            <body>
-                <h1>🎯 AI 도깨비마을 STEM 센터</h1>
-                <p>8명의 촌장급 STEM 전문가 도깨비들이 무료로 서비스 중입니다!</p>
-                <a href="/stem">🧙‍♂️ STEM 서비스 이용하기</a>
-            </body>
-        </html>
-        """
-
-
 @app.get("/health")
 async def health_check():
     """헬스 체크"""
     return {
         "status": "healthy",
-        "version": "4.1.0",
-        "service": "STEM 도깨비마을장터 BETA",
-        "agents": 8,
+        "version": "5.1.0",
+        "service": "STEM 도깨비마을장터 전문가급 시스템",
+        "agents": 16,
     }
 
 
