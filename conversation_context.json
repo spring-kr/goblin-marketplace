@@ -13,23 +13,51 @@
       "topic": "업무효율",
       "intent": "how_to",
       "depth": 2
+    },
+    {
+      "timestamp": "2025-08-20T15:09:17.372755",
+      "question": "업무 효율성을 높이는 방법은?",
+      "topic": "업무효율",
+      "intent": "how_to",
+      "depth": 3
+    },
+    {
+      "timestamp": "2025-08-20T15:12:49.897188",
+      "question": "업무 효율성을 높이는 방법은?",
+      "topic": "업무효율",
+      "intent": "how_to",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:15:04.013671",
+      "question": "업무 효율성을 높이는 방법은?",
+      "topic": "업무효율",
+      "intent": "how_to",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:16:00.935099",
+      "question": "업무 효율성을 높이는 방법은?",
+      "topic": "업무효율",
+      "intent": "how_to",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:21:42.872908",
+      "question": "업무 효율성을 높이는 방법은?",
+      "topic": "업무효율",
+      "intent": "how_to",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:24:27.874010",
+      "question": "업무 효율성을 높이는 방법은?",
+      "topic": "업무효율",
+      "intent": "how_to",
+      "depth": 4
     }
   ],
   "c8a08a07a608a033": [
-    {
-      "timestamp": "2025-08-20T14:50:03.713694",
-      "question": "창업 전략에 대해서 알려주세요",
-      "topic": "일반상담",
-      "intent": "general",
-      "depth": 1
-    },
-    {
-      "timestamp": "2025-08-20T14:50:31.383250",
-      "question": "창업 전략에 대해서 알려주세요",
-      "topic": "일반상담",
-      "intent": "general",
-      "depth": 2
-    },
     {
       "timestamp": "2025-08-20T14:50:44.032948",
       "question": "창업 전략에 대해서 알려주세요",
@@ -41,6 +69,713 @@
       "timestamp": "2025-08-20T14:50:44.057953",
       "question": "구조를 짜는게 힘들어요",
       "topic": "일반상담",
+      "intent": "general",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T14:55:51.755618",
+      "question": "창업 전략에 대해서 알려주세요",
+      "topic": "일반상담",
+      "intent": "general",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:08:37.972717",
+      "question": "창업 전략을 어떻게 세워야 하나요?",
+      "topic": "일반상담",
+      "intent": "how_to",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:09:17.756240",
+      "question": "창업 전략을 어떻게 세워야 하나요?",
+      "topic": "일반상담",
+      "intent": "how_to",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:12:50.241599",
+      "question": "창업 전략을 어떻게 세워야 하나요?",
+      "topic": "일반상담",
+      "intent": "how_to",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:15:04.401302",
+      "question": "창업 전략을 어떻게 세워야 하나요?",
+      "topic": "일반상담",
+      "intent": "how_to",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:16:01.341295",
+      "question": "창업 전략을 어떻게 세워야 하나요?",
+      "topic": "일반상담",
+      "intent": "how_to",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:21:43.261599",
+      "question": "창업 전략을 어떻게 세워야 하나요?",
+      "topic": "일반상담",
+      "intent": "how_to",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:24:28.270861",
+      "question": "창업 전략을 어떻게 세워야 하나요?",
+      "topic": "일반상담",
+      "intent": "how_to",
+      "depth": 4
+    }
+  ],
+  "3940aed1fc71ccb5": [
+    {
+      "timestamp": "2025-08-20T14:57:09.654578",
+      "question": "마케팅 전략을 알려주세요",
+      "topic": "마케팅",
+      "intent": "general",
+      "depth": 1
+    },
+    {
+      "timestamp": "2025-08-20T14:57:29.888345",
+      "question": "마케팅 전략을 알려주세요",
+      "topic": "마케팅",
+      "intent": "general",
+      "depth": 2
+    },
+    {
+      "timestamp": "2025-08-20T15:09:17.598445",
+      "question": "마케팅 전략을 어떻게 세워야 하나요?",
+      "topic": "마케팅",
+      "intent": "how_to",
+      "depth": 3
+    },
+    {
+      "timestamp": "2025-08-20T15:12:50.105613",
+      "question": "마케팅 전략을 어떻게 세워야 하나요?",
+      "topic": "마케팅",
+      "intent": "how_to",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:15:04.252941",
+      "question": "마케팅 전략을 어떻게 세워야 하나요?",
+      "topic": "마케팅",
+      "intent": "how_to",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:16:01.180972",
+      "question": "마케팅 전략을 어떻게 세워야 하나요?",
+      "topic": "마케팅",
+      "intent": "how_to",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:21:43.112380",
+      "question": "마케팅 전략을 어떻게 세워야 하나요?",
+      "topic": "마케팅",
+      "intent": "how_to",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:24:28.122699",
+      "question": "마케팅 전략을 어떻게 세워야 하나요?",
+      "topic": "마케팅",
+      "intent": "how_to",
+      "depth": 4
+    }
+  ],
+  "2cc09f2b054e5a73": [
+    {
+      "timestamp": "2025-08-20T14:57:09.684116",
+      "question": "HR 관리 방법을 알려주세요",
+      "topic": "일반상담",
+      "intent": "how_to",
+      "depth": 1
+    },
+    {
+      "timestamp": "2025-08-20T15:09:17.568464",
+      "question": "인사관리 시스템 개선 방법은?",
+      "topic": "일반상담",
+      "intent": "how_to",
+      "depth": 2
+    },
+    {
+      "timestamp": "2025-08-20T15:12:50.079004",
+      "question": "인사관리 시스템 개선 방법은?",
+      "topic": "일반상담",
+      "intent": "how_to",
+      "depth": 3
+    },
+    {
+      "timestamp": "2025-08-20T15:15:04.223909",
+      "question": "인사관리 시스템 개선 방법은?",
+      "topic": "일반상담",
+      "intent": "how_to",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:16:01.150685",
+      "question": "인사관리 시스템 개선 방법은?",
+      "topic": "일반상담",
+      "intent": "how_to",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:21:43.084786",
+      "question": "인사관리 시스템 개선 방법은?",
+      "topic": "일반상담",
+      "intent": "how_to",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:24:28.090488",
+      "question": "인사관리 시스템 개선 방법은?",
+      "topic": "일반상담",
+      "intent": "how_to",
+      "depth": 4
+    }
+  ],
+  "7cfe9ac6fd3b9ae8": [
+    {
+      "timestamp": "2025-08-20T14:57:09.709688",
+      "question": "건강관리 방법을 알려주세요",
+      "topic": "건강",
+      "intent": "how_to",
+      "depth": 1
+    },
+    {
+      "timestamp": "2025-08-20T15:09:17.629033",
+      "question": "의료진단 정확성을 향상시키려면?",
+      "topic": "건강",
+      "intent": "general",
+      "depth": 2
+    },
+    {
+      "timestamp": "2025-08-20T15:12:50.131292",
+      "question": "의료진단 정확성을 향상시키려면?",
+      "topic": "건강",
+      "intent": "general",
+      "depth": 3
+    },
+    {
+      "timestamp": "2025-08-20T15:15:04.282277",
+      "question": "의료진단 정확성을 향상시키려면?",
+      "topic": "건강",
+      "intent": "general",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:16:01.217976",
+      "question": "의료진단 정확성을 향상시키려면?",
+      "topic": "건강",
+      "intent": "general",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:21:43.140347",
+      "question": "의료진단 정확성을 향상시키려면?",
+      "topic": "건강",
+      "intent": "general",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:24:28.154260",
+      "question": "의료진단 정확성을 향상시키려면?",
+      "topic": "건강",
+      "intent": "general",
+      "depth": 4
+    }
+  ],
+  "506d3c3718698628": [
+    {
+      "timestamp": "2025-08-20T14:57:09.733698",
+      "question": "데이터 분석 방법을 알려주세요",
+      "topic": "일반상담",
+      "intent": "how_to",
+      "depth": 1
+    },
+    {
+      "timestamp": "2025-08-20T15:09:17.483091",
+      "question": "데이터 분석 프로젝트 진행 방법은?",
+      "topic": "일반상담",
+      "intent": "how_to",
+      "depth": 2
+    },
+    {
+      "timestamp": "2025-08-20T15:12:50.003396",
+      "question": "데이터 분석 프로젝트 진행 방법은?",
+      "topic": "일반상담",
+      "intent": "how_to",
+      "depth": 3
+    },
+    {
+      "timestamp": "2025-08-20T15:15:04.132591",
+      "question": "데이터 분석 프로젝트 진행 방법은?",
+      "topic": "일반상담",
+      "intent": "how_to",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:16:01.063070",
+      "question": "데이터 분석 프로젝트 진행 방법은?",
+      "topic": "일반상담",
+      "intent": "how_to",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:21:42.996839",
+      "question": "데이터 분석 프로젝트 진행 방법은?",
+      "topic": "일반상담",
+      "intent": "how_to",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:24:28.005127",
+      "question": "데이터 분석 프로젝트 진행 방법은?",
+      "topic": "일반상담",
+      "intent": "how_to",
+      "depth": 4
+    }
+  ],
+  "3bf7c98d0099f8d0": [
+    {
+      "timestamp": "2025-08-20T15:09:17.399711",
+      "question": "웹 애플리케이션 개발 방법론은?",
+      "topic": "기술",
+      "intent": "how_to",
+      "depth": 1
+    },
+    {
+      "timestamp": "2025-08-20T15:12:49.922818",
+      "question": "웹 애플리케이션 개발 방법론은?",
+      "topic": "기술",
+      "intent": "how_to",
+      "depth": 2
+    },
+    {
+      "timestamp": "2025-08-20T15:15:04.044267",
+      "question": "웹 애플리케이션 개발 방법론은?",
+      "topic": "기술",
+      "intent": "how_to",
+      "depth": 3
+    },
+    {
+      "timestamp": "2025-08-20T15:16:00.971363",
+      "question": "웹 애플리케이션 개발 방법론은?",
+      "topic": "기술",
+      "intent": "how_to",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:21:42.903904",
+      "question": "웹 애플리케이션 개발 방법론은?",
+      "topic": "기술",
+      "intent": "how_to",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:24:27.909211",
+      "question": "웹 애플리케이션 개발 방법론은?",
+      "topic": "기술",
+      "intent": "how_to",
+      "depth": 4
+    }
+  ],
+  "ac9978381b06d0eb": [
+    {
+      "timestamp": "2025-08-20T15:09:17.426456",
+      "question": "상담 기법을 개선하려면 어떻게 해야 하나요?",
+      "topic": "상담",
+      "intent": "how_to",
+      "depth": 1
+    },
+    {
+      "timestamp": "2025-08-20T15:12:49.948820",
+      "question": "상담 기법을 개선하려면 어떻게 해야 하나요?",
+      "topic": "상담",
+      "intent": "how_to",
+      "depth": 2
+    },
+    {
+      "timestamp": "2025-08-20T15:15:04.071378",
+      "question": "상담 기법을 개선하려면 어떻게 해야 하나요?",
+      "topic": "상담",
+      "intent": "how_to",
+      "depth": 3
+    },
+    {
+      "timestamp": "2025-08-20T15:16:01.001736",
+      "question": "상담 기법을 개선하려면 어떻게 해야 하나요?",
+      "topic": "상담",
+      "intent": "how_to",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:21:42.932962",
+      "question": "상담 기법을 개선하려면 어떻게 해야 하나요?",
+      "topic": "상담",
+      "intent": "how_to",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:24:27.943402",
+      "question": "상담 기법을 개선하려면 어떻게 해야 하나요?",
+      "topic": "상담",
+      "intent": "how_to",
+      "depth": 4
+    }
+  ],
+  "1582f8f901ca66e1": [
+    {
+      "timestamp": "2025-08-20T15:09:17.456050",
+      "question": "창작 아이디어 발굴법을 알려주세요",
+      "topic": "창작",
+      "intent": "general",
+      "depth": 1
+    },
+    {
+      "timestamp": "2025-08-20T15:12:49.976816",
+      "question": "창작 아이디어 발굴법을 알려주세요",
+      "topic": "창작",
+      "intent": "general",
+      "depth": 2
+    },
+    {
+      "timestamp": "2025-08-20T15:15:04.097515",
+      "question": "창작 아이디어 발굴법을 알려주세요",
+      "topic": "창작",
+      "intent": "general",
+      "depth": 3
+    },
+    {
+      "timestamp": "2025-08-20T15:16:01.031436",
+      "question": "창작 아이디어 발굴법을 알려주세요",
+      "topic": "창작",
+      "intent": "general",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:21:42.964017",
+      "question": "창작 아이디어 발굴법을 알려주세요",
+      "topic": "창작",
+      "intent": "general",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:24:27.974587",
+      "question": "창작 아이디어 발굴법을 알려주세요",
+      "topic": "창작",
+      "intent": "general",
+      "depth": 4
+    }
+  ],
+  "86ffe81a2c5a2414": [
+    {
+      "timestamp": "2025-08-20T15:09:17.511155",
+      "question": "올해 운세는 어떤가요?",
+      "topic": "일반상담",
+      "intent": "general",
+      "depth": 1
+    },
+    {
+      "timestamp": "2025-08-20T15:12:50.027993",
+      "question": "올해 운세는 어떤가요?",
+      "topic": "일반상담",
+      "intent": "general",
+      "depth": 2
+    },
+    {
+      "timestamp": "2025-08-20T15:15:04.166698",
+      "question": "올해 운세는 어떤가요?",
+      "topic": "일반상담",
+      "intent": "general",
+      "depth": 3
+    },
+    {
+      "timestamp": "2025-08-20T15:16:01.093659",
+      "question": "올해 운세는 어떤가요?",
+      "topic": "일반상담",
+      "intent": "general",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:21:43.026518",
+      "question": "올해 운세는 어떤가요?",
+      "topic": "일반상담",
+      "intent": "general",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:24:28.033514",
+      "question": "올해 운세는 어떤가요?",
+      "topic": "일반상담",
+      "intent": "general",
+      "depth": 4
+    }
+  ],
+  "92b86026541ae5a6": [
+    {
+      "timestamp": "2025-08-20T15:09:17.538787",
+      "question": "개인 성장 계획을 세우려면?",
+      "topic": "시간관리",
+      "intent": "general",
+      "depth": 1
+    },
+    {
+      "timestamp": "2025-08-20T15:12:50.053993",
+      "question": "개인 성장 계획을 세우려면?",
+      "topic": "시간관리",
+      "intent": "general",
+      "depth": 2
+    },
+    {
+      "timestamp": "2025-08-20T15:15:04.197171",
+      "question": "개인 성장 계획을 세우려면?",
+      "topic": "시간관리",
+      "intent": "general",
+      "depth": 3
+    },
+    {
+      "timestamp": "2025-08-20T15:16:01.122603",
+      "question": "개인 성장 계획을 세우려면?",
+      "topic": "시간관리",
+      "intent": "general",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:21:43.058131",
+      "question": "개인 성장 계획을 세우려면?",
+      "topic": "시간관리",
+      "intent": "general",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:24:28.062302",
+      "question": "개인 성장 계획을 세우려면?",
+      "topic": "시간관리",
+      "intent": "general",
+      "depth": 4
+    }
+  ],
+  "5d93599809031531": [
+    {
+      "timestamp": "2025-08-20T15:09:17.659028",
+      "question": "영업 성과 향상 방법은?",
+      "topic": "일반상담",
+      "intent": "how_to",
+      "depth": 1
+    },
+    {
+      "timestamp": "2025-08-20T15:12:50.158211",
+      "question": "영업 성과 향상 방법은?",
+      "topic": "일반상담",
+      "intent": "how_to",
+      "depth": 2
+    },
+    {
+      "timestamp": "2025-08-20T15:15:04.311894",
+      "question": "영업 성과 향상 방법은?",
+      "topic": "일반상담",
+      "intent": "how_to",
+      "depth": 3
+    },
+    {
+      "timestamp": "2025-08-20T15:16:01.247989",
+      "question": "영업 성과 향상 방법은?",
+      "topic": "일반상담",
+      "intent": "how_to",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:21:43.171344",
+      "question": "영업 성과 향상 방법은?",
+      "topic": "일반상담",
+      "intent": "how_to",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:24:28.178605",
+      "question": "영업 성과 향상 방법은?",
+      "topic": "일반상담",
+      "intent": "how_to",
+      "depth": 4
+    }
+  ],
+  "02d42fef75037791": [
+    {
+      "timestamp": "2025-08-20T15:09:17.691557",
+      "question": "SEO 최적화 어떻게 하나요?",
+      "topic": "일반상담",
+      "intent": "how_to",
+      "depth": 1
+    },
+    {
+      "timestamp": "2025-08-20T15:12:50.183260",
+      "question": "SEO 최적화 어떻게 하나요?",
+      "topic": "일반상담",
+      "intent": "how_to",
+      "depth": 2
+    },
+    {
+      "timestamp": "2025-08-20T15:15:04.342432",
+      "question": "SEO 최적화 어떻게 하나요?",
+      "topic": "일반상담",
+      "intent": "how_to",
+      "depth": 3
+    },
+    {
+      "timestamp": "2025-08-20T15:16:01.278653",
+      "question": "SEO 최적화 어떻게 하나요?",
+      "topic": "일반상담",
+      "intent": "how_to",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:21:43.203018",
+      "question": "SEO 최적화 어떻게 하나요?",
+      "topic": "일반상담",
+      "intent": "how_to",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:24:28.213203",
+      "question": "SEO 최적화 어떻게 하나요?",
+      "topic": "일반상담",
+      "intent": "how_to",
+      "depth": 4
+    }
+  ],
+  "af32b9c6712bc0cc": [
+    {
+      "timestamp": "2025-08-20T15:09:17.726207",
+      "question": "현명한 쇼핑 방법은?",
+      "topic": "일반상담",
+      "intent": "how_to",
+      "depth": 1
+    },
+    {
+      "timestamp": "2025-08-20T15:12:50.214623",
+      "question": "현명한 쇼핑 방법은?",
+      "topic": "일반상담",
+      "intent": "how_to",
+      "depth": 2
+    },
+    {
+      "timestamp": "2025-08-20T15:15:04.368730",
+      "question": "현명한 쇼핑 방법은?",
+      "topic": "일반상담",
+      "intent": "how_to",
+      "depth": 3
+    },
+    {
+      "timestamp": "2025-08-20T15:16:01.311283",
+      "question": "현명한 쇼핑 방법은?",
+      "topic": "일반상담",
+      "intent": "how_to",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:21:43.235654",
+      "question": "현명한 쇼핑 방법은?",
+      "topic": "일반상담",
+      "intent": "how_to",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:24:28.239695",
+      "question": "현명한 쇼핑 방법은?",
+      "topic": "일반상담",
+      "intent": "how_to",
+      "depth": 4
+    }
+  ],
+  "950a61af799f0f8e": [
+    {
+      "timestamp": "2025-08-20T15:09:17.790757",
+      "question": "마을 전체 관리 방향은?",
+      "topic": "일반상담",
+      "intent": "general",
+      "depth": 1
+    },
+    {
+      "timestamp": "2025-08-20T15:12:50.269614",
+      "question": "마을 전체 관리 방향은?",
+      "topic": "일반상담",
+      "intent": "general",
+      "depth": 2
+    },
+    {
+      "timestamp": "2025-08-20T15:15:04.428643",
+      "question": "마을 전체 관리 방향은?",
+      "topic": "일반상담",
+      "intent": "general",
+      "depth": 3
+    },
+    {
+      "timestamp": "2025-08-20T15:16:01.375299",
+      "question": "마을 전체 관리 방향은?",
+      "topic": "일반상담",
+      "intent": "general",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:21:43.291603",
+      "question": "마을 전체 관리 방향은?",
+      "topic": "일반상담",
+      "intent": "general",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:24:28.300086",
+      "question": "마을 전체 관리 방향은?",
+      "topic": "일반상담",
+      "intent": "general",
+      "depth": 4
+    }
+  ],
+  "4a92daeb7c2f6818": [
+    {
+      "timestamp": "2025-08-20T15:09:17.827433",
+      "question": "글쓰기 실력 향상법은?",
+      "topic": "창작",
+      "intent": "general",
+      "depth": 1
+    },
+    {
+      "timestamp": "2025-08-20T15:12:50.296696",
+      "question": "글쓰기 실력 향상법은?",
+      "topic": "창작",
+      "intent": "general",
+      "depth": 2
+    },
+    {
+      "timestamp": "2025-08-20T15:15:04.457752",
+      "question": "글쓰기 실력 향상법은?",
+      "topic": "창작",
+      "intent": "general",
+      "depth": 3
+    },
+    {
+      "timestamp": "2025-08-20T15:16:01.405600",
+      "question": "글쓰기 실력 향상법은?",
+      "topic": "창작",
+      "intent": "general",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:21:43.322880",
+      "question": "글쓰기 실력 향상법은?",
+      "topic": "창작",
+      "intent": "general",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:24:28.328708",
+      "question": "글쓰기 실력 향상법은?",
+      "topic": "창작",
       "intent": "general",
       "depth": 4
     }
