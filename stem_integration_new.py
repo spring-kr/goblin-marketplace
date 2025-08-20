@@ -25,7 +25,7 @@ class STEMIntegration:
         """대화 기록 로드"""
         try:
             if os.path.exists(self.context_file):
-                with open(self.context_file, 'r', encoding='utf-8') as f:
+                with open(self.context_file, "r", encoding="utf-8") as f:
                     self.conversation_history = json.load(f)
         except Exception:
             self.conversation_history = {}
@@ -33,7 +33,7 @@ class STEMIntegration:
     def _save_conversation_history(self):
         """대화 기록 저장"""
         try:
-            with open(self.context_file, 'w', encoding='utf-8') as f:
+            with open(self.context_file, "w", encoding="utf-8") as f:
                 json.dump(self.conversation_history, f, ensure_ascii=False, indent=2)
         except Exception:
             pass
@@ -44,137 +44,110 @@ class STEMIntegration:
         return hashlib.md5(key.encode()).hexdigest()[:16]
 
     def _analyze_follow_up_intent(self, question: str, previous_topics: list) -> dict:
-        """후속 질문 의도 분석"""
-        question_lower = question.lower()
-        
-        follow_up_indicators = {
-            "more_detail": ["구체적으로", "더 자세히", "세부적으로", "상세하게", "더 알려주세요", "자세히 설명"],
-            "example": ["예시", "사례", "실제", "예를 들어", "구체적인 예", "실습"],
-            "how_to": ["어떻게", "방법", "단계", "절차", "프로세스"],
-            "advanced": ["고급", "심화", "전문적", "더 깊이", "고도화"],
-            "practical": ["실무", "현실적", "실제로", "바로", "실행"],
-            "tools": ["도구", "툴", "프로그램", "소프트웨어", "앱"],
-            "troubleshooting": ["문제", "해결", "오류", "안될때", "실패"]
+        """후속 질문 의도 분석 - 간단 규칙 기반"""
+        q = (question or "").strip().lower()
+
+        indicators = {
+            "more_detail": ["구체적으로", "더 자세히", "세부", "상세"],
+            "example": ["예시", "사례", "예를 들어"],
+            "how_to": ["어떻게", "방법", "단계", "절차"],
+            "advanced": ["고급", "심화", "전문", "더 깊이"],
+            "practical": ["실무", "현실적", "바로", "실행"],
         }
-        
-        detected_intent = "general"
-        for intent, keywords in follow_up_indicators.items():
-            if any(keyword in question_lower for keyword in keywords):
-                detected_intent = intent
+
+        intent = "general"
+        for k, words in indicators.items():
+            if any(w in q for w in words):
+                intent = k
                 break
-        
+
+        # 간단한 follow-up 신호
+        follow_signals = [
+            "다시",
+            "이어",
+            "추가",
+            "더",
+            "계속",
+            "앞에서",
+            "방금",
+            "위 내용",
+        ]
+        is_follow_up = False
+        if previous_topics:
+            recent_topics = [
+                t.lower() for t in previous_topics[-3:] if isinstance(t, str)
+            ]
+            if any(sig in q for sig in follow_signals) or any(
+                t and t in q for t in recent_topics
+            ):
+                is_follow_up = True
+
+        depth_level = 1 + min(2, len(previous_topics)) if is_follow_up else 1
+
         return {
-            "intent": detected_intent,
-            "is_follow_up": len(previous_topics) > 0,
-            "depth_level": len(previous_topics) + 1
+            "is_follow_up": is_follow_up,
+            "intent": intent,
+            "depth_level": depth_level,
         }
 
     def process_question(
-        self, agent_type: str, question: str, user_ip: Optional[str] = None
+        self, agent_type: str, question: str, user_ip: str
     ) -> Dict[str, Any]:
-        """실제 AI 대화 능력으로 질문 처리 - 컨텍스트 추적 포함"""
+        """사용자 질문 처리 (동적 응답)"""
         try:
-            from usage_tracker import usage_tracker
+            try:
+                from usage_tracker import usage_tracker  # 지표 기록
+            except Exception:
+                usage_tracker = None
 
-            # 사용자 IP가 없으면 기본값 설정
-            if not user_ip:
-                user_ip = "unknown"
-
-            # 대화 기록 키 생성
-            conversation_key = self._get_conversation_key(user_ip, agent_type)
-            
-            # 이전 대화 기록 가져오기
-            previous_conversations = self.conversation_history.get(conversation_key, [])
-            previous_topics = [conv.get("topic", "") for conv in previous_conversations[-3:]]  # 최근 3개만
-            
-            # 후속 질문 의도 분석
-            follow_up_analysis = self._analyze_follow_up_intent(question, previous_topics)
-
-            # 원래 16개 도깨비 정보
-            agent_info = {
-                "assistant": {
-                    "emoji": "🤖",
-                    "name": "박사급 비서 도깨비",
-                    "field": "업무 관리",
-                },
-                "builder": {"emoji": "💻", "name": "빌더 도깨비", "field": "개발"},
-                "counselor": {"emoji": "💬", "name": "상담 도깨비", "field": "상담"},
-                "creative": {"emoji": "🎨", "name": "창작 도깨비", "field": "창작"},
-                "data_analyst": {
-                    "emoji": "📊",
-                    "name": "데이터분석 도깨비",
-                    "field": "데이터 분석",
-                },
-                "fortune": {"emoji": "🔮", "name": "운세 도깨비", "field": "운세"},
-                "growth": {"emoji": "🌱", "name": "성장 도깨비", "field": "성장"},
-                "hr": {"emoji": "👥", "name": "HR 도깨비", "field": "인사 관리"},
-                "marketing": {
-                    "emoji": "📢",
-                    "name": "마케팅 도깨비",
-                    "field": "마케팅",
-                },
-                "medical": {"emoji": "🏥", "name": "의료 도깨비", "field": "의료"},
-                "sales": {"emoji": "💰", "name": "영업 도깨비", "field": "영업"},
-                "seo": {"emoji": "🔍", "name": "SEO 도깨비", "field": "검색 최적화"},
-                "shopping": {"emoji": "🛒", "name": "쇼핑 도깨비", "field": "쇼핑"},
-                "startup": {"emoji": "🚀", "name": "스타트업 도깨비", "field": "창업전략"},
-                "village_chief": {
-                    "emoji": "👑",
-                    "name": "이장 도깨비",
-                    "field": "마을 관리",
-                },
-                "writing": {
-                    "emoji": "✍️",
-                    "name": "박사급 문서 작성 도깨비",
-                    "field": "문서 작성",
-                },
-            }
-
-            if agent_type not in agent_info:
-                # 실패 로그 기록
-                usage_tracker.log_usage(agent_type, question, False, user_ip)
+            info_map = self.get_agent_info().get("agents", {})
+            if agent_type not in info_map:
+                if usage_tracker:
+                    usage_tracker.log_usage(agent_type, question, False, user_ip)
                 return {
                     "success": False,
                     "error": f"지원하지 않는 에이전트 타입: {agent_type}",
                 }
 
-            # 질문 유효성 검사
             if not question or len(question.strip()) < 2:
-                usage_tracker.log_usage(agent_type, question, False, user_ip)
+                if usage_tracker:
+                    usage_tracker.log_usage(agent_type, question, False, user_ip)
                 return {
                     "success": False,
                     "error": "질문이 너무 짧습니다. 최소 2글자 이상 입력해주세요.",
                 }
 
-            # 도깨비별 전문 응답 생성 (컨텍스트 포함)
-            info = agent_info[agent_type]
-            response = self._create_contextual_ai_response(
-                question, agent_type, info, previous_conversations, follow_up_analysis
-            )
+            conversation_key = self._get_conversation_key(user_ip, agent_type)
+            previous_conversations = self.conversation_history.get(conversation_key, [])
+            previous_topics = [c.get("topic", "") for c in previous_conversations]
 
-            # 현재 대화를 기록에 추가
-            current_conversation = {
+            follow_up = self._analyze_follow_up_intent(question, previous_topics)
+
+            info = info_map[agent_type]
+            if follow_up.get("is_follow_up"):
+                response = self._create_follow_up_response(
+                    question, agent_type, info, previous_conversations, follow_up
+                )
+            else:
+                response = self._create_natural_ai_response(question, agent_type, info)
+
+            # 대화 로그 업데이트
+            current = {
                 "timestamp": datetime.now().isoformat(),
                 "question": question,
                 "topic": self._extract_topic(question),
-                "intent": follow_up_analysis["intent"],
-                "depth": follow_up_analysis["depth_level"]
+                "intent": follow_up.get("intent", "general"),
+                "depth": follow_up.get("depth_level", 1),
             }
-            
-            if conversation_key not in self.conversation_history:
-                self.conversation_history[conversation_key] = []
-            
-            self.conversation_history[conversation_key].append(current_conversation)
-            
-            # 최근 10개 대화만 유지
+            self.conversation_history.setdefault(conversation_key, []).append(current)
             if len(self.conversation_history[conversation_key]) > 10:
-                self.conversation_history[conversation_key] = self.conversation_history[conversation_key][-10:]
-            
-            # 대화 기록 저장
+                self.conversation_history[conversation_key] = self.conversation_history[
+                    conversation_key
+                ][-10:]
             self._save_conversation_history()
 
-            # 성공 로그 기록
-            usage_tracker.log_usage(agent_type, question, True, user_ip)
+            if usage_tracker:
+                usage_tracker.log_usage(agent_type, question, True, user_ip)
 
             return {
                 "success": True,
@@ -185,111 +158,61 @@ class STEMIntegration:
                     "field": info["field"],
                 },
                 "response": response,
-                "timestamp": datetime.now().isoformat(),
                 "context": {
-                    "is_follow_up": follow_up_analysis["is_follow_up"],
-                    "depth_level": follow_up_analysis["depth_level"],
-                    "intent": follow_up_analysis["intent"]
-                }
+                    "previous_topics": previous_topics[-3:],
+                    "intent": current["intent"],
+                    "depth": current["depth"],
+                },
             }
-
         except Exception as e:
-            # 에러 로그 기록
-            usage_tracker.log_usage(agent_type, question, False, user_ip)
+            try:
+                from usage_tracker import usage_tracker
+
+                usage_tracker.log_usage(agent_type, question, False, user_ip)
+            except Exception:
+                pass
             return {"success": False, "error": f"처리 중 오류가 발생했습니다: {str(e)}"}
 
-    def _extract_topic(self, question: str) -> str:
-        """질문에서 주제 추출"""
-        # 간단한 주제 추출 로직
-        question_lower = question.lower()
-        
-        topic_keywords = {
-            "시간관리": ["시간", "일정", "스케줄", "계획"],
-            "업무효율": ["효율", "생산성", "업무", "일"],
-            "기술": ["개발", "프로그래밍", "코딩", "기술"],
-            "마케팅": ["마케팅", "광고", "홍보", "브랜드"],
-            "건강": ["건강", "운동", "의료", "병원"],
-            "창작": ["창작", "디자인", "글쓰기", "아이디어"],
-            "상담": ["상담", "고민", "스트레스", "관계"]
-        }
-        
-        for topic, keywords in topic_keywords.items():
-            if any(keyword in question_lower for keyword in keywords):
-                return topic
-        
-        return "일반상담"
-
-    def _create_contextual_ai_response(
-        self, question: str, agent_type: str, info: dict, previous_conversations: list, follow_up_analysis: dict
-    ) -> str:
-        """컨텍스트를 고려한 AI 응답 생성"""
-        
-        # 후속 질문인지 확인
-        if follow_up_analysis["is_follow_up"] and follow_up_analysis["depth_level"] > 1:
-            return self._create_follow_up_response(question, agent_type, info, previous_conversations, follow_up_analysis)
-        else:
-            return self._create_natural_ai_response(question, agent_type, info)
-
     def _create_follow_up_response(
-        self, question: str, agent_type: str, info: dict, previous_conversations: list, follow_up_analysis: dict
+        self,
+        question: str,
+        agent_type: str,
+        info: dict,
+        previous_conversations: list,
+        follow_up_analysis: dict,
     ) -> str:
-        """후속 질문에 대한 심화 응답 생성"""
-        
-        # 이전 주제들 파악
-        previous_topics = [conv.get("topic", "") for conv in previous_conversations[-3:]]
-        main_topic = previous_topics[-1] if previous_topics else "일반상담"
-        
-        intent = follow_up_analysis["intent"]
-        depth = follow_up_analysis["depth_level"]
-        
-        # 기존 함수들을 활용한 심화 응답
-        detailed_solution = self._get_detailed_solution(question, info["field"])
-        practical_steps = self._get_practical_steps(question, info["field"])
-        expert_tips = self._get_expert_tips(question, info["field"])
-        deep_analysis = self._get_deep_analysis(question, info["field"])
-        
-        # 의도별 맞춤 응답
-        if intent == "more_detail":
-            intro = f"{info['emoji']} 더 구체적으로 설명드리겠습니다! ({depth}단계 심화)"
-            focus = "🔍 **세부 분석:**"
-        elif intent == "example":
-            intro = f"{info['emoji']} 실제 사례로 설명드리겠습니다!"
-            focus = "📚 **구체적 사례:**"
-        elif intent == "how_to":
-            intro = f"{info['emoji']} 단계별 방법을 자세히 알려드리겠습니다!"
-            focus = "📋 **상세 실행 방법:**"
-        elif intent == "practical":
-            intro = f"{info['emoji']} 실무에 바로 적용할 수 있는 방법을 알려드리겠습니다!"
-            focus = "⚡ **실무 적용법:**"
-        elif intent == "advanced":
-            intro = f"{info['emoji']} 고급 수준의 내용을 다뤄보겠습니다!"
-            focus = "🎓 **전문가 수준:**"
-        else:
-            intro = f"{info['emoji']} 더 깊이 있게 설명드리겠습니다!"
-            focus = "💡 **심화 내용:**"
-        
-        return f"""{intro}
+        """후속 질문 심화 응답 - 컨텍스트 매니저 사용"""
+        from response_context_manager import ResponseContextManager, ContextInfo
 
-이전에 {main_topic}에 대해 기본적인 내용을 말씀드렸는데, 이제 더욱 구체적이고 실용적인 부분을 다뤄보겠습니다.
+        previous_topics = [
+            conv.get("topic", "") for conv in previous_conversations[-3:]
+        ]
+        depth = follow_up_analysis.get("depth_level", 2)
+        intent = follow_up_analysis.get("intent", "general")
 
-{focus}
-{detailed_solution}
+        # expertise_areas 비어있을 경우 field를 기본 전문영역으로 사용 (항상 List[str])
+        expertise_areas: list[str] = []
+        raw_exp = info.get("expertise")
+        if isinstance(raw_exp, list):
+            expertise_areas = [str(x) for x in raw_exp if isinstance(x, str)]
+        if not expertise_areas:
+            expertise_areas = [str(info.get("field", "전문"))]
 
-🛠️ **심화 실행 방법:**
-{practical_steps}
+        context_info = ContextInfo(
+            current_time=datetime.now(),
+            expertise_areas=expertise_areas,
+            depth_level=depth,
+            previous_topics=previous_topics,
+            conversation_flow={"intent": [intent]},
+        )
 
-⭐ **전문가 노하우 (레벨 {depth}):**
-{expert_tips}
+        manager = ResponseContextManager()
+        return manager.create_expertise_based_response(question, info, context_info)
 
-� **깊이 있는 분석:**
-{deep_analysis}
-
-💬 **다음 단계 제안:**
-- 더 구체적인 상황을 알려주시면 맞춤형 조언 제공
-- 실제 적용 중 어려움이 있으면 문제 해결 방법 안내
-- 성과 측정이나 개선 방법에 대한 추가 상담 가능
-
-{info['field']} 전문가로서 {depth}단계 심화 상담을 제공했습니다. 더 궁금한 점이나 구체적인 상황이 있으시면 언제든 말씀해주세요!"""
+    def _extract_topic(self, question: str) -> str:
+        """질문에서 간단한 토픽 추출 (선형 슬라이스)"""
+        q = (question or "").strip()
+        return q[:30] if len(q) > 30 else q
 
     def _create_natural_ai_response(
         self, question: str, agent_type: str, info: dict
@@ -458,33 +381,8 @@ class STEMIntegration:
         self, question: str, info: dict, personality: dict
     ) -> str:
         """맥락을 고려한 자연스러운 응답 생성"""
-
-        # 질문 길이와 복잡도 분석
-        question_length = len(question)
+        # 질문 길이와 복잡도 분석 (하드코딩된 고정 응답 제거, 동적 생성으로 통일)
         question_lower = question.lower()
-
-        # 인사말 처리
-        greetings = ["안녕", "하이", "헬로", "hi", "hello"]
-        if (
-            any(greeting in question_lower for greeting in greetings)
-            and question_length < 20
-        ):
-            responses = [
-                f"{info['emoji']} 안녕하세요! {info['name']}입니다! 어떤 {info['field']} 관련 도움이 필요하신가요?",
-                f"{info['emoji']} 반갑습니다! {info['name']}가 인사드려요. {info['field']} 전문가로서 최선을 다해 도와드리겠습니다!",
-                f"{info['emoji']} 안녕하세요! {info['field']} 전문가 {info['name']}입니다. 무엇을 도와드릴까요?",
-            ]
-            return random.choice(responses)
-
-        # 감사 표현 처리
-        thanks = ["고마워", "감사", "고맙", "thanks", "thank"]
-        if any(thank in question_lower for thank in thanks):
-            responses = [
-                f"{info['emoji']} 별말씀을요! {info['name']}로서 도움이 되었다니 정말 기쁩니다!",
-                f"{info['emoji']} 천만에요! {info['field']} 관련해서 언제든 찾아주세요!",
-                f"{info['emoji']} 도움이 되어서 다행이에요! {info['name']}는 항상 여기 있습니다!",
-            ]
-            return random.choice(responses)
 
         # 전문 분야 키워드가 포함된 경우
         if any(
@@ -499,72 +397,38 @@ class STEMIntegration:
     def _generate_expert_response(
         self, question: str, info: dict, personality: dict
     ) -> str:
-        """전문 분야 관련 응답 생성 - 더 길고 구체적인 응답"""
+        """전문 분야 관련 응답 생성 - 중앙 컨텍스트 매니저 기반 동적 응답"""
+        from response_context_manager import ResponseContextManager, ContextInfo
+        from datetime import datetime
 
-        specific_solution = self._get_detailed_solution(question, info["field"])
-        practical_steps = self._get_practical_steps(question, info["field"])
-        expert_tips = self._get_expert_tips(question, info["field"])
+        context_info = ContextInfo(
+            current_time=datetime.now(),
+            expertise_areas=personality.get("expertise", []),
+            depth_level=1,
+            previous_topics=[],
+            conversation_flow={},
+        )
 
-        return f"""{info['emoji']} {info['name']}입니다!
-
-'{question}'에 대해 {personality['role']}로서 전문적이고 상세한 답변을 드리겠습니다.
-
-🎯 **심층 전문가 분석:**
-질문하신 내용은 {info['field']} 분야에서 매우 중요한 주제입니다. {personality['style']}와 함께 실무에서 바로 적용할 수 있는 구체적인 방법론을 제시해드리겠습니다.
-
-💡 **상세 솔루션:**
-{specific_solution}
-
-📋 **단계별 실행 방안:**
-{practical_steps}
-
-⭐ **전문가 노하우:**
-{expert_tips}
-
-🔍 **심화 분석:**
-{self._get_deep_analysis(question, info["field"])}
-
-✨ **성공 사례 및 주의사항:**
-{self._get_success_cases_and_warnings(info["field"])}
-
-🚀 **다음 단계 로드맵:**
-이 조언을 바탕으로 단계적으로 실행해보시고, 진행 과정에서 궁금한 점이나 구체적인 상황에 대한 추가 조언이 필요하시면 언제든 말씀해주세요. {info['field']} 전문가로서 더욱 세밀한 가이드를 제공해드리겠습니다!"""
+        manager = ResponseContextManager()
+        return manager.create_expertise_based_response(question, info, context_info)
 
     def _generate_general_expert_response(
         self, question: str, info: dict, personality: dict
     ) -> str:
-        """일반적인 질문에 대한 전문가 관점 응답 - 더 길고 구체적인 응답"""
+        """일반적인 질문에 대한 전문가 관점 응답 - 중앙 컨텍스트 매니저 기반 동적 응답"""
+        from response_context_manager import ResponseContextManager, ContextInfo
+        from datetime import datetime
 
-        field_analysis = self._get_comprehensive_analysis(question, info["field"])
-        strategic_approach = self._get_strategic_approach(question, info["field"])
-        implementation_guide = self._get_implementation_guide(info["field"])
+        context_info = ContextInfo(
+            current_time=datetime.now(),
+            expertise_areas=personality.get("expertise", []),
+            depth_level=1,
+            previous_topics=[],
+            conversation_flow={},
+        )
 
-        return f"""{info['emoji']} {info['name']}입니다!
-
-'{question}'에 대해 {info['field']} 전문가로서 종합적이고 심층적인 관점을 제공해드리겠습니다.
-
-🔍 **전문가 종합 진단:**
-{personality['role']}로서 이 문제를 다각도로 분석해보면, {info['field']} 영역에서 고려해야 할 핵심 요소들이 여러 가지 있습니다.
-
-💭 **전략적 접근 방법:**
-{strategic_approach}
-
-📊 **세부 분석:**
-{field_analysis}
-
-🛠️ **실행 가이드:**
-{implementation_guide}
-
-⚡ **즉시 적용 가능한 방법:**
-{self._get_immediate_actions(info["field"])}
-
-🎯 **장기적 전략:**
-{self._get_long_term_strategy(info["field"])}
-
-📞 **전문 상담 안내:**
-{info['field']} 분야의 특성상 개별 상황에 따라 접근 방법이 달라질 수 있습니다. 구체적인 상황이나 추가적인 배경 정보를 알려주시면, {personality['role']}로서 더욱 정밀하고 맞춤형 솔루션을 제공해드릴 수 있습니다. 
-
-언제든 세부적인 질문이나 후속 상담이 필요하시면 {info['name']}를 찾아주세요!"""
+        manager = ResponseContextManager()
+        return manager.create_expertise_based_response(question, info, context_info)
 
     def _get_specific_solution(self, question: str, field: str) -> str:
         """분야별 구체적 솔루션 제공"""

@@ -1,5 +1,5 @@
 """
-🎯 AI 도깨비마을 STEM 센터 - 전문가급 16도깨비 시스템
+🎯 AI 도깨비마을 STEM 센터 - 전문가입 16도깨비 시스템
 16명의 전문가급 STEM 전문가 도깨비들과 함께하는 서비스
 버전: v5.0.0 - 전문가급 시스템
 """
@@ -71,7 +71,9 @@ async def stem_chat(request: STEMRequest, http_request: Request):
 # 메인 페이지 - 모든 경로를 STEM 시스템으로 통합
 @app.get("/", response_class=HTMLResponse)
 async def main_page():
-    """메인 페이지 - STEM 전용 인터페이스 (최신 전문가 시스템)"""
+    """
+메인 페이지 - STEM 전용 인터페이스 (최신 전문가 시스템)
+"""
     try:
         # index_stem.html 파일이 있는지 확인
         if os.path.exists("index_stem.html"):
@@ -243,7 +245,9 @@ async def admin_stats(http_request: Request):
 
 @app.get("/agents", response_class=HTMLResponse)
 async def all_agents():
-    """실제 있는 8개 STEM 도깨비 에이전트 목록"""
+    """
+실제 있는 8개 STEM 도깨비 에이전트 목록
+"""
     stem_agents = {
         "math": {
             "name": "🧮 수학 전문가 도깨비",

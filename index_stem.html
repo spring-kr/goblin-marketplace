@@ -403,17 +403,17 @@
         let currentAgentType = '';
         let currentAgentName = '';
         
-        // 비밀 관리자 접근 코드 - Ctrl+Shift+Alt 조합
+        // 비밀 관리자 접근 코드 - Ctrl + Shift + A
         document.addEventListener('keydown', function(event) {
-            // Ctrl + Shift + Alt 조합 감지
-            if (event.ctrlKey && event.shiftKey && event.altKey) {
+            // Ctrl + Shift + A 조합 감지 (대/소문자 모두 허용)
+            if (event.ctrlKey && event.shiftKey && (event.key === 'A' || event.key === 'a')) {
                 event.preventDefault(); // 기본 동작 방지
-                
-                // 관리자 로그인 모달 직접 표시
+
+                // 관리자 로그인 모달 표시
                 const modal = new bootstrap.Modal(document.getElementById('adminModal'));
                 modal.show();
-                
-                // 효과음과 함께 알림
+
+                // 알림 토스트
                 const notification = document.createElement('div');
                 notification.style.cssText = `
                     position: fixed; top: 20px; right: 20px; z-index: 10000;
@@ -422,10 +422,10 @@
                     box-shadow: 0 10px 30px rgba(0,0,0,0.3);
                     font-weight: bold; animation: fadeInOut 3s forwards;
                 `;
-                notification.innerHTML = '� 관리자 인증 모드!';
+                notification.innerHTML = '🔐 관리자 인증 모드';
                 document.body.appendChild(notification);
-                
-                setTimeout(() => notification.remove(), 3000);
+
+                setTimeout(() => notification.remove(), 2000);
             }
         });
         

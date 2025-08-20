@@ -474,44 +474,72 @@
   ],
   "86ffe81a2c5a2414": [
     {
-      "timestamp": "2025-08-20T15:09:17.511155",
-      "question": "올해 운세는 어떤가요?",
-      "topic": "일반상담",
-      "intent": "general",
-      "depth": 1
-    },
-    {
-      "timestamp": "2025-08-20T15:12:50.027993",
-      "question": "올해 운세는 어떤가요?",
-      "topic": "일반상담",
-      "intent": "general",
-      "depth": 2
-    },
-    {
-      "timestamp": "2025-08-20T15:15:04.166698",
-      "question": "올해 운세는 어떤가요?",
-      "topic": "일반상담",
-      "intent": "general",
-      "depth": 3
-    },
-    {
-      "timestamp": "2025-08-20T15:16:01.093659",
-      "question": "올해 운세는 어떤가요?",
-      "topic": "일반상담",
-      "intent": "general",
-      "depth": 4
-    },
-    {
-      "timestamp": "2025-08-20T15:21:43.026518",
-      "question": "올해 운세는 어떤가요?",
-      "topic": "일반상담",
-      "intent": "general",
-      "depth": 4
-    },
-    {
       "timestamp": "2025-08-20T15:24:28.033514",
       "question": "올해 운세는 어떤가요?",
       "topic": "일반상담",
+      "intent": "general",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T15:35:28.827139",
+      "question": "연애운을 보고 싶어요",
+      "topic": "일반상담",
+      "intent": "general",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T16:02:26.156194",
+      "question": "오늘 건강운이 어떤가요?",
+      "topic": "건강",
+      "intent": "general",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T16:03:40.811379",
+      "question": "오늘 건강운이 어떤가요?",
+      "topic": "건강",
+      "intent": "general",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T16:04:22.472360",
+      "question": "소개팅 나가는데 연애운을 보고 싶어요",
+      "topic": "일반상담",
+      "intent": "general",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T16:04:22.502292",
+      "question": "다음 주에 중요한 미팅이 있는데 사업운이 어떤가요?",
+      "topic": "일반상담",
+      "intent": "general",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T16:04:22.540141",
+      "question": "오늘 건강운이 어떤가요?",
+      "topic": "건강",
+      "intent": "general",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T16:05:56.543946",
+      "question": "소개팅 나가는데 연애운을 보고 싶어요",
+      "topic": "일반상담",
+      "intent": "general",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T16:05:56.578584",
+      "question": "다음 주에 중요한 미팅이 있는데 사업운이 어떤가요?",
+      "topic": "일반상담",
+      "intent": "general",
+      "depth": 4
+    },
+    {
+      "timestamp": "2025-08-20T16:05:56.616874",
+      "question": "오늘 건강운이 어떤가요?",
+      "topic": "건강",
       "intent": "general",
       "depth": 4
     }
@@ -778,6 +806,42 @@
       "topic": "창작",
       "intent": "general",
       "depth": 4
+    }
+  ],
+  "eb20b1e775024ad9": [
+    {
+      "timestamp": "2025-08-20T16:29:46.657722",
+      "question": "오늘 연애운 어떤가요?",
+      "topic": "일반상담",
+      "intent": "general",
+      "depth": 1
+    }
+  ],
+  "4bda30f01d320dc0": [
+    {
+      "timestamp": "2025-08-20T16:30:04.140100",
+      "question": "업무 효율을 높이고 싶어요",
+      "topic": "업무효율",
+      "intent": "general",
+      "depth": 1
+    }
+  ],
+  "33d4dcf930add256": [
+    {
+      "timestamp": "2025-08-20T16:30:04.169759",
+      "question": "업무 효율을 높이고 싶어요",
+      "topic": "업무효율",
+      "intent": "general",
+      "depth": 1
+    }
+  ],
+  "741877331abe0989": [
+    {
+      "timestamp": "2025-08-20T16:30:04.200359",
+      "question": "업무 효율을 높이고 싶어요",
+      "topic": "업무효율",
+      "intent": "general",
+      "depth": 1
     }
   ]
 }
