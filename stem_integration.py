@@ -19,8 +19,8 @@ class STEMIntegration:
     def __init__(self):
         self.system_name = "🏰 도깨비마을장터 박사급 AI 상담소"
 
-    async def process_question(
-        self, question: str, agent_type: str, user_ip: Optional[str] = None
+    def process_question(
+        self, agent_type: str, question: str, user_ip: Optional[str] = None
     ) -> Dict[str, Any]:
         """실제 AI 대화 능력으로 질문 처리"""
         try:

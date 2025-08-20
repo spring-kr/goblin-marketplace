@@ -386,7 +386,7 @@
                     <form id="adminForm" onsubmit="checkAdminKey(); return false;">
                         <div class="mb-3">
                             <label for="adminKey" class="form-label">관리자 키:</label>
-                            <input type="password" class="form-control" id="adminKey" style="color: #333;" placeholder="관리자 키를 입력하세요" onkeypress="if(event.key==='Enter') checkAdminKey()">
+                            <input type="password" class="form-control" id="adminKey" style="color: #333;" placeholder="관리자 키를 입력하세요" autocomplete="new-password" onkeypress="if(event.key==='Enter') checkAdminKey()">
                         </div>
                     </form>
                 </div>

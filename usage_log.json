@@ -3202,5 +3202,17 @@
     "user_ip": "192.168.73.210",
     "weekday": "Tuesday",
     "hour": 6
+  },
+  {
+    "timestamp": "2025-08-20T13:27:22.523074",
+    "date": "2025-08-20",
+    "time": "13:27:22",
+    "agent_type": "assistant",
+    "question_length": 5,
+    "question_preview": "안녕하세요",
+    "response_success": true,
+    "user_ip": "127.0.0.1",
+    "weekday": "Wednesday",
+    "hour": 13
   }
 ]
