@@ -372,6 +372,13 @@
                 <button class="btn btn-primary" onclick="sendMessage()">전송</button>
             </div>
         </div>
+
+        <!-- 관리자 섹션 -->
+        <div class="admin-section">
+            <h3>📊 관리자 전용</h3>
+            <p>서비스 이용 통계 및 관리 기능</p>
+            <button class="btn btn-warning" onclick="showAdminLogin()">통계 보기</button>
+        </div>
     </div>
 
     <!-- 관리자 로그인 모달 -->
@@ -400,43 +407,6 @@
     <script>
         let currentAgentType = '';
         let currentAgentName = '';
-        
-        // 비밀 관리자 접근 코드 - Ctrl+Shift+Alt 조합
-        document.addEventListener('keydown', function(event) {
-            // Ctrl + Shift + Alt 조합 감지
-            if (event.ctrlKey && event.shiftKey && event.altKey) {
-                event.preventDefault(); // 기본 동작 방지
-                
-                // 관리자 로그인 모달 직접 표시
-                const modal = new bootstrap.Modal(document.getElementById('adminModal'));
-                modal.show();
-                
-                // 효과음과 함께 알림
-                const notification = document.createElement('div');
-                notification.style.cssText = `
-                    position: fixed; top: 20px; right: 20px; z-index: 10000;
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    color: white; padding: 15px 25px; border-radius: 10px;
-                    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-                    font-weight: bold; animation: fadeInOut 3s forwards;
-                `;
-                notification.innerHTML = '� 관리자 인증 모드!';
-                document.body.appendChild(notification);
-                
-                setTimeout(() => notification.remove(), 3000);
-            }
-        });
-        
-        // CSS 애니메이션 추가
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes fadeInOut {
-                0% { opacity: 0; transform: translateX(100px); }
-                20%, 80% { opacity: 1; transform: translateX(0); }
-                100% { opacity: 0; transform: translateX(100px); }
-            }
-        `;
-        document.head.appendChild(style);
 
         function startChat(agentType, agentName) {
             currentAgentType = agentType;
@@ -516,6 +486,11 @@
                 console.error('Error:', error);
                 addMessage('bot', '❌ 서버 연결 오류가 발생했습니다.');
             }
+        }
+
+        function showAdminLogin() {
+            const modal = new bootstrap.Modal(document.getElementById('adminModal'));
+            modal.show();
         }
 
         async function checkAdminKey() {

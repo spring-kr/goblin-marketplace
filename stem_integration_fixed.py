@@ -135,25 +135,12 @@ class STEMIntegration:
             return self._general_expert_response(question, info)
 
     def _assistant_expert_response(self, question: str, info: dict) -> str:
-        """박사급 비서 도깨비 전문 응답 - 실제 AI 대화"""
-        # 질문 키워드 분석으로 맞춤 응답
-        question_lower = question.lower()
-        
-        # 일정/시간 관리 관련
-        if any(keyword in question_lower for keyword in ['일정', '스케줄', '계획', '시간', '관리']):
-            return f"{info['emoji']} 안녕하세요! {info['name']}입니다.\n\n'{question}' 관련 시간 관리 전문 조언을 드리겠습니다.\n\n⏰ **효율적 시간 관리법:**\n• 중요도×긴급도 매트릭스로 우선순위 설정\n• 25분 집중 + 5분 휴식 포모도로 기법\n• 하루 20% 버퍼 타임 확보\n\n📅 **일정 최적화:**\n• 비슷한 업무는 배치 처리\n• 에너지 높은 시간대에 어려운 업무\n• 주간/월간 정기 리뷰 실시\n\n🎯 **즉시 실행 팁:**\n오늘부터 가장 중요한 업무 3개만 선정해보세요!"
-        
-        # 회의/소통 관련
-        elif any(keyword in question_lower for keyword in ['회의', '미팅', '소통', '커뮤니케이션', '발표']):
-            return f"{info['emoji']} {info['name']}가 회의 효율성 전문가로 답변드립니다!\n\n'{question}' 관련 소통 최적화 방안입니다.\n\n💬 **효과적 회의 운영:**\n• 명확한 목적과 아젠다 사전 공유\n• 시간 한계 설정 (최대 1시간)\n• 액션 아이템과 담당자 명시\n\n🎯 **참여도 극대화:**\n• 모든 참석자 발언 기회 제공\n• 결정사항 실시간 기록\n• 회의 후 24시간 내 요약 공유\n\n� **성과 측정:**\n회의 만족도와 실행률을 정기 체크하세요!"
-        
-        # 업무 효율/생산성 관련
-        elif any(keyword in question_lower for keyword in ['업무', '생산성', '효율', '성과', '목표']):
-            return f"{info['emoji']} {info['name']}가 생산성 전문가로 조언드립니다!\n\n'{question}'에 대한 업무 효율성 향상 방안입니다.\n\n⚡ **생산성 부스터:**\n• 2분 룰: 2분 내 가능한 일은 즉시 처리\n• 멀티태스킹 금지, 한 번에 하나씩\n• 업무 환경 최적화 (정리정돈 필수)\n\n🧠 **에너지 관리:**\n• 개인별 황금 시간대 파악 활용\n• 어려운 업무는 컨디션 좋을 때\n• 정기적 휴식으로 지속 가능한 리듬\n\n� **성과 추적:**\n주간 단위 업무 완료율과 품질 점검하세요!"
-        
-        # 일반적인 업무 관리 질문
-        else:
-            return f"{info['emoji']} 안녕하세요! {info['name']}입니다.\n\n'{question}'에 대해 업무 관리 전문가로서 조언드리겠습니다.\n\n📋 **종합 분석:**\n체계적인 업무 관리가 성공의 핵심입니다.\n\n✅ **핵심 원칙:**\n• 명확한 목표 설정과 우선순위 관리\n• 시간과 에너지 자원의 최적 배분\n• 지속적인 개선과 피드백 반영\n\n💡 **맞춤 솔루션:**\n구체적인 상황을 더 알려주시면 더 정확한 조언을 드릴 수 있습니다!\n\n🚀 **시작 제안:**\n오늘부터 작은 습관 하나씩 개선해보세요."
+        """박사급 비서 도깨비 전문 응답"""
+        responses = [
+            f"{info['emoji']} 안녕하세요! {info['name']}입니다.\n\n업무 관리와 관련된 질문에 전문적으로 답변드리겠습니다:\n\n📋 **분석 결과:**\n'{question}'에 대해 효율적인 업무 처리 방안을 제시하겠습니다.\n\n✅ **추천 솔루션:**\n• 업무 우선순위 설정\n• 시간 관리 최적화\n• 생산성 향상 도구 활용\n\n💡 **실행 팁:**\n체계적인 업무 관리로 성과를 극대화하세요!",
+            f"{info['emoji']} {info['name']}가 도와드리겠습니다!\n\n📊 **업무 효율성 분석:**\n질문하신 '{question}'에 대한 전문적인 업무 관리 조언을 드립니다.\n\n🎯 **핵심 포인트:**\n• 작업 흐름 최적화\n• 커뮤니케이션 효율성\n• 목표 달성 전략\n\n📈 **기대 효과:**\n업무 생산성 30% 향상 가능합니다!",
+        ]
+        return random.choice(responses)
 
     def _builder_expert_response(self, question: str, info: dict) -> str:
         """빌더 도깨비 전문 응답"""

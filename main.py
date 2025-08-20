@@ -114,6 +114,25 @@ async def demo_redirect(service_id: str):
     )
 
 
+@app.get("/stem", response_class=HTMLResponse)
+async def stem_service():
+    """STEM 도깨비 서비스 메인 페이지"""
+    try:
+        with open("index_stem.html", "r", encoding="utf-8") as f:
+            return f.read()
+    except FileNotFoundError:
+        return HTMLResponse("""
+        <html>
+            <head><title>STEM 서비스 오류</title></head>
+            <body>
+                <h1>❌ STEM 서비스 파일을 찾을 수 없습니다</h1>
+                <p>index_stem.html 파일이 필요합니다.</p>
+                <a href="/">홈으로 돌아가기</a>
+            </body>
+        </html>
+        """, status_code=404)
+
+
 @app.get("/agents", response_class=HTMLResponse)
 async def all_agents():
     """실제 있는 8개 STEM 도깨비 에이전트 목록"""
