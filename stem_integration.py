@@ -37,24 +37,27 @@ class STEMService:
     ) -> Dict[str, Any]:
         """실제 AI 대화 능력으로 질문 처리"""
         try:
-            # 에이전트별 정보
+            # 에이전트별 정보 - 16개 분야
             agent_info = {
+                # 기존 8개 (조금 더 친근하게)
                 "math": {"emoji": "🧮", "name": "수학 도깨비", "field": "수학"},
                 "physics": {"emoji": "⚛️", "name": "물리학 도깨비", "field": "물리학"},
                 "chemistry": {"emoji": "🧪", "name": "화학 도깨비", "field": "화학"},
                 "biology": {"emoji": "🧬", "name": "생물학 도깨비", "field": "생물학"},
                 "engineering": {"emoji": "⚙️", "name": "공학 도깨비", "field": "공학"},
-                "assistant": {
-                    "emoji": "🤖",
-                    "name": "업무 도우미 도깨비",
-                    "field": "업무 관리",
-                },
-                "marketing": {
-                    "emoji": "📈",
-                    "name": "마케팅 도깨비",
-                    "field": "마케팅",
-                },
+                "assistant": {"emoji": "🤖", "name": "업무 도우미 도깨비", "field": "업무 관리"},
+                "marketing": {"emoji": "📈", "name": "마케팅 도깨비", "field": "마케팅"},
                 "startup": {"emoji": "🚀", "name": "스타트업 도깨비", "field": "창업"},
+                
+                # 새로운 8개 (일반인 친화적)
+                "cooking": {"emoji": "🍳", "name": "요리 도깨비", "field": "요리"},
+                "lifestyle": {"emoji": "💡", "name": "생활 꿀팁 도깨비", "field": "생활 팁"},
+                "interior": {"emoji": "🏠", "name": "집꾸미기 도깨비", "field": "인테리어"},
+                "finance": {"emoji": "�", "name": "가계부 도깨비", "field": "재정 관리"},
+                "hobby": {"emoji": "🎮", "name": "취미 도깨비", "field": "취미 활동"},
+                "tech": {"emoji": "💻", "name": "IT 도깨비", "field": "컴퓨터 활용"},
+                "health": {"emoji": "🏃", "name": "건강 도깨비", "field": "건강 관리"},
+                "learning": {"emoji": "�", "name": "공부 도깨비", "field": "학습 도움"}
             }
 
             if agent_type not in agent_info:
@@ -111,6 +114,23 @@ class STEMService:
             return self._marketing_expert_response(question, info)
         elif agent_type == "startup":
             return self._startup_expert_response(question, info)
+        # 새로운 8개 도깨비
+        elif agent_type == "cooking":
+            return self._cooking_expert_response(question, info)
+        elif agent_type == "lifestyle":
+            return self._lifestyle_expert_response(question, info)
+        elif agent_type == "interior":
+            return self._interior_expert_response(question, info)
+        elif agent_type == "finance":
+            return self._finance_expert_response(question, info)
+        elif agent_type == "hobby":
+            return self._hobby_expert_response(question, info)
+        elif agent_type == "tech":
+            return self._tech_expert_response(question, info)
+        elif agent_type == "health":
+            return self._health_expert_response(question, info)
+        elif agent_type == "learning":
+            return self._learning_expert_response(question, info)
         else:
             return self._general_expert_response(question, info)
 
@@ -375,6 +395,238 @@ class STEMService:
 아이디어 단계부터 엑싯까지 창업의 전 과정에서 실무 경험을 바탕으로 한 실용적인 조언을 제공합니다!
 
 구체적인 업종이나 창업 단계를 알려주시면 더 정확한 가이드를 제공해드리겠습니다! 🚀"""
+
+    def _cooking_expert_response(self, question: str, info: dict) -> str:
+        """요리 전문가 답변"""
+        question_lower = question.lower()
+
+        cooking_topics = {
+            "레시피": "맛있는 레시피를 추천해드리겠습니다!\n\n**간단 요리**: 15분 만에 완성하는 원팬 요리\n**건강식**: 저칼로리 다이어트 메뉴\n**집밥**: 엄마 손맛 나는 가정식\n**간식**: 아이들이 좋아하는 수제 간식\n**국물요리**: 속 깊은 국물 우리는 법",
+            "재료": "재료 활용법을 알려드리겠습니다!\n\n**냉장고 파먹기**: 남은 재료로 만드는 요리\n**대체재료**: 없는 재료 대신 쓸 수 있는 것들\n**보관법**: 신선하게 오래 보관하는 팁\n**손질법**: 재료별 효율적인 손질 방법",
+            "조리법": "요리 기법을 설명해드리겠습니다!\n\n**볶음**: 센 불에서 빠르게 볶는 법\n**조림**: 간이 잘 배도록 조리는 팁\n**튀김**: 바삭하게 튀기는 온도와 시간\n**찜**: 부드럽게 쪄내는 방법",
+            "다이어트": "건강한 다이어트 요리를 추천합니다!\n\n**저칼로리**: 포만감 있는 저칼로리 메뉴\n**단백질**: 근손실 방지 고단백 요리\n**식이섬유**: 배변활동에 좋은 채소 요리\n**저염**: 나트륨 줄인 건강 요리",
+        }
+
+        for keyword, explanation in cooking_topics.items():
+            if keyword in question_lower:
+                return f"{info['emoji']} {info['name']}이 맛있는 요리법을 알려드릴게요!\n\n{explanation}\n\n구체적인 재료나 요리 스타일을 말씀해주시면 더 자세한 레시피를 제공해드릴게요! 👨‍🍳"
+
+        return f"""{info['emoji']} {info['name']}입니다!
+
+"{question}"에 대한 요리 팁을 알려드릴게요!
+
+**요리의 기본:**
+🔥 **화력 조절**: 재료에 맞는 적절한 온도
+🧂 **간**: 단계별로 맛을 맞춰가기
+⏰ **타이밍**: 재료 넣는 순서와 시간
+🍽️ **플레이팅**: 보기 좋게 담는 법
+
+집에서도 맛집 못지않은 요리를 만들 수 있도록 도와드리겠습니다!
+
+어떤 요리가 궁금하신지 구체적으로 말씀해주세요! 🍳"""
+
+    def _lifestyle_expert_response(self, question: str, info: dict) -> str:
+        """생활 꿀팁 전문가 답변"""
+        question_lower = question.lower()
+
+        lifestyle_topics = {
+            "청소": "효과적인 청소 꿀팁을 알려드릴게요!\n\n**베이킹소다**: 기름때, 냄새 제거의 만능템\n**식초**: 물때, 세균 제거에 효과적\n**순서**: 위에서 아래로, 안쪽에서 바깥쪽으로\n**도구**: 용도별 청소 도구 활용법",
+            "정리": "깔끔한 정리 수납법을 설명해드릴게요!\n\n**미니멀**: 안 쓰는 물건은 과감히 버리기\n**분류**: 용도별, 사용 빈도별 분류\n**수납**: 보이는 곳은 예쁘게, 안 보이는 곳은 효율적으로\n**라벨링**: 가족 모두가 알 수 있게 표시",
+            "절약": "생활비 절약 노하우를 공유하겠습니다!\n\n**전기세**: 대기전력 차단, LED 전구 사용\n**수도세**: 절수형 샤워기, 세탁 모아서 하기\n**가스비**: 압력솥 활용, 불끄고 여열 이용\n**통신비**: 요금제 최적화, 할인 혜택 활용",
+            "세탁": "옷 관리와 세탁 팁을 알려드릴게요!\n\n**분리세탁**: 색깔별, 소재별 분리\n**온도**: 소재에 맞는 적정 온도\n**세제**: 중성세제, 표백제 올바른 사용\n**건조**: 통풍 좋은 곳에서 자연건조",
+        }
+
+        for keyword, explanation in lifestyle_topics.items():
+            if keyword in question_lower:
+                return f"{info['emoji']} {info['name']}이 생활의 지혜를 전수해드릴게요!\n\n{explanation}\n\n더 구체적인 상황을 말씀해주시면 맞춤형 꿀팁을 제공해드릴게요! ✨"
+
+        return f"""{info['emoji']} {info['name']}입니다!
+
+"{question}"에 관한 생활 꿀팁을 알려드릴게요!
+
+**생활의 지혜:**
+🧹 **청소**: 간단하고 효과적인 청소법
+📦 **정리수납**: 공간 활용 극대화 팁
+💰 **절약**: 생활비 줄이는 실용 노하우
+👕 **관리**: 옷, 가전제품 오래 쓰는 법
+
+일상생활이 더 편리하고 경제적이 되도록 도와드리겠습니다!
+
+어떤 생활 고민이 있으신지 자세히 말씀해주세요! 💡"""
+
+    def _interior_expert_response(self, question: str, info: dict) -> str:
+        """집꾸미기 전문가 답변"""
+        question_lower = question.lower()
+
+        interior_topics = {
+            "작은방": "작은 공간 인테리어 노하우를 알려드릴게요!\n\n**색상**: 밝은 톤으로 공간감 확대\n**가구**: 다용도 가구로 공간 활용\n**거울**: 거울로 시각적 공간 확장\n**수직공간**: 벽면 수납으로 바닥 공간 확보",
+            "조명": "조명 인테리어 팁을 설명해드릴게요!\n\n**자연광**: 커튼으로 채광 조절\n**간접조명**: 따뜻한 분위기 연출\n**포인트조명**: 공간별 용도에 맞는 조명\n**스마트조명**: 색온도 조절로 분위기 변화",
+            "가구": "가구 배치와 선택 요령을 알려드릴게요!\n\n**동선**: 움직임에 방해되지 않는 배치\n**비율**: 공간 크기에 맞는 가구 선택\n**기능성**: 수납과 실용성을 고려한 선택\n**통일성**: 전체적인 스타일 조화",
+            "diy": "DIY 인테리어 아이디어를 제안해드릴게요!\n\n**페인팅**: 벽면 포인트 컬러로 분위기 변화\n**데코**: 소품으로 개성 있는 공간 연출\n**리폼**: 기존 가구 활용한 새로운 스타일\n**플랜테리어**: 식물로 자연스러운 인테리어",
+        }
+
+        for keyword, explanation in interior_topics.items():
+            if keyword in question_lower:
+                return f"{info['emoji']} {info['name']}이 멋진 공간 만들기를 도와드릴게요!\n\n{explanation}\n\n구체적인 공간이나 예산을 말씀해주시면 더 자세한 조언을 드릴게요! 🎨"
+
+        return f"""{info['emoji']} {info['name']}입니다!
+
+"{question}"에 대한 인테리어 조언을 드릴게요!
+
+**공간 꾸미기 원칙:**
+🎨 **컬러**: 2-3가지 메인 컬러로 통일감
+🪑 **가구**: 기능성과 미적 조화
+💡 **조명**: 분위기를 좌우하는 핵심 요소
+🌿 **소품**: 개성을 드러내는 포인트
+
+작은 변화로도 공간이 완전히 달라질 수 있어요!
+
+어떤 공간을 꾸미고 싶으신지, 예산은 어느 정도인지 알려주세요! 🏠"""
+
+    def _finance_expert_response(self, question: str, info: dict) -> str:
+        """가계부 전문가 답변"""
+        question_lower = question.lower()
+
+        finance_topics = {
+            "저축": "효과적인 저축 방법을 알려드릴게요!\n\n**자동이체**: 월급날 바로 저축 계좌로 이체\n**365일 저축**: 매일 조금씩 쌓아가는 습관\n**목표 설정**: 구체적인 목표 금액과 기간\n**고금리 상품**: 적금, CMA 등 금리 비교",
+            "가계부": "가계부 작성 노하우를 설명해드릴게요!\n\n**분류**: 고정비, 변동비로 나누어 기록\n**앱 활용**: 간편한 가계부 앱 추천\n**분석**: 월별 지출 패턴 분석\n**목표**: 지출 한도 설정과 관리",
+            "투자": "안전한 투자 시작법을 알려드릴게요!\n\n**예적금**: 안전한 기본 투자\n**펀드**: 분산투자로 리스크 관리\n**주식**: 기업 분석 후 장기 투자\n**부동산**: 실거주 목적의 내 집 마련",
+            "부채": "부채 관리 전략을 제안해드릴게요!\n\n**우선순위**: 고금리 부채부터 상환\n**통합**: 여러 부채를 낮은 금리로 통합\n**상환계획**: 무리하지 않는 선에서 계획\n**추가부채 금지**: 상환 완료까지 추가 대출 자제",
+        }
+
+        for keyword, explanation in finance_topics.items():
+            if keyword in question_lower:
+                return f"{info['emoji']} {info['name']}이 든든한 재정 관리를 도와드릴게요!\n\n{explanation}\n\n구체적인 상황을 말씀해주시면 맞춤형 재정 계획을 세워드릴게요! 📊"
+
+        return f"""{info['emoji']} {info['name']}입니다!
+
+"{question}"에 대한 재정 관리 조언을 드릴게요!
+
+**건전한 재정 관리:**
+💳 **지출 관리**: 수입의 70% 이내 생활비
+💰 **저축**: 수입의 20% 이상 저축
+📈 **투자**: 수입의 10% 장기 투자
+🆘 **비상금**: 월 생활비의 3-6개월분
+
+돈 관리가 어렵지 않도록 단계적으로 도와드리겠습니다!
+
+현재 재정 상황이나 고민을 구체적으로 말씀해주세요! 💰"""
+
+    def _hobby_expert_response(self, question: str, info: dict) -> str:
+        """취미 전문가 답변"""
+        question_lower = question.lower()
+
+        hobby_topics = {
+            "운동": "건강한 운동 취미를 추천해드릴게요!\n\n**홈트**: 집에서 할 수 있는 간단한 운동\n**러닝**: 부담 없이 시작하는 조깅\n**수영**: 전신 운동으로 체력 향상\n**등산**: 자연과 함께하는 힐링 운동",
+            "독서": "독서 취미 시작 가이드를 알려드릴게요!\n\n**장르 선택**: 관심 분야부터 가볍게 시작\n**독서 습관**: 매일 30분씩 꾸준히\n**독서 기록**: 감상문이나 명언 메모\n**독서 모임**: 함께 읽고 토론하기",
+            "여행": "여행 계획과 팁을 공유해드릴게요!\n\n**국내여행**: 가까운 곳부터 천천히\n**예산 여행**: 저렴하게 즐기는 여행법\n**혼행**: 혼자서도 안전하고 즐거운 여행\n**사진**: 여행의 추억을 남기는 사진 촬영",
+            "요리": "요리 취미 시작법을 알려드릴게요!\n\n**기본기**: 칼질, 불 조절 등 기초 기술\n**간단 레시피**: 실패 없는 쉬운 요리부터\n**도구**: 꼭 필요한 기본 조리 도구\n**응용**: 기본을 익힌 후 창의적 응용",
+        }
+
+        for keyword, explanation in hobby_topics.items():
+            if keyword in question_lower:
+                return f"{info['emoji']} {info['name']}이 즐거운 취미 생활을 제안해드릴게요!\n\n{explanation}\n\n어떤 취미에 관심이 있으신지 더 자세히 말씀해주세요! 🌟"
+
+        return f"""{info['emoji']} {info['name']}입니다!
+
+"{question}"에 관한 취미 활동을 추천해드릴게요!
+
+**취미 생활의 즐거움:**
+🎯 **목표**: 성취감을 주는 도전적 활동
+👥 **소통**: 같은 관심사를 가진 사람들과 교류
+🧘 **힐링**: 스트레스 해소와 재충전
+📚 **성장**: 새로운 지식과 기술 습득
+
+바쁜 일상 속에서도 즐길 수 있는 취미를 찾아드리겠습니다!
+
+관심 있는 분야나 가능한 시간을 알려주세요! 🎮"""
+
+    def _tech_expert_response(self, question: str, info: dict) -> str:
+        """IT 전문가 답변"""
+        question_lower = question.lower()
+
+        tech_topics = {
+            "컴퓨터": "컴퓨터 활용 팁을 알려드릴게요!\n\n**기본 설정**: 보안, 업데이트, 백업 관리\n**단축키**: 작업 효율을 높이는 필수 단축키\n**프로그램**: 생산성 향상 프로그램 추천\n**문제 해결**: 자주 발생하는 오류 해결법",
+            "스마트폰": "스마트폰 똑똑하게 쓰는 법을 설명해드릴게요!\n\n**앱 정리**: 필요한 앱만 깔끔하게 정리\n**배터리**: 배터리 오래 쓰는 설정 방법\n**보안**: 개인정보 보호 설정\n**사진**: 스마트폰으로 잘 찍는 사진 팁",
+            "엑셀": "엑셀 활용법을 가르쳐드릴게요!\n\n**기본 함수**: SUM, AVERAGE, IF 함수\n**표 작성**: 깔끔한 표 만들기와 서식\n**차트**: 데이터 시각화로 이해도 높이기\n**자동화**: 반복 작업을 줄이는 매크로",
+            "인터넷": "인터넷 안전하게 사용하는 법을 알려드릴게요!\n\n**보안**: 피싱, 악성코드 예방법\n**검색**: 원하는 정보 빠르게 찾는 검색 팁\n**쇼핑**: 안전한 온라인 쇼핑 방법\n**SNS**: 개인정보 보호하며 SNS 이용",
+        }
+
+        for keyword, explanation in tech_topics.items():
+            if keyword in question_lower:
+                return f"{info['emoji']} {info['name']}이 디지털 생활을 도와드릴게요!\n\n{explanation}\n\n어떤 기능이나 프로그램에 대해 더 알고 싶으신지 말씀해주세요! 🔧"
+
+        return f"""{info['emoji']} {info['name']}입니다!
+
+"{question}"에 대한 IT 활용법을 알려드릴게요!
+
+**디지털 라이프 향상:**
+💻 **컴퓨터**: 기본 설정부터 고급 활용까지
+📱 **모바일**: 스마트폰 100% 활용법
+📊 **오피스**: 워드, 엑셀, 파워포인트 정복
+🌐 **인터넷**: 안전하고 효율적인 웹 서핑
+
+컴맹 탈출부터 업무 자동화까지 도와드리겠습니다!
+
+어떤 기술이나 프로그램이 궁금하신지 구체적으로 말씀해주세요! 💻"""
+
+    def _health_expert_response(self, question: str, info: dict) -> str:
+        """건강 전문가 답변"""
+        question_lower = question.lower()
+
+        health_topics = {
+            "운동": "건강한 운동법을 알려드릴게요!\n\n**유산소**: 심폐 기능 향상을 위한 유산소 운동\n**근력**: 기초 대사량 증가를 위한 근력 운동\n**스트레칭**: 유연성과 부상 예방을 위한 스트레칭\n**홈트**: 집에서 할 수 있는 간단한 운동",
+            "식단": "건강한 식단 관리법을 설명해드릴게요!\n\n**균형**: 탄수화물, 단백질, 지방의 균형\n**채소**: 하루 5가지 색깔 채소 섭취\n**수분**: 하루 2L 이상 충분한 수분 섭취\n**금식**: 간헐적 단식의 올바른 방법",
+            "수면": "숙면을 위한 팁을 알려드릴게요!\n\n**시간**: 규칙적인 수면 시간 유지\n**환경**: 어둡고 시원한 수면 환경 조성\n**습관**: 잠들기 전 디지털 기기 사용 자제\n**이완**: 명상이나 독서로 마음 진정",
+            "스트레스": "스트레스 관리법을 제안해드릴게요!\n\n**호흡법**: 복식 호흡으로 마음 안정\n**명상**: 10분 명상으로 마음 정리\n**취미**: 좋아하는 활동으로 스트레스 해소\n**소통**: 가족, 친구와의 대화로 마음 나누기",
+        }
+
+        for keyword, explanation in health_topics.items():
+            if keyword in question_lower:
+                return f"{info['emoji']} {info['name']}이 건강한 생활을 도와드릴게요!\n\n{explanation}\n\n더 구체적인 건강 고민이 있으시면 말씀해주세요! 💪"
+
+        return f"""{info['emoji']} {info['name']}입니다!
+
+"{question}"에 관한 건강 관리법을 알려드릴게요!
+
+**건강한 생활 습관:**
+🏃 **운동**: 주 3회 이상 규칙적인 운동
+🥗 **식단**: 균형 잡힌 영양소 섭취
+😴 **수면**: 하루 7-8시간 충분한 잠
+🧘 **마음**: 스트레스 관리와 정신 건강
+
+작은 변화부터 시작해서 건강한 삶을 만들어보세요!
+
+어떤 건강 고민이 있으신지 구체적으로 말씀해주세요! 🏃"""
+
+    def _learning_expert_response(self, question: str, info: dict) -> str:
+        """공부 전문가 답변"""
+        question_lower = question.lower()
+
+        learning_topics = {
+            "공부법": "효과적인 공부 방법을 알려드릴게요!\n\n**플래닝**: 구체적인 학습 계획 세우기\n**집중**: 25분 공부 + 5분 휴식 (포모도로 기법)\n**복습**: 에빙하우스 망각곡선에 따른 복습\n**환경**: 집중력을 높이는 공부 환경 조성",
+            "기억법": "기억력 향상 기법을 설명해드릴게요!\n\n**연상법**: 기억할 내용을 이미지로 연상\n**스토리**: 내용을 이야기로 만들어서 기억\n**반복**: 규칙적인 간격으로 반복 학습\n**정리**: 마인드맵이나 요약으로 체계화",
+            "시험": "시험 준비 전략을 제안해드릴게요!\n\n**기출문제**: 출제 경향 파악을 위한 기출 분석\n**모의고사**: 실전 연습으로 시간 관리 연습\n**오답노트**: 틀린 문제 분석하고 반복 학습\n**컨디션**: 시험 전 충분한 휴식과 컨디션 관리",
+            "집중력": "집중력 향상 방법을 알려드릴게요!\n\n**환경**: 공부에만 집중할 수 있는 환경 조성\n**스마트폰**: 공부 시간에는 스마트폰 멀리 두기\n**목표**: 구체적이고 달성 가능한 목표 설정\n**휴식**: 적절한 휴식으로 집중력 회복",
+        }
+
+        for keyword, explanation in learning_topics.items():
+            if keyword in question_lower:
+                return f"{info['emoji']} {info['name']}이 효과적인 학습을 도와드릴게요!\n\n{explanation}\n\n어떤 과목이나 시험을 준비하시는지 알려주시면 더 구체적인 조언을 드릴게요! ✏️"
+
+        return f"""{info['emoji']} {info['name']}입니다!
+
+"{question}"에 대한 학습 조언을 드릴게요!
+
+**스마트한 학습법:**
+📝 **계획**: 목표에 맞는 체계적인 학습 계획
+🧠 **기억**: 효과적인 암기와 이해 방법
+⏰ **시간관리**: 효율적인 시간 활용법
+💪 **동기부여**: 지속 가능한 학습 동기 유지
+
+공부가 즐거워지는 방법을 찾아드리겠습니다!
+
+어떤 과목이나 분야를 공부하시는지 알려주세요! 📚"""
 
     def _general_expert_response(self, question: str, info: dict) -> str:
         """일반적인 전문가 답변"""
