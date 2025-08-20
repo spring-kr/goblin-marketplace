@@ -107,34 +107,225 @@ class STEMIntegration:
     def _generate_smart_response(
         self, question: str, agent_type: str, info: dict
     ) -> str:
-        """도깨비별 전문 응답 생성"""
+        """도깨비별 전문 응답 생성 - 실제 AI처럼 자연스럽게"""
+        
+        # 실제 AI 대화처럼 자연스럽고 맥락적인 응답 생성
+        return self._create_natural_ai_response(question, agent_type, info)
 
-        # 각 도깨비별 전문 응답 함수 호출
-        response_methods = {
-            "assistant": self._assistant_expert_response,
-            "builder": self._builder_expert_response,
-            "counselor": self._counselor_expert_response,
-            "creative": self._creative_expert_response,
-            "data_analyst": self._data_analyst_expert_response,
-            "fortune": self._fortune_expert_response,
-            "growth": self._growth_expert_response,
-            "hr": self._hr_expert_response,
-            "marketing": self._marketing_expert_response,
-            "medical": self._medical_expert_response,
-            "sales": self._sales_expert_response,
-            "seo": self._seo_expert_response,
-            "shopping": self._shopping_expert_response,
-            "startup": self._startup_expert_response,
-            "village_chief": self._village_chief_expert_response,
-            "writing": self._writing_expert_response,
+    def _generate_smart_response(
+        self, question: str, agent_type: str, info: dict
+    ) -> str:
+        """도깨비별 전문 응답 생성 - 실제 AI처럼 자연스럽게"""
+        
+        # 실제 AI 대화처럼 자연스럽고 맥락적인 응답 생성
+        return self._create_natural_ai_response(question, agent_type, info)
+
+    def _create_natural_ai_response(self, question: str, agent_type: str, info: dict) -> str:
+        """실제 AI처럼 자연스럽고 맥락적인 응답 생성"""
+        
+        # 도깨비별 전문 분야와 성격 정의
+        agent_personalities = {
+            "assistant": {
+                "role": "효율적이고 체계적인 업무 관리 전문가",
+                "style": "실용적이고 구체적인 조언",
+                "expertise": ["시간관리", "업무효율", "생산성", "계획수립", "조직관리"]
+            },
+            "builder": {
+                "role": "창의적이고 실용적인 개발 전문가", 
+                "style": "기술적이면서도 이해하기 쉬운 설명",
+                "expertise": ["프로그래밍", "웹개발", "앱개발", "시스템설계", "기술아키텍처"]
+            },
+            "counselor": {
+                "role": "따뜻하고 공감능력이 뛰어난 상담 전문가",
+                "style": "경청하고 공감하며 따뜻한 조언",
+                "expertise": ["심리상담", "갈등해결", "스트레스관리", "인간관계", "감정관리"]
+            },
+            "creative": {
+                "role": "영감이 넘치고 창의적인 아이디어 전문가",
+                "style": "독창적이고 흥미로운 아이디어 제시",
+                "expertise": ["창작", "디자인", "브랜딩", "콘텐츠기획", "아이디어발상"]
+            },
+            "data_analyst": {
+                "role": "논리적이고 분석적인 데이터 전문가",
+                "style": "근거와 데이터를 바탕으로 한 객관적 분석",
+                "expertise": ["데이터분석", "통계", "시각화", "예측모델링", "비즈니스인텔리전스"]
+            },
+            "fortune": {
+                "role": "신비롭고 지혜로운 운세 전문가",
+                "style": "신비로우면서도 희망적인 메시지",
+                "expertise": ["운세", "점성술", "타로", "풍수", "운명해석"]
+            },
+            "growth": {
+                "role": "동기부여가 넘치는 성장 전문가",
+                "style": "격려하고 동기부여하는 긍정적 조언",
+                "expertise": ["자기계발", "목표설정", "습관형성", "동기부여", "성장전략"]
+            },
+            "hr": {
+                "role": "사람 중심의 인사 관리 전문가",
+                "style": "배려 깊고 공정한 인사 관리 조언",
+                "expertise": ["채용", "인사평가", "조직문화", "리더십", "팀관리"]
+            },
+            "marketing": {
+                "role": "트렌드에 민감한 마케팅 전문가",
+                "style": "창의적이고 실행 가능한 마케팅 전략",
+                "expertise": ["브랜드마케팅", "디지털마케팅", "고객분석", "마케팅전략", "광고기획"]
+            },
+            "medical": {
+                "role": "신뢰할 수 있는 의료 정보 전문가",
+                "style": "정확하고 신중한 의학 정보 제공",
+                "expertise": ["건강관리", "질병예방", "의학정보", "건강검진", "생활습관"]
+            },
+            "sales": {
+                "role": "열정적이고 설득력 있는 영업 전문가",
+                "style": "적극적이고 성과지향적인 영업 조언",
+                "expertise": ["영업전략", "고객관계", "협상기술", "매출관리", "세일즈"]
+            },
+            "seo": {
+                "role": "검색엔진에 정통한 SEO 전문가",
+                "style": "기술적이면서도 실무적인 SEO 조언",
+                "expertise": ["검색최적화", "키워드분석", "웹사이트최적화", "구글SEO", "콘텐츠SEO"]
+            },
+            "shopping": {
+                "role": "합리적이고 트렌드에 민감한 쇼핑 전문가",
+                "style": "실용적이고 경제적인 구매 조언",
+                "expertise": ["제품비교", "가격분석", "쇼핑팁", "소비패턴", "구매가이드"]
+            },
+            "startup": {
+                "role": "도전정신이 강한 창업 전문가",
+                "style": "현실적이면서도 꿈을 응원하는 창업 조언",
+                "expertise": ["창업전략", "비즈니스모델", "투자유치", "스타트업경영", "사업계획"]
+            },
+            "village_chief": {
+                "role": "경험이 풍부하고 지혜로운 리더",
+                "style": "포용력 있고 균형잡힌 종합적 조언",
+                "expertise": ["리더십", "조직관리", "갈등조정", "의사결정", "커뮤니티관리"]
+            },
+            "writing": {
+                "role": "문장력이 뛰어난 글쓰기 전문가",
+                "style": "명확하고 품격 있는 문서 작성 조언",
+                "expertise": ["문서작성", "글쓰기", "논문작성", "보고서", "콘텐츠라이팅"]
+            }
         }
+        
+        personality = agent_personalities.get(agent_type, {
+            "role": "전문가",
+            "style": "도움이 되는 조언",
+            "expertise": ["전문상담"]
+        })
+        
+        # 질문 분석 및 맥락적 응답 생성
+        return self._generate_contextual_response(question, info, personality)
 
-        if agent_type in response_methods:
-            return response_methods[agent_type](question, info)
-        else:
-            return self._general_expert_response(question, info)
+    def _generate_contextual_response(self, question: str, info: dict, personality: dict) -> str:
+        """맥락을 고려한 자연스러운 응답 생성"""
+        
+        # 질문 길이와 복잡도 분석
+        question_length = len(question)
+        
+        # 인사말 처리
+        greetings = ["안녕", "안녕하세요", "하이", "헬로", "hi", "hello"]
+        if any(greeting in question.lower() for greeting in greetings) and question_length < 20:
+            return f"{info['emoji']} 안녕하세요! {info['name']}입니다! 어떤 {info['field']} 관련 도움이 필요하신가요? 궁금한 것이 있으시면 언제든 말씀해주세요!"
+        
+        # 감사 표현 처리
+        thanks = ["고마워", "감사", "고맙", "thanks", "thank"]
+        if any(thank in question.lower() for thank in thanks):
+            return f"{info['emoji']} 별말씀을요! {info['name']}로서 도움이 되었다니 정말 기쁩니다. 앞으로도 {info['field']} 관련해서 궁금한 것이 있으시면 언제든 찾아주세요!"
+        
+        # 전문 분야 키워드가 포함된 경우
+        if any(expertise in question.lower() for expertise in personality.get("expertise", [])):
+            return self._generate_expert_response(question, info, personality)
+        
+        # 일반적인 질문에 대한 전문가적 관점 제시
+        return self._generate_general_expert_response(question, info, personality)
 
-    def _assistant_expert_response(self, question: str, info: dict) -> str:
+    def _generate_expert_response(self, question: str, info: dict, personality: dict) -> str:
+        """전문 분야 관련 응답 생성"""
+        
+        return f"""{info['emoji']} {info['name']}입니다!
+
+'{question}'에 대해 {personality['role']}로서 답변드리겠습니다.
+
+🎯 **전문가 분석:**
+질문하신 내용은 제가 가장 잘 다룰 수 있는 {info['field']} 분야네요. {personality['style']}를 제공해드리겠습니다.
+
+💡 **맞춤 솔루션:**
+{self._get_specific_solution(question, info['field'])}
+
+✨ **추가 조언:**
+더 구체적인 상황이나 세부사항을 알려주시면, 더욱 정확하고 실용적인 조언을 드릴 수 있습니다!
+
+🚀 **다음 단계:**
+궁금한 점이 더 있으시면 언제든 말씀해주세요!"""
+
+    def _generate_general_expert_response(self, question: str, info: dict, personality: dict) -> str:
+        """일반적인 질문에 대한 전문가 관점 응답"""
+        
+        return f"""{info['emoji']} {info['name']}입니다!
+
+'{question}'에 대해 {info['field']} 전문가 관점에서 답변드리겠습니다.
+
+🔍 **전문가 시각:**
+{personality['role']}로서 이 문제를 바라보면, {info['field']} 관점에서 접근해볼 수 있을 것 같습니다.
+
+💭 **종합적 고려사항:**
+• 현재 상황의 정확한 파악이 중요합니다
+• {info['field']} 원칙을 적용한 체계적 접근
+• 실행 가능한 구체적 방안 모색
+
+🎯 **제안사항:**
+{self._get_field_specific_advice(question, info['field'])}
+
+📞 **추가 상담:**
+더 자세한 상황을 알려주시면 {info['field']} 전문성을 바탕으로 더 구체적인 도움을 드릴 수 있습니다!"""
+
+    def _get_specific_solution(self, question: str, field: str) -> str:
+        """분야별 구체적 솔루션 제공"""
+        
+        solutions = {
+            "업무 관리": "효율적인 시간 관리와 우선순위 설정을 통해 생산성을 극대화하고, 체계적인 업무 프로세스를 구축하세요.",
+            "개발": "문제를 단계별로 분해하고, 적절한 기술 스택을 선택하여 확장 가능한 솔루션을 설계해보세요.",
+            "상담": "먼저 감정을 충분히 인정하고 수용한 후, 건설적인 해결 방안을 함께 모색해나가는 것이 중요합니다.",
+            "창작": "기존의 틀에서 벗어나 새로운 관점으로 접근하고, 다양한 영감의 원천을 탐색해보세요.",
+            "데이터 분석": "데이터의 품질을 먼저 검증하고, 적절한 분석 방법론을 적용하여 의미 있는 인사이트를 도출하세요.",
+            "운세": "현재의 에너지 흐름을 이해하고, 긍정적인 마음가짐으로 좋은 기운을 끌어당기세요.",
+            "성장": "작은 습관부터 시작하여 꾸준히 실천하고, 단계적으로 목표를 확장해나가세요.",
+            "인사 관리": "구성원 개개인의 강점을 파악하고, 공정하고 투명한 시스템을 통해 조직 역량을 극대화하세요.",
+            "마케팅": "타겟 고객의 니즈를 정확히 파악하고, 차별화된 가치 제안을 통해 브랜드 경쟁력을 강화하세요.",
+            "의료": "정확한 진단과 전문의 상담을 받으시고, 예방 중심의 건강한 생활습관을 유지하세요.",
+            "영업": "고객의 입장에서 생각하고, 진정성 있는 관계 구축을 통해 신뢰를 바탕으로 한 영업을 하세요.",
+            "검색 최적화": "사용자 의도에 맞는 고품질 콘텐츠를 제작하고, 기술적 SEO를 체계적으로 최적화하세요.",
+            "쇼핑": "신중한 비교검토를 통해 가성비를 따져보고, 실제 필요성을 고려한 합리적 소비를 하세요.",
+            "창업": "시장 검증을 통해 실제 고객 문제를 해결하는 솔루션을 개발하고, 점진적으로 사업을 확장하세요.",
+            "마을 관리": "모든 구성원의 의견을 듣고 조율하여, 공동체 전체의 이익을 고려한 균형잡힌 의사결정을 하세요.",
+            "문서 작성": "명확한 구조와 논리적 흐름을 갖추고, 독자의 입장에서 이해하기 쉽게 작성하세요."
+        }
+        
+        return solutions.get(field, "전문적인 관점에서 체계적으로 접근하고, 실행 가능한 방안을 단계별로 수립해보세요.")
+
+    def _get_field_specific_advice(self, question: str, field: str) -> str:
+        """분야별 맞춤 조언 제공"""
+        
+        advice = {
+            "업무 관리": "시간 관리 매트릭스를 활용해 중요도와 긴급도를 분류하고, 집중 시간을 확보하세요.",
+            "개발": "MVP(최소 실행 제품)부터 시작해서 사용자 피드백을 받으며 반복 개선해나가세요.",
+            "상담": "경청의 자세로 상대방의 마음을 충분히 이해하고, 함께 해결책을 찾아가세요.",
+            "창작": "다양한 경험과 관찰을 통해 영감을 축적하고, 실험정신을 갖고 도전해보세요.",
+            "데이터 분석": "가설을 세우고 데이터로 검증하는 과정을 반복하여 신뢰할 수 있는 결과를 도출하세요.",
+            "운세": "현재에 충실하면서도 미래에 대한 긍정적 비전을 갖고 행동하세요.",
+            "성장": "SMART 목표 설정법을 활용해 구체적이고 측정 가능한 목표를 수립하세요.",
+            "인사 관리": "정기적인 1:1 면담과 피드백을 통해 구성원과 소통하고 성장을 지원하세요.",
+            "마케팅": "고객 여정을 분석하고 각 단계별 최적의 터치포인트를 설계하세요.",
+            "의료": "정기 건강검진과 함께 균형잡힌 식단, 규칙적인 운동으로 건강을 관리하세요.",
+            "영업": "고객의 니즈를 파악하고 그에 맞는 솔루션을 제시하는 컨설팅 영업을 하세요.",
+            "검색 최적화": "키워드 리서치부터 시작해서 콘텐츠 최적화와 기술적 SEO를 병행하세요.",
+            "쇼핑": "가격 비교 사이트를 활용하고, 리뷰와 평점을 꼼꼼히 확인한 후 구매하세요.",
+            "창업": "린 스타트업 방법론을 적용해 빠른 실험과 학습을 통해 사업 모델을 검증하세요.",
+            "마을 관리": "투명한 소통 채널을 구축하고, 정기적인 의견 수렴을 통해 민주적으로 운영하세요.",
+            "문서 작성": "5W1H 원칙에 따라 정보를 정리하고, 단락별 핵심 메시지를 명확히 하세요."
+        }
+        
+        return advice.get(field, "전문 지식을 바탕으로 단계적이고 실용적인 접근 방법을 찾아보세요.")
         """박사급 비서 도깨비 전문 응답 - 실제 AI 대화"""
         # 질문 키워드 분석으로 맞춤 응답
         question_lower = question.lower()
