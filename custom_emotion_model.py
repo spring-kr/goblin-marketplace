@@ -61,22 +61,24 @@ class CustomEmotionModelLoader:
                 model_data = pickle.load(f)
 
             # PyTorch 모델인지 확인
-            if hasattr(model_data, 'state_dict') or isinstance(model_data, torch.nn.Module):
+            if hasattr(model_data, "state_dict") or isinstance(
+                model_data, torch.nn.Module
+            ):
                 self.model = model_data
                 self.model_type = "pytorch"
                 # 평가 모드로 설정
-                if hasattr(self.model, 'eval'):
+                if hasattr(self.model, "eval"):
                     self.model.eval()
                 print("✅ PyTorch 모델 로드 성공!")
             # 단일 모델인지 여러 컴포넌트가 포함된 딕셔너리인지 확인
             elif isinstance(model_data, dict):
                 # PyTorch 모델이 딕셔너리에 포함된 경우
-                if 'model' in model_data and hasattr(model_data['model'], 'state_dict'):
+                if "model" in model_data and hasattr(model_data["model"], "state_dict"):
                     self.model = model_data.get("model")
                     self.tokenizer = model_data.get("tokenizer")
                     self.config = model_data.get("config")
                     self.model_type = "pytorch"
-                    if hasattr(self.model, 'eval'):
+                    if hasattr(self.model, "eval"):
                         self.model.eval()
                     print("✅ PyTorch 모델 (딕셔너리) 로드 성공!")
                 else:
@@ -103,7 +105,7 @@ class CustomEmotionModelLoader:
             model_data = joblib.load(model_path)
 
             # Pipeline 객체인지 확인
-            if hasattr(model_data, 'named_steps'):
+            if hasattr(model_data, "named_steps"):
                 # Scikit-learn Pipeline
                 self.model = model_data
                 self.model_type = "pipeline"
@@ -164,14 +166,14 @@ class CustomEmotionModelLoader:
             # 일반적인 모델 파일명 패턴들
             model_patterns = [
                 "model.pkl",
-                "model.joblib", 
+                "model.joblib",
                 "emotion_model.pkl",
                 "emotion_model.joblib",
                 "classifier.pkl",
                 "classifier.joblib",
                 "korean_bert_emotion.pkl",  # 추가된 패턴
                 "*emotion*.pkl",  # 감정 관련 패턴
-                "*bert*.pkl",     # BERT 관련 패턴
+                "*bert*.pkl",  # BERT 관련 패턴
             ]
 
             vectorizer_patterns = [
@@ -185,23 +187,29 @@ class CustomEmotionModelLoader:
 
             # 실제 디렉토리의 모든 .pkl 파일 검색
             import glob
+
             pkl_files = glob.glob(os.path.join(model_dir, "*.pkl"))
             pth_files = glob.glob(os.path.join(model_dir, "*.pth"))  # PyTorch 모델
-            
+
             print(f"🔍 발견된 모델 파일들: {pkl_files + pth_files}")
 
             # 모델 파일 찾기 - 직접 검색
             for pkl_file in pkl_files:
                 file_name = os.path.basename(pkl_file).lower()
-                if any(keyword in file_name for keyword in ["emotion", "bert", "model", "classifier"]):
+                if any(
+                    keyword in file_name
+                    for keyword in ["emotion", "bert", "model", "classifier"]
+                ):
                     print(f"🎯 모델 파일 로드 시도: {pkl_file}")
                     try:
                         if pkl_file.endswith(".pkl"):
                             with open(pkl_file, "rb") as f:
                                 model_data = pickle.load(f)
-                            
+
                             # PyTorch 모델인지 확인
-                            if hasattr(model_data, 'state_dict') or isinstance(model_data, torch.nn.Module):
+                            if hasattr(model_data, "state_dict") or isinstance(
+                                model_data, torch.nn.Module
+                            ):
                                 self.model = model_data
                                 self.model_type = "pytorch"
                                 print(f"✅ PyTorch 모델 로드 성공: {pkl_file}")
@@ -209,7 +217,11 @@ class CustomEmotionModelLoader:
                                 self.model = model_data.get("model")
                                 self.tokenizer = model_data.get("tokenizer")
                                 self.config = model_data.get("config")
-                                self.model_type = "pytorch" if hasattr(self.model, 'state_dict') else "sklearn"
+                                self.model_type = (
+                                    "pytorch"
+                                    if hasattr(self.model, "state_dict")
+                                    else "sklearn"
+                                )
                                 print(f"✅ 딕셔너리 모델 로드 성공: {pkl_file}")
                             else:
                                 self.model = model_data
@@ -255,11 +267,11 @@ class CustomEmotionModelLoader:
             # PyTorch 모델 처리
             if self.model_type == "pytorch":
                 return self._predict_with_pytorch(processed_text)
-            
+
             # Pipeline 모델 처리
             elif self.model_type == "pipeline":
                 return self._predict_with_pipeline(processed_text)
-            
+
             # 벡터화 (vectorizer가 있는 경우만 처리)
             if self.vectorizer:
                 try:
@@ -331,10 +343,18 @@ class CustomEmotionModelLoader:
         try:
             # 기본 감정 클래스 (config에서 로드하거나 기본값 사용)
             emotion_classes = [
-                "불안", "우울", "분노", "두려움", "슬픔",
-                "기쁨", "안도", "희망", "감사", "중립"
+                "불안",
+                "우울",
+                "분노",
+                "두려움",
+                "슬픔",
+                "기쁨",
+                "안도",
+                "희망",
+                "감사",
+                "중립",
             ]
-            
+
             if self.config and "emotion_categories" in self.config:
                 emotion_classes = self.config["emotion_categories"]["class_labels"]
 
@@ -342,39 +362,47 @@ class CustomEmotionModelLoader:
             if self.tokenizer:
                 # BERT 토크나이저 사용
                 inputs = self.tokenizer(
-                    text, 
-                    max_length=512, 
-                    padding='max_length', 
-                    truncation=True, 
-                    return_tensors='pt'
+                    text,
+                    max_length=512,
+                    padding="max_length",
+                    truncation=True,
+                    return_tensors="pt",
                 )
-                
+
                 # 모델 예측
                 with torch.no_grad():
                     outputs = self.model(**inputs)
-                    if hasattr(outputs, 'logits'):
-                        predictions = torch.nn.functional.softmax(outputs.logits, dim=-1)
+                    if hasattr(outputs, "logits"):
+                        predictions = torch.nn.functional.softmax(
+                            outputs.logits, dim=-1
+                        )
                     else:
                         predictions = torch.nn.functional.softmax(outputs, dim=-1)
-                
+
                 # 결과 처리
                 probabilities = predictions[0].cpu().numpy()
                 emotion_scores = dict(zip(emotion_classes, probabilities))
-                
+
                 # 가장 높은 확률의 감정 찾기
                 max_idx = int(torch.argmax(predictions[0]).item())
-                primary_emotion = emotion_classes[max_idx] if max_idx < len(emotion_classes) else "중립"
+                primary_emotion = (
+                    emotion_classes[max_idx]
+                    if max_idx < len(emotion_classes)
+                    else "중립"
+                )
                 confidence = float(probabilities[max_idx])
-                
+
                 # 강도 계산
                 intensity = (
-                    "높음" if confidence > 0.7 else "보통" if confidence > 0.4 else "낮음"
+                    "높음"
+                    if confidence > 0.7
+                    else "보통" if confidence > 0.4 else "낮음"
                 )
-                
+
                 return {
                     "primary_emotion": primary_emotion,
                     "confidence": confidence,
-                    "intensity": intensity, 
+                    "intensity": intensity,
                     "all_emotions": emotion_scores,
                     "analysis_method": "Custom_PyTorch_BERT",
                     "model_info": {
@@ -383,7 +411,7 @@ class CustomEmotionModelLoader:
                         "model_class": type(self.model).__name__,
                     },
                 }
-                
+
             else:
                 # 토크나이저가 없는 경우 폴백
                 return self._fallback_emotion_analysis(text)
@@ -397,34 +425,34 @@ class CustomEmotionModelLoader:
         try:
             # 파이프라인 직접 사용 (벡터화 + 예측 통합)
             prediction = self.model.predict([text])[0]
-            
+
             # 확률 예측 (가능한 경우)
-            if hasattr(self.model, 'predict_proba'):
+            if hasattr(self.model, "predict_proba"):
                 probabilities = self.model.predict_proba([text])[0]
-                
+
                 # 클래스 라벨 가져오기
-                if hasattr(self.model, 'classes_'):
+                if hasattr(self.model, "classes_"):
                     classes = self.model.classes_
                 else:
                     # 파이프라인의 분류기에서 클래스 가져오기
-                    classifier = self.model.named_steps.get('classifier')
-                    if hasattr(classifier, 'classes_'):
+                    classifier = self.model.named_steps.get("classifier")
+                    if hasattr(classifier, "classes_"):
                         classes = classifier.classes_
                     else:
                         classes = ["기쁨", "슬픔", "분노", "불안", "중립"]
-                
+
                 emotion_scores = dict(zip(classes, probabilities))
                 confidence = float(max(probabilities))
             else:
                 # 확률 예측이 불가능한 경우
                 emotion_scores = {str(prediction): 0.8}
                 confidence = 0.8
-            
+
             # 강도 계산
             intensity = (
                 "높음" if confidence > 0.7 else "보통" if confidence > 0.4 else "낮음"
             )
-            
+
             return {
                 "primary_emotion": str(prediction),
                 "confidence": confidence,

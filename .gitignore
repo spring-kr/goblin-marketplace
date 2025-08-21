@@ -1,87 +1,80 @@
-# HYOJIN.AI MVP - Git 무시 파일
-# 업데이트: 2025.08.19
+# 로그 파일
+*.log
 
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
+# 환경 변수 (실제 운영환경에서는 제외)
+.env.local
+.env.production
 
-# Virtual Environment
-venv/
-env/
-ENV/
-
-# IDE
-.vscode/
+# 에디터 설정
 .idea/
 *.swp
 *.swo
 
-# OS
+# 운영체제 파일
 .DS_Store
 Thumbs.db
 
-# Database
-*.db
-*.sqlite3
+# 빌드 결과물
+dist/
+build/
 
-# Logs
-*.log
+# 노드 모듈 (필요시)
+node_modules/
 
-# Environment variables
-.env
+# 백업 파일
+*.bak
+*.backup
+*_backup*
+backup_files/
 
-# Railway
-.railway/
+# 임시 파일들
+deleted_files*.txt
+origin_files*.txt
+remote_tree.txt
+staged_deleted.txt
+untracked_list.txt
 
-# Backup files
-*_backup.py
-*_backup.html
-*_old.py
-*_old.html
-main_security.py
+# 로그 및 데이터베이스 (개발용)
+usage_logs.json
+conversation_context.json
+hyojin_payments.db
 
-# Temporary/Development files
-index_new.html
-index_updated.html
-admin-login.html
-link-dashboard.html
-temp_*.py
+# 테스트 임시 파일
+generate_test_data_backup.py
+
+# Python 캐시
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# 보안상 중요한 AI 에이전트 파일들
+phd_goblins/
+stem_agents/
+stem_integration.py
+response_context_manager.py
+
+# 테스트 파일들
 test_*.py
+*_test.py
+*_test_*.py
+quick_*.py
+create_*.py
+debug_*.py
+simple_*.py
+customize_*.py
+usage_log.json
 
-# Documentation (optional - comment out if you want to track them)
-# DEVELOPMENT_PROGRESS.md
-# ROADMAP.md
-# TECHNICAL_SPECS.md
-# VIRTUAL_LINKS.md
+# 모델 및 데이터 파일들
+models/
+*.pkl
+*.joblib
+*.model
 
-# Internal/Sensitive Documentation (DO NOT COMMIT)
-DEVELOPMENT_PROGRESS.md
-ROADMAP.md
-TECHNICAL_SPECS.md
-VIRTUAL_LINKS.md
-*_INTERNAL.md
-*_PRIVATE.md
-docs/internal/
-docs/private/
-
-# Temporary files
-temp/
-tmp/
+# 작업 공간 디렉토리들 (필요시 제외)
+chemistry_workspace/
+physics_workspace/
+professional_workspace/
+stem_math_workspace/
+tests/

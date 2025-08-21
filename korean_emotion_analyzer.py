@@ -31,7 +31,7 @@ class KoreanEmotionAnalyzer:
         """사용자 맞춤형 모델 초기화"""
         try:
             from custom_emotion_model import CustomEmotionModelLoader
-            
+
             # 모델 경로들 시도 (새 파이프라인 우선)
             model_paths = [
                 "./models/korean_emotion_complete_pipeline.pkl",  # 새로 생성된 파이프라인
@@ -40,22 +40,24 @@ class KoreanEmotionAnalyzer:
                 "./models/",  # 디렉토리 경로
                 "./models/trained_models/",  # 훈련된 모델 디렉토리
             ]
-            
+
             for model_path in model_paths:
                 try:
                     print(f"🔍 모델 로드 시도: {model_path}")
                     loader = CustomEmotionModelLoader(model_path)
                     if loader.is_loaded:
                         self.custom_model = loader
-                        print(f"✅ 사용자 맞춤형 감정분석 모델 로드 성공! ({model_path})")
+                        print(
+                            f"✅ 사용자 맞춤형 감정분석 모델 로드 성공! ({model_path})"
+                        )
                         return True
                 except Exception as e:
                     print(f"⚠️ {model_path} 로드 실패: {e}")
                     continue
-            
+
             print("⚠️ 사용자 모델 없음, 기본 모델 사용")
             return False
-            
+
         except ImportError:
             print("⚠️ 사용자 모델 로더 없음")
             return False
@@ -94,14 +96,18 @@ class KoreanEmotionAnalyzer:
             try:
                 result = self.custom_model.predict_emotion(text)
                 print(f"🎯 사용자 모델 사용: {result.get('analysis_method', 'Custom')}")
-                
+
                 # 반환 값 구조 통일
                 return {
-                    "emotion": result.get("primary_emotion", result.get("emotion", "중립")),
+                    "emotion": result.get(
+                        "primary_emotion", result.get("emotion", "중립")
+                    ),
                     "confidence": result.get("confidence", 0.5),
                     "intensity": result.get("intensity", "보통"),
                     "method": result.get("analysis_method", "Custom_Model"),
-                    "emotion_scores": result.get("all_emotions", result.get("emotion_scores", {}))
+                    "emotion_scores": result.get(
+                        "all_emotions", result.get("emotion_scores", {})
+                    ),
                 }
             except Exception as e:
                 print(f"⚠️ 사용자 모델 실패, 백업 모델 사용: {e}")
@@ -115,7 +121,7 @@ class KoreanEmotionAnalyzer:
                     "confidence": result.get("confidence", 0.5),
                     "intensity": result.get("intensity", "보통"),
                     "method": result.get("analysis_method", "BERT"),
-                    "emotion_scores": result.get("all_emotions", {})
+                    "emotion_scores": result.get("all_emotions", {}),
                 }
             except Exception as e:
                 print(f"⚠️ BERT 모델 실패, 규칙 기반 사용: {e}")
@@ -127,7 +133,7 @@ class KoreanEmotionAnalyzer:
             "confidence": result.get("confidence", 0.5),
             "intensity": result.get("intensity", "보통"),
             "method": result.get("analysis_method", "Rule_Based"),
-            "emotion_scores": result.get("all_emotions", {})
+            "emotion_scores": result.get("all_emotions", {}),
         }
 
     def _bert_emotion_analysis(self, text: str) -> Dict[str, Any]:
