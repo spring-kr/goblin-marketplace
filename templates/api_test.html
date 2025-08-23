@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API 테스트</title>
+</head>
+<body>
+    <h1>도깨비 API 테스트</h1>
+    <button onclick="testAPI()">API 테스트</button>
+    <div id="results"></div>
+
+    <script>
+        async function testAPI() {
+            console.log('API 테스트 시작...');
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<p>API 요청 중...</p>';
+            
+            try {
+                console.log('API 요청 전송...');
+                const response = await fetch('/api/mobile/goblins');
+                console.log('응답 받음:', response.status);
+                
+                const data = await response.json();
+                console.log('JSON 파싱 완료:', data);
+                
+                if (data.success) {
+                    const goblins = data.goblins;
+                    const count = Object.keys(goblins).length;
+                    
+                    let html = `<h2>성공! 도깨비 ${count}명 발견</h2><ul>`;
+                    
+                    let i = 0;
+                    for (const [id, info] of Object.entries(goblins)) {
+                        if (i < 5) {
+                            html += `<li>${info.emoji} ${info.name} - ${info.specialty}</li>`;
+                        } else if (i === 5) {
+                            html += `<li>... 및 ${count - 5}명 더</li>`;
+                            break;
+                        }
+                        i++;
+                    }
+                    
+                    html += '</ul>';
+                    resultsDiv.innerHTML = html;
+                } else {
+                    resultsDiv.innerHTML = `<p style="color: red;">실패: ${data.error}</p>`;
+                }
+                
+            } catch (error) {
+                console.error('오류:', error);
+                resultsDiv.innerHTML = `<p style="color: red;">오류: ${error.message}</p>`;
+            }
+        }
+        
+        // 페이지 로드 시 자동 테스트
+        window.addEventListener('load', testAPI);
+    </script>
+</body>
+</html>

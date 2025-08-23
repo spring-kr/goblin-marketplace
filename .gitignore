@@ -1,80 +1,91 @@
-# 로그 파일
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# Database files
+*.db
+*.sqlite3
+
+# Log files
 *.log
 
-# 환경 변수 (실제 운영환경에서는 제외)
-.env.local
-.env.production
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 
-# 에디터 설정
+# IDE
+.vscode/
 .idea/
 *.swp
 *.swo
 
-# 운영체제 파일
-.DS_Store
-Thumbs.db
+# Environment variables
+.env
+.env.local
 
-# 빌드 결과물
-dist/
-build/
+# Temporary files
+temp/
+tmp/
+*.tmp
 
-# 노드 모듈 (필요시)
-node_modules/
+# Memory database files
+*_advanced_memory_v11.db
+*_memory.db
 
-# 백업 파일
-*.bak
-*.backup
-*_backup*
-backup_files/
-
-# 임시 파일들
-deleted_files*.txt
-origin_files*.txt
-remote_tree.txt
-staged_deleted.txt
-untracked_list.txt
-
-# 로그 및 데이터베이스 (개발용)
-usage_logs.json
-conversation_context.json
-hyojin_payments.db
-
-# 테스트 임시 파일
-generate_test_data_backup.py
-
-# Python 캐시
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-
-# 보안상 중요한 AI 에이전트 파일들
-phd_goblins/
-stem_agents/
-stem_integration.py
-response_context_manager.py
-
-# 테스트 파일들
+# Test files
 test_*.py
 *_test.py
-*_test_*.py
-quick_*.py
-create_*.py
 debug_*.py
-simple_*.py
-customize_*.py
-usage_log.json
 
-# 모델 및 데이터 파일들
+# Backup files
+*_backup_*.py
+*_복사본.py
+
+# Output files
+*.png
+*.jpg
+*.jpeg
+multimodal_output/
 models/
-*.pkl
-*.joblib
-*.model
 
-# 작업 공간 디렉토리들 (필요시 제외)
-chemistry_workspace/
-physics_workspace/
-professional_workspace/
-stem_math_workspace/
-tests/
+# Version files
+*_v*.py
+!goblin_mobile_app_v11.py
+!complete_goblin_integration_v11.py
+!advanced_memory_system_v11.py
+!advanced_goblin_adapter_v11.py
+
+# Korean files (temporary exclusion)
+*한글*
+*도깨비*
+*.md
+!README.md
+!서비스_배포_가이드.md

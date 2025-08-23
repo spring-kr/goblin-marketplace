@@ -1,0 +1,12 @@
+<!-- PWA 테스트용 기본 아이콘 (SVG 형태) -->
+<svg width="192" height="192" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="grad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </radialGradient>
+  </defs>
+  <rect width="192" height="192" rx="32" fill="url(#grad)"/>
+  <text x="96" y="110" font-family="Arial, sans-serif" font-size="80" fill="white" text-anchor="middle">🧚</text>
+  <text x="96" y="150" font-family="Arial, sans-serif" font-size="20" fill="white" text-anchor="middle">도깨비장터</text>
+</svg>

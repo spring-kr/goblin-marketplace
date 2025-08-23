@@ -1,15 +1,11 @@
-# Render 배포 설정 - Python 3.8.18 강제 고정
 services:
   - type: web
-    name: hyojin-ai-mvp
+    name: goblin-marketplace
     runtime: python
-    buildCommand: |
-      python --version
-      pip install --upgrade pip
-      pip install -r requirements.txt
-    startCommand: uvicorn main_server:app --host 0.0.0.0 --port $PORT
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python goblin_mobile_app_v11.py"
     envVars:
       - key: PYTHON_VERSION
-        value: 3.8.18
+        value: 3.9.16
       - key: PORT
-        generateValue: true
+        value: 5012

@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 도깨비마을장터 통합 대시보드 v12.5</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            color: white;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+
+        .status-bar {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .status-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .card h2 {
+            color: #4a5568;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        /* 채팅 인터페이스 */
+        .chat-container {
+            height: 500px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 15px;
+            background: #f8fafc;
+            margin-bottom: 15px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px;
+            border-radius: 12px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-message {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            margin-left: 20%;
+        }
+
+        .ai-message {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+            margin-right: 20%;
+        }
+
+        .system-message {
+            background: #e2e8f0;
+            color: #4a5568;
+            text-align: center;
+            font-style: italic;
+        }
+
+        .message-meta {
+            font-size: 0.8em;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        .chat-input-area {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .input-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        select, input, button {
+            padding: 12px;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+            font-size: 14px;
+        }
+
+        #messageInput {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        #sendButton {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+
+        #sendButton:hover {
+            transform: translateY(-2px);
+        }
+
+        #sendButton:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* 모니터링 대시보드 */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        /* 시스템 상태 */
+        .system-health {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .system-card {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .system-status {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .status-healthy { background: #48bb78; color: white; }
+        .status-warning { background: #ed8936; color: white; }
+        .status-error { background: #f56565; color: white; }
+
+        /* 전문가 선택 */
+        .expert-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .expert-btn {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+            border: none;
+            padding: 15px 10px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            font-size: 0.9em;
+        }
+
+        .expert-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .expert-btn.selected {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            transform: scale(1.05);
+        }
+
+        /* 차트 컨테이너 */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 20px;
+        }
+
+        /* 반응형 디자인 */
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .input-controls {
+                flex-direction: column;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+        }
+
+        /* 로딩 애니메이션 */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* 알림 */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(72, 187, 120, 0.9);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            z-index: 1000;
+            animation: slideInRight 0.3s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        .notification.error {
+            background: rgba(245, 101, 101, 0.9);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎮 도깨비마을장터 통합 대시보드</h1>
+            <p class="subtitle">v12.5 - 모든 AI 시스템을 한 곳에서 관리</p>
+            <div class="status-bar">
+                <div class="status-item">
+                    <span id="connectionStatus">🔴 연결 중...</span>
+                </div>
+                <div class="status-item">
+                    <span id="activeUsers">👥 사용자: 0</span>
+                </div>
+                <div class="status-item">
+                    <span id="systemHealth">💚 시스템: 최적</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-grid">
+            <!-- AI 채팅 인터페이스 -->
+            <div class="card">
+                <h2>🤖 AI 통합 채팅</h2>
+                
+                <div class="expert-grid">
+                    <button class="expert-btn selected" data-expert="auto">🎯 자동</button>
+                    <button class="expert-btn" data-expert="psychology">🧠 심리</button>
+                    <button class="expert-btn" data-expert="business">💼 비즈니스</button>
+                    <button class="expert-btn" data-expert="health">💪 건강</button>
+                    <button class="expert-btn" data-expert="technology">💻 기술</button>
+                    <button class="expert-btn" data-expert="creative">🎨 창의</button>
+                </div>
+
+                <div class="chat-container">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="message system-message">
+                            🎉 도깨비마을장터 통합 시스템에 오신 것을 환영합니다!<br>
+                            v11.0 기본 시스템 + v12.0 고급 AI가 함께 도와드립니다.
+                        </div>
+                    </div>
+                    
+                    <div class="chat-input-area">
+                        <div class="input-controls">
+                            <select id="responseStyle">
+                                <option value="adaptive">🎭 적응형</option>
+                                <option value="empathetic">💝 공감형</option>
+                                <option value="analytical">📊 분석형</option>
+                                <option value="creative">🌟 창의형</option>
+                                <option value="practical">🔧 실용형</option>
+                            </select>
+                            <input type="text" id="messageInput" placeholder="메시지를 입력하세요..." maxlength="1000">
+                            <button id="sendButton">전송</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 실시간 모니터링 -->
+            <div class="card">
+                <h2>📊 실시간 시스템 모니터링</h2>
+                
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value" id="totalRequests">0</div>
+                        <div class="metric-label">총 요청</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="responseTime">0.0s</div>
+                        <div class="metric-label">응답시간</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="errorRate">0.0%</div>
+                        <div class="metric-label">오류율</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="activeSessions">0</div>
+                        <div class="metric-label">활성 세션</div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="performanceChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- 시스템 상태 -->
+        <div class="card">
+            <h2>🏥 시스템 상태</h2>
+            <div class="system-health" id="systemHealth">
+                <div class="system-card">
+                    <div class="system-status status-healthy" id="v11Status">v11</div>
+                    <h3>기본 시스템 v11.0</h3>
+                    <p>32명의 전문가 + 27마리 슈퍼 도깨비</p>
+                    <p id="v11Details">가용성: 95%</p>
+                </div>
+                <div class="system-card">
+                    <div class="system-status status-healthy" id="v12Status">v12</div>
+                    <h3>고급 AI v12.0</h3>
+                    <p>GPT-4 수준 응답 + 감정 분석</p>
+                    <p id="v12Details">가용성: 88%</p>
+                </div>
+                <div class="system-card">
+                    <div class="system-status status-healthy" id="fallbackStatus">FB</div>
+                    <h3>폴백 시스템</h3>
+                    <p>기본 응답 + 안정성 보장</p>
+                    <p id="fallbackDetails">가용성: 100%</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Socket.IO 연결
+        const socket = io();
+        
+        // 전역 변수
+        let selectedExpert = 'auto';
+        let isProcessing = false;
+        let performanceChart;
+        
+        // DOM 요소
+        const chatMessages = document.getElementById('chatMessages');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        const responseStyle = document.getElementById('responseStyle');
+        
+        // 연결 이벤트
+        socket.on('connect', () => {
+            updateConnectionStatus('🟢 연결됨', 'success');
+            showNotification('서버에 성공적으로 연결되었습니다!', 'success');
+        });
+        
+        socket.on('disconnect', () => {
+            updateConnectionStatus('🔴 연결 해제됨', 'error');
+            showNotification('서버 연결이 해제되었습니다.', 'error');
+        });
+        
+        // 연결 확인 수신
+        socket.on('connection_established', (data) => {
+            addSystemMessage(`환영합니다! 세션 ID: ${data.session_id.substring(0, 8)}...`);
+            addSystemMessage('사용 가능한 기능: ' + data.available_features.join(', '));
+        });
+        
+        // 메시지 응답 수신
+        socket.on('message_response', (data) => {
+            addUserMessage(data.user_message);
+            addAIMessage(data.ai_response, data);
+            setProcessing(false);
+        });
+        
+        // 처리 시작 알림
+        socket.on('processing_start', (data) => {
+            addSystemMessage(data.message);
+        });
+        
+        // 오류 처리
+        socket.on('error', (data) => {
+            addSystemMessage(`오류: ${data.message}`);
+            setProcessing(false);
+            showNotification(data.message, 'error');
+        });
+        
+        // 사용자 수 업데이트
+        socket.on('user_count_update', (data) => {
+            document.getElementById('activeUsers').textContent = `👥 사용자: ${data.active_users}`;
+        });
+        
+        // 시스템 통계 업데이트
+        socket.on('system_stats_update', (data) => {
+            updateMetrics(data);
+        });
+        
+        // 시스템 건강도 업데이트
+        socket.on('system_health_update', (data) => {
+            updateSystemHealth(data);
+        });
+        
+        // 전문가 선택 버튼 이벤트
+        document.querySelectorAll('.expert-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.expert-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                selectedExpert = btn.dataset.expert;
+                
+                socket.emit('join_expert_room', { expert_type: selectedExpert });
+                addSystemMessage(`${btn.textContent} 전문가를 선택했습니다.`);
+            });
+        });
+        
+        // 메시지 전송
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message || isProcessing) return;
+            
+            setProcessing(true);
+            
+            socket.emit('send_message', {
+                message: message,
+                expert: selectedExpert,
+                style: responseStyle.value
+            });
+            
+            messageInput.value = '';
+        }
+        
+        // 이벤트 리스너
+        sendButton.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+        
+        // 메시지 추가 함수들
+        function addMessage(content, className, metadata = null) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${className}`;
+            
+            let html = content;
+            if (metadata) {
+                html += `<div class="message-meta">
+                    시스템: ${metadata.system_used} | 
+                    처리시간: ${metadata.processing_time}s | 
+                    신뢰도: ${metadata.confidence}
+                </div>`;
+            }
+            
+            messageDiv.innerHTML = html;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function addUserMessage(content) {
+            addMessage(content, 'user-message');
+        }
+        
+        function addAIMessage(content, metadata) {
+            addMessage(content, 'ai-message', metadata);
+        }
+        
+        function addSystemMessage(content) {
+            addMessage(content, 'system-message');
+        }
+        
+        // UI 업데이트 함수들
+        function setProcessing(processing) {
+            isProcessing = processing;
+            sendButton.disabled = processing;
+            sendButton.innerHTML = processing ? '<div class="loading"></div>' : '전송';
+        }
+        
+        function updateConnectionStatus(text, type) {
+            const statusElement = document.getElementById('connectionStatus');
+            statusElement.textContent = text;
+            statusElement.className = type;
+        }
+        
+        function updateMetrics(data) {
+            document.getElementById('totalRequests').textContent = data.total_requests;
+            document.getElementById('responseTime').textContent = `${data.response_time}s`;
+            document.getElementById('errorRate').textContent = `${data.error_rate}%`;
+            document.getElementById('activeSessions').textContent = data.active_sessions || 0;
+            
+            // 차트 업데이트
+            updateChart(data);
+        }
+        
+        function updateSystemHealth(data) {
+            const systems = data.systems;
+            
+            // v11 시스템
+            if (systems.v11_basic) {
+                updateSystemStatus('v11Status', 'v11Details', systems.v11_basic);
+            }
+            
+            // v12 시스템
+            if (systems.v12_advanced) {
+                updateSystemStatus('v12Status', 'v12Details', systems.v12_advanced);
+            }
+            
+            // 폴백 시스템
+            if (systems.fallback) {
+                updateSystemStatus('fallbackStatus', 'fallbackDetails', systems.fallback);
+            }
+        }
+        
+        function updateSystemStatus(statusId, detailsId, systemData) {
+            const statusElement = document.getElementById(statusId);
+            const detailsElement = document.getElementById(detailsId);
+            
+            const availability = systemData.availability || 1.0;
+            const responseTime = systemData.response_time || 0.5;
+            
+            // 상태 색상 결정
+            if (availability >= 0.9) {
+                statusElement.className = 'system-status status-healthy';
+            } else if (availability >= 0.7) {
+                statusElement.className = 'system-status status-warning';
+            } else {
+                statusElement.className = 'system-status status-error';
+            }
+            
+            // 세부 정보 업데이트
+            detailsElement.textContent = `가용성: ${(availability * 100).toFixed(1)}% | 응답: ${responseTime.toFixed(2)}s`;
+        }
+        
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+        
+        // 성능 차트 초기화
+        function initChart() {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            performanceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: '응답 시간 (초)',
+                        data: [],
+                        borderColor: 'rgb(102, 126, 234)',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.1
+                    }, {
+                        label: '오류율 (%)',
+                        data: [],
+                        borderColor: 'rgb(245, 101, 101)',
+                        backgroundColor: 'rgba(245, 101, 101, 0.1)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: '실시간 성능 모니터링'
+                        }
+                    }
+                }
+            });
+        }
+        
+        function updateChart(data) {
+            if (!performanceChart) return;
+            
+            const now = new Date().toLocaleTimeString();
+            
+            // 최대 20개 데이터 포인트 유지
+            if (performanceChart.data.labels.length >= 20) {
+                performanceChart.data.labels.shift();
+                performanceChart.data.datasets[0].data.shift();
+                performanceChart.data.datasets[1].data.shift();
+            }
+            
+            performanceChart.data.labels.push(now);
+            performanceChart.data.datasets[0].data.push(data.response_time);
+            performanceChart.data.datasets[1].data.push(data.error_rate);
+            
+            performanceChart.update();
+        }
+        
+        // 초기화
+        document.addEventListener('DOMContentLoaded', () => {
+            initChart();
+            
+            // 시스템 상태 주기적 요청
+            setInterval(() => {
+                socket.emit('request_system_health');
+            }, 30000);
+            
+            // 초기 상태 요청
+            socket.emit('request_system_health');
+        });
+        
+        // 자동 스크롤 메시지 입력
+        messageInput.addEventListener('input', () => {
+            if (messageInput.value.length > 0) {
+                messageInput.style.height = 'auto';
+                messageInput.style.height = Math.min(messageInput.scrollHeight, 120) + 'px';
+            }
+        });
+    </script>
+</body>
+</html>
