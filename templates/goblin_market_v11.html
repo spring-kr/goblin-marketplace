@@ -430,6 +430,7 @@
             <div class="team-mode-section">
                 <h4>🤝 팀 협업 모드</h4>
                 <button class="team-btn" onclick="startTeamMode()">선택된 도깨비들과 협업</button>
+                <button class="team-btn" onclick="goToPayment()" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); margin-left: 10px;">💳 유료 상담 신청</button>
                 <div id="selected-goblins">
                     <small>선택된 도깨비: <span id="selected-count">0</span>명</small>
                 </div>
@@ -653,6 +654,11 @@
             document.getElementById('send-btn').disabled = false;
             
             currentConversationId = null;
+        }
+
+        // 결제 페이지로 이동
+        function goToPayment() {
+            window.open('/payment', '_blank');
         }
 
         // 대화 모드 변경

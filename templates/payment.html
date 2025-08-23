@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💳 도깨비마을장터 결제</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .payment-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            color: #5a67d8;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .payment-form {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        select, input {
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #5a67d8;
+        }
+
+        .expert-card {
+            background: #f7fafc;
+            padding: 1rem;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+            margin-bottom: 1rem;
+        }
+
+        .expert-card.selected {
+            border-color: #5a67d8;
+            background: #ebf4ff;
+        }
+
+        .price-info {
+            background: #f0fff4;
+            padding: 1rem;
+            border-radius: 10px;
+            border: 2px solid #68d391;
+            text-align: center;
+        }
+
+        .payment-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .payment-method {
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .payment-method:hover {
+            border-color: #5a67d8;
+            background: #ebf4ff;
+        }
+
+        .payment-method.selected {
+            border-color: #5a67d8;
+            background: #ebf4ff;
+        }
+
+        .pay-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .pay-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #5a67d8;
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-container">
+        <div class="header">
+            <h1>💳 도깨비마을장터 결제</h1>
+            <p>전문가 도깨비 상담 서비스</p>
+        </div>
+
+        <div class="payment-form">
+            <div class="form-group">
+                <label for="expert-select">상담 받을 전문가 선택</label>
+                <select id="expert-select">
+                    <option value="">전문가를 선택해주세요</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>상담 시간</label>
+                <div class="payment-methods">
+                    <div class="payment-method" data-time="30" data-price="1">
+                        <div>⏰ 30분</div>
+                        <div>기본 상담</div>
+                    </div>
+                    <div class="payment-method" data-time="60" data-price="1.8">
+                        <div>⏰ 60분</div>
+                        <div>심화 상담</div>
+                    </div>
+                    <div class="payment-method" data-time="90" data-price="2.5">
+                        <div>⏰ 90분</div>
+                        <div>집중 상담</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="price-info">
+                <div>💰 결제 금액</div>
+                <div id="total-price" style="font-size: 1.5rem; font-weight: bold; color: #38a169;">0원</div>
+            </div>
+
+            <div class="form-group">
+                <label>결제 방법</label>
+                <div class="payment-methods">
+                    <div class="payment-method" data-method="kakao">
+                        <div>💛 카카오페이</div>
+                    </div>
+                    <div class="payment-method" data-method="toss">
+                        <div>💙 토스페이</div>
+                    </div>
+                    <div class="payment-method" data-method="card">
+                        <div>💳 신용카드</div>
+                    </div>
+                    <div class="payment-method" data-method="bank">
+                        <div>🏦 계좌이체</div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="pay-button" onclick="processPayment()">결제하기</button>
+            
+            <div class="loading">
+                <div>결제 처리 중...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedExpert = null;
+        let selectedTime = null;
+        let selectedMethod = null;
+        let basePrice = 0;
+
+        // 전문가 목록 로드
+        fetch('/api/experts')
+            .then(response => response.json())
+            .then(experts => {
+                const select = document.getElementById('expert-select');
+                experts.forEach(expert => {
+                    const option = document.createElement('option');
+                    option.value = expert.id;
+                    option.textContent = `${expert.name} (${expert.category}) - ${expert.price.toLocaleString()}원`;
+                    option.dataset.price = expert.price;
+                    option.dataset.name = expert.name;
+                    select.appendChild(option);
+                });
+            });
+
+        // 전문가 선택
+        document.getElementById('expert-select').addEventListener('change', function() {
+            const option = this.options[this.selectedIndex];
+            if (option.value) {
+                selectedExpert = {
+                    id: option.value,
+                    name: option.dataset.name,
+                    price: parseInt(option.dataset.price)
+                };
+                basePrice = selectedExpert.price;
+                updatePrice();
+            }
+        });
+
+        // 상담 시간 선택
+        document.querySelectorAll('[data-time]').forEach(method => {
+            method.addEventListener('click', function() {
+                document.querySelectorAll('[data-time]').forEach(m => m.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedTime = {
+                    minutes: this.dataset.time,
+                    multiplier: parseFloat(this.dataset.price)
+                };
+                updatePrice();
+            });
+        });
+
+        // 결제 방법 선택
+        document.querySelectorAll('[data-method]').forEach(method => {
+            method.addEventListener('click', function() {
+                document.querySelectorAll('[data-method]').forEach(m => m.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedMethod = this.dataset.method;
+            });
+        });
+
+        // 가격 업데이트
+        function updatePrice() {
+            if (selectedExpert && selectedTime) {
+                const totalPrice = Math.round(basePrice * selectedTime.multiplier);
+                document.getElementById('total-price').textContent = totalPrice.toLocaleString() + '원';
+            }
+        }
+
+        // 결제 처리
+        function processPayment() {
+            if (!selectedExpert || !selectedTime || !selectedMethod) {
+                alert('모든 항목을 선택해주세요.');
+                return;
+            }
+
+            const totalPrice = Math.round(basePrice * selectedTime.multiplier);
+
+            // 로딩 표시
+            document.querySelector('.loading').style.display = 'block';
+            document.querySelector('.pay-button').style.display = 'none';
+
+            // 결제 API 호출
+            fetch('/api/payment/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    expert_name: selectedExpert.name,
+                    service_type: `${selectedTime.minutes}분 상담`,
+                    amount: totalPrice,
+                    payment_method: selectedMethod
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert(`결제 요청이 생성되었습니다!\n결제 ID: ${data.payment_id}`);
+                    // 실제로는 PG사 결제 페이지로 리다이렉트
+                    window.location.href = '/';
+                } else {
+                    alert('결제 처리 중 오류가 발생했습니다.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('결제 처리 중 오류가 발생했습니다.');
+            })
+            .finally(() => {
+                document.querySelector('.loading').style.display = 'none';
+                document.querySelector('.pay-button').style.display = 'block';
+            });
+        }
+    </script>
+</body>
+</html>
