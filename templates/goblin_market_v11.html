@@ -104,6 +104,22 @@
             font-size: 0.8rem;
             color: #888;
             font-style: italic;
+            margin-bottom: 0.3rem;
+        }
+
+        .goblin-price {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #e53e3e;
+            background: rgba(229, 62, 62, 0.1);
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.3rem;
+            text-align: center;
+        }
+
+        .goblin-price:contains('무료') {
+            color: #38a169;
+            background: rgba(56, 161, 105, 0.1);
         }
 
         /* 채팅 영역 */
@@ -522,39 +538,40 @@
         let lastMessageId = null;
         let selectedRating = 0;
 
-        // Socket.IO 연결
+        // Socket.IO 연결 (임시 비활성화)
         function initSocket() {
-            socket = io();
+            console.log('Socket.IO 연결 비활성화됨 - 시뮬레이션 모드');
+            // socket = io();
             
-            socket.on('connect', function() {
-                console.log('서버에 연결되었습니다');
-                showToast('도깨비마을장터에 연결되었습니다! 🎉');
-            });
+            // socket.on('connect', function() {
+            //     console.log('서버에 연결되었습니다');
+            //     showToast('도깨비마을장터에 연결되었습니다! 🎉');
+            // });
             
-            socket.on('connected', function(data) {
-                console.log('연결 확인:', data);
-            });
+            // socket.on('connected', function(data) {
+            //     console.log('연결 확인:', data);
+            // });
             
-            socket.on('chat_response', function(data) {
-                handleChatResponse(data);
-            });
+            // socket.on('chat_response', function(data) {
+            //     handleChatResponse(data);
+            // });
             
-            socket.on('team_response', function(data) {
-                handleTeamResponse(data);
-            });
+            // socket.on('team_response', function(data) {
+            //     handleTeamResponse(data);
+            // });
             
-            socket.on('feedback_result', function(data) {
-                handleFeedbackResult(data);
-            });
+            // socket.on('feedback_result', function(data) {
+            //     handleFeedbackResult(data);
+            // });
             
-            socket.on('performance_update', function(data) {
-                updatePerformanceStats(data);
-            });
+            // socket.on('performance_update', function(data) {
+            //     updatePerformanceStats(data);
+            // });
             
-            socket.on('disconnect', function() {
-                console.log('서버 연결이 끊어졌습니다');
-                showToast('연결이 끊어졌습니다', 'error');
-            });
+            // socket.on('disconnect', function() {
+            //     console.log('서버 연결이 끊어졌습니다');
+            //     showToast('연결이 끊어졌습니다', 'error');
+            // });
         }
 
         // 도깨비 목록 로드
@@ -563,8 +580,8 @@
                 const response = await fetch('/api/goblins');
                 const data = await response.json();
                 
-                if (data.success) {
-                    displayGoblins(data.goblins);
+                if (data.status === 'success') {
+                    displayGoblins(data.experts);
                 } else {
                     console.error('도깨비 목록 로드 실패:', data.error);
                 }
@@ -574,22 +591,26 @@
         }
 
         // 도깨비 목록 표시
-        function displayGoblins(goblins) {
+        function displayGoblins(experts) {
             const goblinList = document.getElementById('goblin-list');
             goblinList.innerHTML = '';
             
-            Object.entries(goblins).forEach(([goblinId, goblinInfo]) => {
+            experts.forEach((expert) => {
                 const goblinCard = document.createElement('div');
                 goblinCard.className = 'goblin-card';
-                goblinCard.dataset.goblinId = goblinId;
+                goblinCard.dataset.goblinId = expert.id;
+                
+                // 무료/유료 표시
+                const priceDisplay = expert.free ? '🆓 무료' : `₩${expert.price.toLocaleString()}`;
                 
                 goblinCard.innerHTML = `
-                    <div class="goblin-name">${goblinInfo.name}</div>
-                    <div class="goblin-specialty">${goblinInfo.specialty}</div>
-                    <div class="goblin-personality">${goblinInfo.personality}</div>
+                    <div class="goblin-name">${expert.name}</div>
+                    <div class="goblin-specialty">${expert.specialty}</div>
+                    <div class="goblin-personality">${expert.personality}</div>
+                    <div class="goblin-price">${priceDisplay}</div>
                 `;
                 
-                goblinCard.onclick = () => selectGoblin(goblinId, goblinInfo);
+                goblinCard.onclick = () => selectGoblin(expert.id, expert);
                 goblinList.appendChild(goblinCard);
             });
         }
@@ -692,21 +713,32 @@
             document.getElementById('send-btn').disabled = true;
             
             if (isTeamMode && selectedGoblins.size > 1) {
-                // 팀 채팅
-                socket.emit('chat_team', {
+                // 팀 채팅 (시뮬레이션)
+                console.log('팀 채팅 시뮬레이션:', {
                     goblin_ids: Array.from(selectedGoblins),
                     message: message,
                     conversation_id: currentConversationId
                 });
+                
+                // 시뮬레이션 응답
+                setTimeout(() => {
+                    simulateTeamResponse(message, Array.from(selectedGoblins));
+                }, 1000);
+                
             } else {
-                // 개별 채팅
+                // 개별 채팅 (시뮬레이션)
                 const goblinId = Array.from(selectedGoblins)[0];
-                socket.emit('chat_single', {
+                console.log('개별 채팅 시뮬레이션:', {
                     goblin_id: goblinId,
                     message: message,
                     conversation_id: currentConversationId,
                     mode: currentMode
                 });
+                
+                // 시뮬레이션 응답
+                setTimeout(() => {
+                    simulateResponse(message, goblinId);
+                }, 1000);
             }
             
             input.value = '';
@@ -850,14 +882,27 @@
             
             const goblinId = Array.from(selectedGoblins)[0];
             
-            socket.emit('feedback', {
+            // socket.emit('feedback', {
+            //     goblin_id: goblinId,
+            //     conversation_id: currentConversationId,
+            //     message_id: lastMessageId,
+            //     rating: selectedRating,
+            //     feedback_type: selectedRating >= 4 ? 'helpful' : 'negative',
+            //     comment: ''
+            // });
+            
+            // 피드백 시뮬레이션
+            console.log('피드백 시뮬레이션:', {
                 goblin_id: goblinId,
-                conversation_id: currentConversationId,
-                message_id: lastMessageId,
-                rating: selectedRating,
-                feedback_type: selectedRating >= 4 ? 'helpful' : 'negative',
-                comment: ''
+                rating: selectedRating
             });
+            
+            setTimeout(() => {
+                handleFeedbackResult({
+                    success: true,
+                    rating: selectedRating
+                });
+            }, 500);
         }
 
         // 피드백 결과 처리
@@ -906,6 +951,39 @@
             }
         });
 
+        // 시뮬레이션 함수들
+        function simulateResponse(message, goblinId) {
+            const responses = [
+                `안녕하세요! "${message}"에 대해 답변드리겠습니다. 이는 매우 흥미로운 질문이네요.`,
+                `"${message}"는 중요한 주제입니다. 제 전문 지식으로 도움을 드릴 수 있습니다.`,
+                `좋은 질문입니다! "${message}"에 대해 자세히 설명해드리겠습니다.`,
+                `"${message}"에 관해서는 여러 관점에서 접근할 수 있습니다. 함께 살펴보죠.`
+            ];
+            
+            const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+            
+            handleChatResponse({
+                success: true,
+                response: randomResponse,
+                goblin_id: goblinId,
+                timestamp: new Date().toISOString()
+            });
+        }
+
+        function simulateTeamResponse(message, goblinIds) {
+            const teamResponse = `팀 협업 답변: "${message}"에 대해 ${goblinIds.length}명의 전문가가 함께 답변드립니다. 다양한 관점에서 종합적인 솔루션을 제공하겠습니다.`;
+            
+            handleTeamResponse({
+                success: true,
+                responses: [{
+                    goblin_id: goblinIds[0],
+                    response: teamResponse,
+                    timestamp: new Date().toISOString()
+                }],
+                team_summary: `${goblinIds.length}명 전문가 협업 완료`
+            });
+        }
+
         // 초기화
         document.addEventListener('DOMContentLoaded', function() {
             initSocket();
@@ -916,10 +994,10 @@
                 try {
                     const response = await fetch('/api/performance');
                     const data = await response.json();
-                    if (data.success) {
+                    if (data.status === 'success') {
                         updatePerformanceStats({
-                            performance: data.performance,
-                            active_users: Object.keys(data.performance.goblin_performances || {}).length
+                            performance: data.data,
+                            active_users: data.data.active_users
                         });
                     }
                 } catch (error) {
