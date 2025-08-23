@@ -1,2 +1,1 @@
-# 도깨비마을장터 Vercel 경량 배포용
-Flask==2.3.3
+Flask
