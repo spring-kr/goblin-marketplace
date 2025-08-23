@@ -1,10 +1,20 @@
 from flask import Flask, render_template, request, jsonify, session
 import json
+import os
 from datetime import datetime, timedelta
 import uuid
 
+# Stripe 결제 시스템
+try:
+    import stripe
+    stripe.api_key = os.getenv('STRIPE_SECRET_KEY', 'sk_test_demo_key')
+    STRIPE_ENABLED = True
+except ImportError:
+    STRIPE_ENABLED = False
+    print("Stripe not installed. Using simulation mode.")
+
 app = Flask(__name__)
-app.secret_key = "goblin_marketplace_secret_key_2024"
+app.secret_key = os.getenv('SECRET_KEY', 'goblin_marketplace_secret_key_2024')
 
 # 결제 완료된 사용자의 권한 정보 저장 (실제로는 데이터베이스 사용)
 user_permissions = {}
@@ -29,35 +39,78 @@ def payment():
 @app.route("/api/payment/create", methods=["POST"])
 def create_payment():
     data = request.get_json()
-
+    
     # 사용자 ID 생성 (실제로는 로그인 시스템에서 가져옴)
     user_id = data.get("user_id", f"USER_{datetime.now().strftime('%Y%m%d%H%M%S')}")
-
-    # 결제 정보 처리 (실제로는 PG사 연동)
+    
+    # 결제 정보 처리
     payment_id = f"PAY_{datetime.now().strftime('%Y%m%d%H%M%S')}"
+    expert_id = data.get("expert_id")
+    expert_name = data.get("expert_name")
+    amount = data.get("amount")
+    duration_minutes = data.get("duration_minutes", 30)
+    
     payment_info = {
         "payment_id": payment_id,
         "user_id": user_id,
-        "expert_id": data.get("expert_id"),
-        "expert_name": data.get("expert_name"),
+        "expert_id": expert_id,
+        "expert_name": expert_name,
         "service_type": data.get("service_type"),
-        "amount": data.get("amount"),
-        "duration_minutes": data.get("duration_minutes", 30),
+        "amount": amount,
+        "duration_minutes": duration_minutes,
         "status": "pending",
         "created_at": datetime.now().isoformat(),
     }
-
+    
     # 결제 기록 저장
     payment_records[payment_id] = payment_info
-
-    return jsonify(
-        {
-            "status": "success",
-            "payment_id": payment_id,
-            "user_id": user_id,
-            "redirect_url": f"/payment/process/{payment_id}",
-        }
-    )
+    
+    # Stripe 결제 인텐트 생성 (실제 결제)
+    if STRIPE_ENABLED and amount and amount > 0:
+        try:
+            # Stripe 결제 인텐트 생성
+            intent = stripe.PaymentIntent.create(
+                amount=int(amount),  # Stripe는 원 단위가 아닌 센트 단위
+                currency='krw',
+                metadata={
+                    'payment_id': payment_id,
+                    'user_id': user_id,
+                    'expert_id': expert_id,
+                    'expert_name': expert_name
+                },
+                description=f"도깨비마을장터 - {expert_name} 상담 ({duration_minutes}분)"
+            )
+            
+            payment_info["stripe_payment_intent_id"] = intent.id
+            payment_info["stripe_client_secret"] = intent.client_secret
+            payment_records[payment_id] = payment_info
+            
+            return jsonify({
+                "status": "success",
+                "payment_id": payment_id,
+                "user_id": user_id,
+                "stripe_client_secret": intent.client_secret,
+                "stripe_publishable_key": os.getenv('STRIPE_PUBLISHABLE_KEY'),
+                "amount": amount,
+                "expert_name": expert_name,
+                "redirect_url": f"/payment/process/{payment_id}",
+                "payment_method": "stripe"
+            })
+            
+        except Exception as e:
+            print(f"Stripe error: {e}")
+            # Stripe 오류 시 시뮬레이션 모드로 fallback
+            pass
+    
+    # 시뮬레이션 모드 (개발/테스트용)
+    return jsonify({
+        "status": "success",
+        "payment_id": payment_id,
+        "user_id": user_id,
+        "redirect_url": f"/payment/process/{payment_id}",
+        "payment_method": "simulation",
+        "message": "테스트 모드: 실제 결제 없이 권한이 부여됩니다."
+    })
 
 
 @app.route("/api/payment/process/<payment_id>", methods=["POST"])
@@ -68,8 +121,21 @@ def process_payment(payment_id):
 
     payment = payment_records[payment_id]
 
-    # 실제 결제 처리 로직 (카카오페이, 토스페이 등)
-    # 여기서는 시뮬레이션으로 성공 처리
+    # Stripe 결제 확인
+    if STRIPE_ENABLED and "stripe_payment_intent_id" in payment:
+        try:
+            # Stripe에서 결제 상태 확인
+            intent = stripe.PaymentIntent.retrieve(payment["stripe_payment_intent_id"])
+            
+            if intent.status != "succeeded":
+                return jsonify({
+                    "status": "error", 
+                    "message": "결제가 완료되지 않았습니다.",
+                    "stripe_status": intent.status
+                })
+                
+        except Exception as e:
+            return jsonify({"status": "error", "message": f"결제 확인 중 오류: {str(e)}"})
 
     # 결제 완료 시 사용자에게 도깨비 이용 권한 부여
     user_id = payment["user_id"]
@@ -94,18 +160,49 @@ def process_payment(payment_id):
     payment_records[payment_id]["status"] = "completed"
     payment_records[payment_id]["completed_at"] = datetime.now().isoformat()
 
-    return jsonify(
-        {
-            "status": "success",
-            "payment_id": payment_id,
-            "message": "결제가 완료되었습니다!",
-            "expert_access": {
-                "expert_name": payment["expert_name"],
-                "duration_minutes": duration_minutes,
-                "expires_at": expiry_time.isoformat(),
-            },
-        }
-    )
+    return jsonify({
+        "status": "success",
+        "payment_id": payment_id,
+        "message": "결제가 완료되었습니다!",
+        "expert_access": {
+            "expert_name": payment["expert_name"],
+            "duration_minutes": duration_minutes,
+            "expires_at": expiry_time.isoformat(),
+        },
+    })
+
+
+@app.route("/api/stripe/webhook", methods=["POST"])
+def stripe_webhook():
+    """Stripe 웹훅 처리 - 실제 결제 완료 시 권한 부여"""
+    if not STRIPE_ENABLED:
+        return jsonify({"error": "Stripe not enabled"}), 400
+        
+    payload = request.get_data()
+    sig_header = request.headers.get('Stripe-Signature')
+    webhook_secret = os.getenv('STRIPE_WEBHOOK_SECRET')
+
+    try:
+        event = stripe.Webhook.construct_event(payload, sig_header, webhook_secret)
+    except ValueError:
+        return jsonify({"error": "Invalid payload"}), 400
+    except stripe.error.SignatureVerificationError:
+        return jsonify({"error": "Invalid signature"}), 400
+
+    # 결제 완료 이벤트 처리
+    if event['type'] == 'payment_intent.succeeded':
+        payment_intent = event['data']['object']
+        
+        # 메타데이터에서 결제 정보 추출
+        payment_id = payment_intent.get('metadata', {}).get('payment_id')
+        user_id = payment_intent.get('metadata', {}).get('user_id')
+        expert_id = payment_intent.get('metadata', {}).get('expert_id')
+        
+        if payment_id and payment_id in payment_records:
+            # 자동으로 권한 부여 (process_payment 로직과 동일)
+            process_payment(payment_id)
+
+    return jsonify({"received": True})
 
 
 @app.route("/api/experts")
@@ -181,47 +278,280 @@ def get_goblins():
     """HTML 템플릿에서 호출하는 도깨비 목록 API"""
     goblins = [
         # 무료 체험 도깨비 (3명)
-        {"id": 1, "name": "AI전문가", "speciality": "인공지능", "is_free": True, "emoji": "🤖"},
-        {"id": 2, "name": "데이터과학박사", "speciality": "빅데이터", "is_free": True, "emoji": "📊"},
-        {"id": 3, "name": "블록체인개발자", "speciality": "암호화폐", "is_free": True, "emoji": "🔗"},
-        
+        {
+            "id": 1,
+            "name": "AI전문가",
+            "speciality": "인공지능",
+            "is_free": True,
+            "emoji": "🤖",
+        },
+        {
+            "id": 2,
+            "name": "데이터과학박사",
+            "speciality": "빅데이터",
+            "is_free": True,
+            "emoji": "📊",
+        },
+        {
+            "id": 3,
+            "name": "블록체인개발자",
+            "speciality": "암호화폐",
+            "is_free": True,
+            "emoji": "🔗",
+        },
         # 유료 도깨비 (36명)
-        {"id": 4, "name": "보안전문가", "speciality": "사이버보안", "is_free": False, "emoji": "🛡️"},
-        {"id": 5, "name": "로봇공학자", "speciality": "로봇공학", "is_free": False, "emoji": "🤖"},
-        {"id": 6, "name": "양자컴퓨팅전문가", "speciality": "양자컴퓨팅", "is_free": False, "emoji": "⚛️"},
-        {"id": 7, "name": "우주항공공학자", "speciality": "우주항공", "is_free": False, "emoji": "🚀"},
-        {"id": 8, "name": "바이오기술자", "speciality": "생명공학", "is_free": False, "emoji": "🧬"},
-        {"id": 9, "name": "게임개발자", "speciality": "게임개발", "is_free": False, "emoji": "🎮"},
-        {"id": 10, "name": "경영학박사", "speciality": "경영전략", "is_free": False, "emoji": "💼"},
-        {"id": 11, "name": "창업컨설턴트", "speciality": "창업지원", "is_free": False, "emoji": "🚀"},
-        {"id": 12, "name": "마케팅전문가", "speciality": "브랜딩", "is_free": False, "emoji": "📈"},
-        {"id": 13, "name": "영업학박사", "speciality": "세일즈", "is_free": False, "emoji": "💰"},
-        {"id": 14, "name": "컨설팅박사", "speciality": "비즈니스", "is_free": False, "emoji": "📋"},
-        {"id": 15, "name": "인사관리박사", "speciality": "HR", "is_free": False, "emoji": "👥"},
-        {"id": 16, "name": "글로벌트레이더", "speciality": "국제무역", "is_free": False, "emoji": "🌍"},
-        {"id": 17, "name": "쇼핑전문가", "speciality": "커머스", "is_free": False, "emoji": "🛒"},
-        {"id": 18, "name": "재테크박사", "speciality": "투자", "is_free": False, "emoji": "💎"},
-        {"id": 19, "name": "경제학박사", "speciality": "경제분석", "is_free": False, "emoji": "📊"},
-        {"id": 20, "name": "투자전문가", "speciality": "자산관리", "is_free": False, "emoji": "📈"},
-        {"id": 21, "name": "부동산전문가", "speciality": "부동산", "is_free": False, "emoji": "🏠"},
-        {"id": 22, "name": "의료AI전문가", "speciality": "의료AI", "is_free": False, "emoji": "⚕️"},
-        {"id": 23, "name": "건강관리사", "speciality": "건강관리", "is_free": False, "emoji": "💪"},
-        {"id": 24, "name": "신약개발연구원", "speciality": "신약개발", "is_free": False, "emoji": "💊"},
-        {"id": 25, "name": "웰니스박사", "speciality": "웰니스", "is_free": False, "emoji": "🧘"},
-        {"id": 26, "name": "교육멘토", "speciality": "교육", "is_free": False, "emoji": "📚"},
-        {"id": 27, "name": "심리상담사", "speciality": "심리상담", "is_free": False, "emoji": "💭"},
-        {"id": 28, "name": "언어학습코치", "speciality": "언어교육", "is_free": False, "emoji": "🗣️"},
-        {"id": 29, "name": "라이프코치", "speciality": "인생설계", "is_free": False, "emoji": "🎯"},
-        {"id": 30, "name": "예술학박사", "speciality": "예술", "is_free": False, "emoji": "🎨"},
-        {"id": 31, "name": "음악프로듀서", "speciality": "음악제작", "is_free": False, "emoji": "🎵"},
-        {"id": 32, "name": "문학박사", "speciality": "문학", "is_free": False, "emoji": "📖"},
-        {"id": 33, "name": "문화기획자", "speciality": "문화기획", "is_free": False, "emoji": "🎭"},
-        {"id": 34, "name": "스토리텔러", "speciality": "스토리텔링", "is_free": False, "emoji": "📝"},
-        {"id": 35, "name": "패션스타일리스트", "speciality": "패션", "is_free": False, "emoji": "👗"},
-        {"id": 36, "name": "여행컨설턴트", "speciality": "여행", "is_free": False, "emoji": "✈️"},
-        {"id": 37, "name": "요리전문가", "speciality": "요리", "is_free": False, "emoji": "👨‍🍳"},
-        {"id": 38, "name": "인테리어디자이너", "speciality": "인테리어", "is_free": False, "emoji": "🏡"},
-        {"id": 39, "name": "펜트하우스컨설턴트", "speciality": "럭셔리", "is_free": False, "emoji": "👑"},
+        {
+            "id": 4,
+            "name": "보안전문가",
+            "speciality": "사이버보안",
+            "is_free": False,
+            "emoji": "🛡️",
+        },
+        {
+            "id": 5,
+            "name": "로봇공학자",
+            "speciality": "로봇공학",
+            "is_free": False,
+            "emoji": "🤖",
+        },
+        {
+            "id": 6,
+            "name": "양자컴퓨팅전문가",
+            "speciality": "양자컴퓨팅",
+            "is_free": False,
+            "emoji": "⚛️",
+        },
+        {
+            "id": 7,
+            "name": "우주항공공학자",
+            "speciality": "우주항공",
+            "is_free": False,
+            "emoji": "🚀",
+        },
+        {
+            "id": 8,
+            "name": "바이오기술자",
+            "speciality": "생명공학",
+            "is_free": False,
+            "emoji": "🧬",
+        },
+        {
+            "id": 9,
+            "name": "게임개발자",
+            "speciality": "게임개발",
+            "is_free": False,
+            "emoji": "🎮",
+        },
+        {
+            "id": 10,
+            "name": "경영학박사",
+            "speciality": "경영전략",
+            "is_free": False,
+            "emoji": "💼",
+        },
+        {
+            "id": 11,
+            "name": "창업컨설턴트",
+            "speciality": "창업지원",
+            "is_free": False,
+            "emoji": "🚀",
+        },
+        {
+            "id": 12,
+            "name": "마케팅전문가",
+            "speciality": "브랜딩",
+            "is_free": False,
+            "emoji": "📈",
+        },
+        {
+            "id": 13,
+            "name": "영업학박사",
+            "speciality": "세일즈",
+            "is_free": False,
+            "emoji": "💰",
+        },
+        {
+            "id": 14,
+            "name": "컨설팅박사",
+            "speciality": "비즈니스",
+            "is_free": False,
+            "emoji": "📋",
+        },
+        {
+            "id": 15,
+            "name": "인사관리박사",
+            "speciality": "HR",
+            "is_free": False,
+            "emoji": "👥",
+        },
+        {
+            "id": 16,
+            "name": "글로벌트레이더",
+            "speciality": "국제무역",
+            "is_free": False,
+            "emoji": "🌍",
+        },
+        {
+            "id": 17,
+            "name": "쇼핑전문가",
+            "speciality": "커머스",
+            "is_free": False,
+            "emoji": "🛒",
+        },
+        {
+            "id": 18,
+            "name": "재테크박사",
+            "speciality": "투자",
+            "is_free": False,
+            "emoji": "💎",
+        },
+        {
+            "id": 19,
+            "name": "경제학박사",
+            "speciality": "경제분석",
+            "is_free": False,
+            "emoji": "📊",
+        },
+        {
+            "id": 20,
+            "name": "투자전문가",
+            "speciality": "자산관리",
+            "is_free": False,
+            "emoji": "📈",
+        },
+        {
+            "id": 21,
+            "name": "부동산전문가",
+            "speciality": "부동산",
+            "is_free": False,
+            "emoji": "🏠",
+        },
+        {
+            "id": 22,
+            "name": "의료AI전문가",
+            "speciality": "의료AI",
+            "is_free": False,
+            "emoji": "⚕️",
+        },
+        {
+            "id": 23,
+            "name": "건강관리사",
+            "speciality": "건강관리",
+            "is_free": False,
+            "emoji": "💪",
+        },
+        {
+            "id": 24,
+            "name": "신약개발연구원",
+            "speciality": "신약개발",
+            "is_free": False,
+            "emoji": "💊",
+        },
+        {
+            "id": 25,
+            "name": "웰니스박사",
+            "speciality": "웰니스",
+            "is_free": False,
+            "emoji": "🧘",
+        },
+        {
+            "id": 26,
+            "name": "교육멘토",
+            "speciality": "교육",
+            "is_free": False,
+            "emoji": "📚",
+        },
+        {
+            "id": 27,
+            "name": "심리상담사",
+            "speciality": "심리상담",
+            "is_free": False,
+            "emoji": "💭",
+        },
+        {
+            "id": 28,
+            "name": "언어학습코치",
+            "speciality": "언어교육",
+            "is_free": False,
+            "emoji": "🗣️",
+        },
+        {
+            "id": 29,
+            "name": "라이프코치",
+            "speciality": "인생설계",
+            "is_free": False,
+            "emoji": "🎯",
+        },
+        {
+            "id": 30,
+            "name": "예술학박사",
+            "speciality": "예술",
+            "is_free": False,
+            "emoji": "🎨",
+        },
+        {
+            "id": 31,
+            "name": "음악프로듀서",
+            "speciality": "음악제작",
+            "is_free": False,
+            "emoji": "🎵",
+        },
+        {
+            "id": 32,
+            "name": "문학박사",
+            "speciality": "문학",
+            "is_free": False,
+            "emoji": "📖",
+        },
+        {
+            "id": 33,
+            "name": "문화기획자",
+            "speciality": "문화기획",
+            "is_free": False,
+            "emoji": "🎭",
+        },
+        {
+            "id": 34,
+            "name": "스토리텔러",
+            "speciality": "스토리텔링",
+            "is_free": False,
+            "emoji": "📝",
+        },
+        {
+            "id": 35,
+            "name": "패션스타일리스트",
+            "speciality": "패션",
+            "is_free": False,
+            "emoji": "👗",
+        },
+        {
+            "id": 36,
+            "name": "여행컨설턴트",
+            "speciality": "여행",
+            "is_free": False,
+            "emoji": "✈️",
+        },
+        {
+            "id": 37,
+            "name": "요리전문가",
+            "speciality": "요리",
+            "is_free": False,
+            "emoji": "👨‍🍳",
+        },
+        {
+            "id": 38,
+            "name": "인테리어디자이너",
+            "speciality": "인테리어",
+            "is_free": False,
+            "emoji": "🏡",
+        },
+        {
+            "id": 39,
+            "name": "펜트하우스컨설턴트",
+            "speciality": "럭셔리",
+            "is_free": False,
+            "emoji": "👑",
+        },
     ]
     return jsonify({"success": True, "goblins": goblins})
 
