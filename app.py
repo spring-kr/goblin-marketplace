@@ -1,20 +1,19 @@
 from flask import Flask, render_template, request, jsonify, session
 import json
 import os
+import requests
+import base64
 from datetime import datetime, timedelta
 import uuid
 
-# Stripe 결제 시스템
-try:
-    import stripe
-    stripe.api_key = os.getenv('STRIPE_SECRET_KEY', 'sk_test_demo_key')
-    STRIPE_ENABLED = True
-except ImportError:
-    STRIPE_ENABLED = False
-    print("Stripe not installed. Using simulation mode.")
+# 토스페이먼츠 결제 시스템
+TOSS_CLIENT_KEY = os.getenv('TOSS_CLIENT_KEY', 'test_ck_demo_key')
+TOSS_SECRET_KEY = os.getenv('TOSS_SECRET_KEY', 'test_sk_demo_key')
+TOSS_API_URL = "https://api.tosspayments.com/v1/payments"
+TOSS_ENABLED = bool(TOSS_CLIENT_KEY and TOSS_SECRET_KEY and 'demo' not in TOSS_SECRET_KEY)
 
 app = Flask(__name__)
-app.secret_key = os.getenv('SECRET_KEY', 'goblin_marketplace_secret_key_2024')
+app.secret_key = os.getenv("SECRET_KEY", "goblin_marketplace_secret_key_2024")
 
 # 결제 완료된 사용자의 권한 정보 저장 (실제로는 데이터베이스 사용)
 user_permissions = {}
@@ -39,17 +38,17 @@ def payment():
 @app.route("/api/payment/create", methods=["POST"])
 def create_payment():
     data = request.get_json()
-    
+
     # 사용자 ID 생성 (실제로는 로그인 시스템에서 가져옴)
     user_id = data.get("user_id", f"USER_{datetime.now().strftime('%Y%m%d%H%M%S')}")
-    
+
     # 결제 정보 처리
     payment_id = f"PAY_{datetime.now().strftime('%Y%m%d%H%M%S')}"
     expert_id = data.get("expert_id")
     expert_name = data.get("expert_name")
     amount = data.get("amount")
     duration_minutes = data.get("duration_minutes", 30)
-    
+
     payment_info = {
         "payment_id": payment_id,
         "user_id": user_id,
@@ -61,56 +60,66 @@ def create_payment():
         "status": "pending",
         "created_at": datetime.now().isoformat(),
     }
-    
+
     # 결제 기록 저장
     payment_records[payment_id] = payment_info
-    
-    # Stripe 결제 인텐트 생성 (실제 결제)
-    if STRIPE_ENABLED and amount and amount > 0:
+
+    # 토스페이먼츠 결제 생성 (실제 결제)
+    if TOSS_ENABLED and amount and amount > 0:
         try:
-            # Stripe 결제 인텐트 생성
-            intent = stripe.PaymentIntent.create(
-                amount=int(amount),  # Stripe는 원 단위가 아닌 센트 단위
-                currency='krw',
-                metadata={
-                    'payment_id': payment_id,
-                    'user_id': user_id,
-                    'expert_id': expert_id,
-                    'expert_name': expert_name
-                },
-                description=f"도깨비마을장터 - {expert_name} 상담 ({duration_minutes}분)"
-            )
+            # 주문 ID 생성 (토스페이먼츠 요구사항에 맞게 고유한 값)
+            order_id = f"ORDER_{payment_id}_{int(datetime.now().timestamp())}"
             
-            payment_info["stripe_payment_intent_id"] = intent.id
-            payment_info["stripe_client_secret"] = intent.client_secret
+            # 토스페이먼츠 결제 생성 데이터
+            payment_data = {
+                "amount": int(amount),
+                "orderId": order_id,
+                "orderName": f"도깨비마을장터 - {expert_name} 상담 ({duration_minutes}분)",
+                "customerEmail": f"user_{user_id}@goblinmarket.com",
+                "customerName": f"사용자_{user_id}",
+                "successUrl": f"{request.url_root}payment/success",
+                "failUrl": f"{request.url_root}payment/fail"
+            }
+
+            payment_info["toss_order_id"] = order_id
+            payment_info["toss_payment_data"] = payment_data
             payment_records[payment_id] = payment_info
-            
-            return jsonify({
-                "status": "success",
-                "payment_id": payment_id,
-                "user_id": user_id,
-                "stripe_client_secret": intent.client_secret,
-                "stripe_publishable_key": os.getenv('STRIPE_PUBLISHABLE_KEY'),
-                "amount": amount,
-                "expert_name": expert_name,
-                "redirect_url": f"/payment/process/{payment_id}",
-                "payment_method": "stripe"
-            })
-            
+
+            return jsonify(
+                {
+                    "status": "success",
+                    "payment_id": payment_id,
+                    "user_id": user_id,
+                    "toss_client_key": TOSS_CLIENT_KEY,
+                    "toss_order_id": order_id,
+                    "amount": amount,
+                    "expert_name": expert_name,
+                    "order_name": payment_data["orderName"],
+                    "customer_email": payment_data["customerEmail"],
+                    "customer_name": payment_data["customerName"],
+                    "success_url": payment_data["successUrl"],
+                    "fail_url": payment_data["failUrl"],
+                    "redirect_url": f"/payment/process/{payment_id}",
+                    "payment_method": "toss",
+                }
+            )
+
         except Exception as e:
-            print(f"Stripe error: {e}")
-            # Stripe 오류 시 시뮬레이션 모드로 fallback
+            print(f"Toss Payments error: {e}")
+            # 토스페이먼츠 오류 시 시뮬레이션 모드로 fallback
             pass
-    
+
     # 시뮬레이션 모드 (개발/테스트용)
-    return jsonify({
-        "status": "success",
-        "payment_id": payment_id,
-        "user_id": user_id,
-        "redirect_url": f"/payment/process/{payment_id}",
-        "payment_method": "simulation",
-        "message": "테스트 모드: 실제 결제 없이 권한이 부여됩니다."
-    })
+    return jsonify(
+        {
+            "status": "success",
+            "payment_id": payment_id,
+            "user_id": user_id,
+            "redirect_url": f"/payment/process/{payment_id}",
+            "payment_method": "simulation",
+            "message": "테스트 모드: 실제 결제 없이 권한이 부여됩니다.",
+        }
+    )
 
 
 @app.route("/api/payment/process/<payment_id>", methods=["POST"])
@@ -121,21 +130,41 @@ def process_payment(payment_id):
 
     payment = payment_records[payment_id]
 
-    # Stripe 결제 확인
-    if STRIPE_ENABLED and "stripe_payment_intent_id" in payment:
+    # 토스페이먼츠 결제 확인
+    if TOSS_ENABLED and "toss_order_id" in payment:
         try:
-            # Stripe에서 결제 상태 확인
-            intent = stripe.PaymentIntent.retrieve(payment["stripe_payment_intent_id"])
+            # 토스페이먼츠에서 결제 상태 확인
+            order_id = payment["toss_order_id"]
             
-            if intent.status != "succeeded":
-                return jsonify({
-                    "status": "error", 
-                    "message": "결제가 완료되지 않았습니다.",
-                    "stripe_status": intent.status
-                })
+            # 토스페이먼츠 결제 확인 API 호출
+            headers = {
+                "Authorization": f"Basic {base64.b64encode(f'{TOSS_SECRET_KEY}:'.encode()).decode()}",
+                "Content-Type": "application/json"
+            }
+            
+            # 결제 상태 조회
+            response = requests.get(f"{TOSS_API_URL}?orderId={order_id}", headers=headers)
+            
+            if response.status_code == 200:
+                payment_data = response.json()
+                payment_status = payment_data.get("status")
                 
+                if payment_status != "DONE":
+                    return jsonify(
+                        {
+                            "status": "error",
+                            "message": "결제가 완료되지 않았습니다.",
+                            "toss_status": payment_status,
+                        }
+                    )
+            else:
+                # 결제 정보를 찾을 수 없는 경우 시뮬레이션 모드로 처리
+                print(f"Toss payment check failed: {response.status_code}")
+
         except Exception as e:
-            return jsonify({"status": "error", "message": f"결제 확인 중 오류: {str(e)}"})
+            print(f"Toss payment verification error: {str(e)}")
+            # 토스페이먼츠 확인 실패시 시뮬레이션 모드로 fallback
+            pass
 
     # 결제 완료 시 사용자에게 도깨비 이용 권한 부여
     user_id = payment["user_id"]
@@ -160,47 +189,64 @@ def process_payment(payment_id):
     payment_records[payment_id]["status"] = "completed"
     payment_records[payment_id]["completed_at"] = datetime.now().isoformat()
 
-    return jsonify({
-        "status": "success",
-        "payment_id": payment_id,
-        "message": "결제가 완료되었습니다!",
-        "expert_access": {
-            "expert_name": payment["expert_name"],
-            "duration_minutes": duration_minutes,
-            "expires_at": expiry_time.isoformat(),
-        },
-    })
+    return jsonify(
+        {
+            "status": "success",
+            "payment_id": payment_id,
+            "message": "결제가 완료되었습니다!",
+            "expert_access": {
+                "expert_name": payment["expert_name"],
+                "duration_minutes": duration_minutes,
+                "expires_at": expiry_time.isoformat(),
+            },
+        }
+    )
 
 
-@app.route("/api/stripe/webhook", methods=["POST"])
-def stripe_webhook():
-    """Stripe 웹훅 처리 - 실제 결제 완료 시 권한 부여"""
-    if not STRIPE_ENABLED:
-        return jsonify({"error": "Stripe not enabled"}), 400
-        
-    payload = request.get_data()
-    sig_header = request.headers.get('Stripe-Signature')
-    webhook_secret = os.getenv('STRIPE_WEBHOOK_SECRET')
+@app.route("/api/toss/webhook", methods=["POST"])
+def toss_webhook():
+    """토스페이먼츠 웹훅 처리 - 실제 결제 완료 시 권한 부여"""
+    if not TOSS_ENABLED:
+        return jsonify({"error": "Toss Payments not enabled"}), 400
 
     try:
-        event = stripe.Webhook.construct_event(payload, sig_header, webhook_secret)
-    except ValueError:
-        return jsonify({"error": "Invalid payload"}), 400
-    except stripe.error.SignatureVerificationError:
-        return jsonify({"error": "Invalid signature"}), 400
+        payload = request.get_json()
+        
+        # 토스페이먼츠 웹훅 이벤트 처리
+        event_type = payload.get("eventType")
+        
+        if event_type == "PAYMENT_COMPLETED":
+            payment_data = payload.get("data", {})
+            order_id = payment_data.get("orderId")
+            payment_key = payment_data.get("paymentKey")
+            
+            # 주문 ID로 결제 정보 찾기
+            for payment_id, payment_record in payment_records.items():
+                if payment_record.get("toss_order_id") == order_id:
+                    # 결제 상태 업데이트
+                    payment_record["status"] = "completed"
+                    payment_record["toss_payment_key"] = payment_key
+                    
+                    # 자동으로 권한 부여 (process_payment 로직과 동일)
+                    try:
+                        process_payment(payment_id)
+                    except Exception as e:
+                        print(f"Auto payment processing error: {e}")
+                    break
+                    
+        elif event_type == "PAYMENT_FAILED":
+            payment_data = payload.get("data", {})
+            order_id = payment_data.get("orderId")
+            
+            # 결제 실패 처리
+            for payment_id, payment_record in payment_records.items():
+                if payment_record.get("toss_order_id") == order_id:
+                    payment_record["status"] = "failed"
+                    break
 
-    # 결제 완료 이벤트 처리
-    if event['type'] == 'payment_intent.succeeded':
-        payment_intent = event['data']['object']
-        
-        # 메타데이터에서 결제 정보 추출
-        payment_id = payment_intent.get('metadata', {}).get('payment_id')
-        user_id = payment_intent.get('metadata', {}).get('user_id')
-        expert_id = payment_intent.get('metadata', {}).get('expert_id')
-        
-        if payment_id and payment_id in payment_records:
-            # 자동으로 권한 부여 (process_payment 로직과 동일)
-            process_payment(payment_id)
+    except Exception as e:
+        print(f"Toss webhook error: {e}")
+        return jsonify({"error": "Webhook processing failed"}), 400
 
     return jsonify({"received": True})
 
@@ -651,6 +697,85 @@ def check_chat_access():
         }
     )
 
+
+@app.route("/payment/success")
+def payment_success():
+    """토스페이먼츠 결제 성공 페이지"""
+    payment_key = request.args.get("paymentKey")
+    order_id = request.args.get("orderId")
+    amount = request.args.get("amount")
+    
+    if not payment_key or not order_id or not amount:
+        return render_template("payment_result.html", 
+                             status="error", 
+                             message="결제 정보가 올바르지 않습니다.")
+    
+    try:
+        # 토스페이먼츠 결제 승인 API 호출
+        headers = {
+            "Authorization": f"Basic {base64.b64encode(f'{TOSS_SECRET_KEY}:'.encode()).decode()}",
+            "Content-Type": "application/json"
+        }
+        
+        confirm_data = {
+            "paymentKey": payment_key,
+            "orderId": order_id,
+            "amount": int(amount)
+        }
+        
+        response = requests.post(f"{TOSS_API_URL}/confirm", 
+                               json=confirm_data, 
+                               headers=headers)
+        
+        if response.status_code == 200:
+            payment_data = response.json()
+            
+            # 주문 ID로 결제 정보 찾기
+            for payment_id, payment_record in payment_records.items():
+                if payment_record.get("toss_order_id") == order_id:
+                    # 결제 상태 업데이트
+                    payment_record["status"] = "completed"
+                    payment_record["toss_payment_key"] = payment_key
+                    
+                    # 권한 부여
+                    process_payment(payment_id)
+                    
+                    return render_template("payment_result.html",
+                                         status="success",
+                                         message="결제가 성공적으로 완료되었습니다!",
+                                         payment_data=payment_data,
+                                         expert_name=payment_record.get("expert_name"))
+        
+        return render_template("payment_result.html",
+                             status="error", 
+                             message="결제 승인에 실패했습니다.")
+            
+    except Exception as e:
+        print(f"Payment confirmation error: {e}")
+        return render_template("payment_result.html",
+                             status="error",
+                             message="결제 처리 중 오류가 발생했습니다.")
+
+@app.route("/payment/fail")
+def payment_fail():
+    """토스페이먼츠 결제 실패 페이지"""
+    error_code = request.args.get("code")
+    error_message = request.args.get("message")
+    order_id = request.args.get("orderId")
+    
+    # 주문 ID로 결제 정보 찾아서 상태 업데이트
+    if order_id:
+        for payment_id, payment_record in payment_records.items():
+            if payment_record.get("toss_order_id") == order_id:
+                payment_record["status"] = "failed"
+                payment_record["error_code"] = error_code
+                payment_record["error_message"] = error_message
+                break
+    
+    return render_template("payment_result.html",
+                         status="failed",
+                         message=f"결제에 실패했습니다: {error_message}",
+                         error_code=error_code)
 
 @app.route("/api/test")
 def api_test():

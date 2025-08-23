@@ -5,7 +5,7 @@
 
 ### ✨ 주요 기능
 - **39명 전문가 도깨비**: 인공지능박사부터 웰니스박사까지
-- **실시간 결제 시스템**: Stripe & 국내 PG사 연동
+- **실시간 결제 시스템**: 토스페이먼츠 & Stripe 연동
 - **권한 관리**: 결제한 도깨비만 이용 가능
 - **실시간 채팅**: WebSocket 기반 즉시 응답  
 - **PWA 지원**: 모바일 앱처럼 설치 가능
@@ -14,7 +14,16 @@
 
 ## 💳 결제 시스템 설정
 
-### 🔥 Stripe 결제 (추천)
+### � 토스페이먼츠 (한국 추천)
+1. [토스페이먼츠 가입](https://tosspayments.com)
+2. 클라이언트 키 & 시크릿 키 획득
+3. 환경변수 설정:
+```bash
+TOSS_CLIENT_KEY=test_ck_your_key
+TOSS_SECRET_KEY=test_sk_your_key
+```
+
+### � Stripe 결제 (글로벌)
 1. [Stripe 계정 생성](https://stripe.com)
 2. API 키 획득 (Publishable Key & Secret Key)
 3. 환경변수 설정:
@@ -24,19 +33,10 @@ STRIPE_SECRET_KEY=sk_test_your_secret
 STRIPE_WEBHOOK_SECRET=whsec_your_webhook
 ```
 
-### 💛 국내 PG사 (토스페이먼츠)
-1. [토스페이먼츠 가입](https://tosspayments.com)
-2. 클라이언트 키 & 시크릿 키 획득
-3. 환경변수 설정:
-```bash
-TOSS_CLIENT_KEY=test_ck_your_key
-TOSS_SECRET_KEY=test_sk_your_key
-```
-
 ### 🏦 실제 계좌 연결
 - 사업자등록증 필요
 - 정산 계좌 등록
-- 수수료: Stripe 3.4% + 30원, 토스 2.9%
+- 수수료: 토스페이먼츠 2.9%, Stripe 3.4% + 30원
 
 ### 📋 사업자 등록 (필수)
 결제 대행사 연동을 위해서는 사업자등록이 필요합니다:
