@@ -90,3 +90,42 @@ models/
 !README.md
 !서비스_배포_가이드.md
 .vercel
+
+# 개발/테스트 파일들 (추가)
+*test*.py
+*test*.html
+*test*.json
+analyze_*.py
+compare_*.py
+auto_*.py
+check_*.py
+*backup*.py
+*복사본*.py
+*damaged*.py
+debug_*.py
+quick_*.py
+realistic_*.py
+ultra_*.py
+v8_*.py
+v9_*.py
+working_*.py
+memory_*.py
+conversation_*.py
+enhanced_*.py
+
+# 폴더들
+phd_goblins/
+stem_agents/
+templates/goblin_*
+!templates/goblin_mobile_simple.html
+static/
+
+# 모든 json과 html (핵심 파일 제외)
+*.json
+!vercel.json
+*.html
+!templates/goblin_mobile_simple.html
+
+# 아이콘 파일들
+*.ico
+*.svg

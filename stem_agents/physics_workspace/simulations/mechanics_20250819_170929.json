@@ -1,9 +1,0 @@
-{
-  "type": "projectile_motion",
-  "parameters": {
-    "initial_velocity": 20,
-    "angle": 45
-  },
-  "result": "10.197",
-  "timestamp": "2025-08-19T17:09:29.047228"
-}
