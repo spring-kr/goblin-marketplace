@@ -1,8 +1,10 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, session
+import json
 import os
 import requests
 import base64
 from datetime import datetime, timedelta
+import uuid
 
 # 토스페이먼츠 결제 시스템
 TOSS_CLIENT_KEY = os.getenv("TOSS_CLIENT_KEY", "test_ck_demo_key")
