@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>도깨비마을장터 - Vercel 배포 테스트</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#4CAF50">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .title {
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 1.2em;
+        }
+        
+        .status {
+            background: #e8f5e8;
+            border: 2px solid #4CAF50;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .goblin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .goblin-card {
+            background: #f9f9f9;
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid #ddd;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .goblin-card:hover {
+            border-color: #4CAF50;
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .chat-area {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 15px;
+        }
+        
+        .chat-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .chat-button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .chat-button:hover {
+            background: #45a049;
+        }
+        
+        .response-area {
+            margin-top: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            border-left: 4px solid #4CAF50;
+            display: none;
+        }
+        
+        .install-button {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">🧙‍♂️ 도깨비마을장터</h1>
+            <p class="subtitle">Vercel 배포 테스트 버전 v11.7</p>
+        </div>
+        
+        <div class="status">
+            <h3>✅ Vercel 배포 성공!</h3>
+            <p>39명 전문가 도깨비와 채팅할 수 있습니다</p>
+            <button class="install-button" onclick="installPWA()">📱 앱으로 설치</button>
+        </div>
+        
+        <div id="goblinGrid" class="goblin-grid">
+            <!-- 도깨비 카드들이 여기에 동적으로 생성됩니다 -->
+        </div>
+        
+        <div class="chat-area">
+            <h3>💬 도깨비와 채팅하기</h3>
+            <input type="text" id="chatInput" class="chat-input" placeholder="메시지를 입력하세요...">
+            <button class="chat-button" onclick="sendMessage()">전송</button>
+            <div id="responseArea" class="response-area"></div>
+        </div>
+    </div>
+
+    <script>
+        let selectedGoblin = 'counselor';
+        let deferredPrompt;
+
+        // PWA 설치
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+        });
+
+        function installPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('사용자가 PWA 설치를 승인했습니다');
+                    }
+                    deferredPrompt = null;
+                });
+            } else {
+                alert('이미 설치되었거나 브라우저에서 지원하지 않습니다.');
+            }
+        }
+
+        // 도깨비 목록 로드
+        async function loadGoblins() {
+            try {
+                const response = await fetch('/api/goblins');
+                const data = await response.json();
+                
+                const goblinGrid = document.getElementById('goblinGrid');
+                goblinGrid.innerHTML = '';
+                
+                Object.entries(data.goblins).forEach(([id, goblin]) => {
+                    const card = document.createElement('div');
+                    card.className = 'goblin-card';
+                    card.onclick = () => selectGoblin(id);
+                    card.innerHTML = `
+                        <h3>${goblin.name}</h3>
+                        <p><strong>전문분야:</strong> ${goblin.specialty}</p>
+                        <p><strong>성격:</strong> ${goblin.personality}</p>
+                    `;
+                    goblinGrid.appendChild(card);
+                });
+            } catch (error) {
+                console.error('도깨비 목록 로드 실패:', error);
+            }
+        }
+
+        function selectGoblin(goblinId) {
+            selectedGoblin = goblinId;
+            document.querySelectorAll('.goblin-card').forEach(card => {
+                card.style.borderColor = '#ddd';
+            });
+            event.currentTarget.style.borderColor = '#4CAF50';
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        goblin_id: selectedGoblin,
+                        message: message
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const responseArea = document.getElementById('responseArea');
+                    responseArea.style.display = 'block';
+                    responseArea.innerHTML = `
+                        <h4>${data.goblin_info.name} 응답:</h4>
+                        <p>${data.response}</p>
+                        <small>시간: ${new Date(data.timestamp * 1000).toLocaleString()}</small>
+                    `;
+                } else {
+                    alert('오류: ' + data.error);
+                }
+                
+                input.value = '';
+            } catch (error) {
+                console.error('메시지 전송 실패:', error);
+                alert('메시지 전송에 실패했습니다.');
+            }
+        }
+
+        // Enter 키로 메시지 전송
+        document.getElementById('chatInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // 페이지 로드시 도깨비 목록 로드
+        window.onload = loadGoblins;
+    </script>
+</body>
+</html>
