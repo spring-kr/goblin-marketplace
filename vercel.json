@@ -1,0 +1,24 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "goblin_mobile_app_v11.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "goblin_mobile_app_v11.py"
+    }
+  ],
+  "env": {
+    "PYTHONPATH": ".",
+    "FLASK_ENV": "production"
+  },
+  "functions": {
+    "goblin_mobile_app_v11.py": {
+      "maxDuration": 30
+    }
+  }
+}

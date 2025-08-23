@@ -365,23 +365,24 @@ def get_mobile_stats():
         return jsonify({"success": False, "error": str(e)})
 
 
+# Vercel 배포용 앱 초기화
+init_goblin_system()
+
+# Vercel용 앱 객체 export
+application = app
+
 if __name__ == "__main__":
-    # 도깨비 시스템 초기화
-    init_goblin_system()
-
-    import os
-
     port = int(os.environ.get("PORT", 5012))
-
+    
     print("📱 도깨비마을장터 모바일 앱 v11.6 서버 시작")
     print(f"📍 서버 포트: {port}")
     print("🌟 PWA + 오프라인 모드 + 푸시 알림 지원")
 
-    # 클라우드 배포용 서버 실행
+    # 로컬 개발용 서버 실행
     socketio.run(
         app,
         host="0.0.0.0",
         port=port,
-        debug=False,  # 프로덕션에서는 debug=False
+        debug=False,
         log_output=True,
     )
