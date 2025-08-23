@@ -1,0 +1,518 @@
+{
+  "test_info": {
+    "timestamp": "20250823_181822",
+    "languages_tested": [
+      "SupportedLanguage.KOREAN",
+      "SupportedLanguage.ENGLISH",
+      "SupportedLanguage.CHINESE",
+      "SupportedLanguage.JAPANESE"
+    ],
+    "experts_tested": [
+      "assistant",
+      "marketing",
+      "startup",
+      "data_analyst"
+    ],
+    "ai_models_tested": [
+      "openai",
+      "anthropic",
+      "google",
+      "local"
+    ]
+  },
+  "detailed_results": {
+    "ko": {
+      "assistant": {
+        "openai": {
+          "response_length": 288,
+          "quality_score": 6.8,
+          "preview": "OpenAI API 키가 설정되지 않았습니다.\n\n🔬 **기술적 보충**: 최신 연구 동향과 실무 적용 방안을 함께 고려하시기 바랍니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 ...",
+          "status": "✅ 성공"
+        },
+        "anthropic": {
+          "response_length": 291,
+          "quality_score": 6.8,
+          "preview": "Anthropic API 키가 설정되지 않았습니다.\n\n🔬 **기술적 보충**: 최신 연구 동향과 실무 적용 방안을 함께 고려하시기 바랍니다.\n\n🎯 **추가 인사이트**\n고도화된 접...",
+          "status": "✅ 성공"
+        },
+        "google": {
+          "response_length": 288,
+          "quality_score": 6.8,
+          "preview": "Google API 키가 설정되지 않았습니다.\n\n🔬 **기술적 보충**: 최신 연구 동향과 실무 적용 방안을 함께 고려하시기 바랍니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 ...",
+          "status": "✅ 성공"
+        },
+        "local": {
+          "response_length": 394,
+          "quality_score": 7.8,
+          "preview": "로컬 AI 응답: \n당신은 인공지능박사 하이도깨비입니다. 네이버 클로바 AI연구소장, 20년 경력 AI전문가로서 다음 질문에 전문적으로 답변해주세요.\n\n전문 분야: 머신러닝, 딥러...",
+          "status": "✅ 성공"
+        }
+      },
+      "marketing": {
+        "openai": {
+          "response_length": 238,
+          "quality_score": 6.4,
+          "preview": "OpenAI API 키가 설정되지 않았습니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 위해서는 다각적 관점에서의 분석이 필요합니다. 특히 변화하는 환경에 능동적으로 대응하고, ...",
+          "status": "✅ 성공"
+        },
+        "anthropic": {
+          "response_length": 241,
+          "quality_score": 6.4,
+          "preview": "Anthropic API 키가 설정되지 않았습니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 위해서는 다각적 관점에서의 분석이 필요합니다. 특히 변화하는 환경에 능동적으로 대응하...",
+          "status": "✅ 성공"
+        },
+        "google": {
+          "response_length": 238,
+          "quality_score": 6.4,
+          "preview": "Google API 키가 설정되지 않았습니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 위해서는 다각적 관점에서의 분석이 필요합니다. 특히 변화하는 환경에 능동적으로 대응하고, ...",
+          "status": "✅ 성공"
+        },
+        "local": {
+          "response_length": 344,
+          "quality_score": 7.8,
+          "preview": "로컬 AI 응답: \n당신은 마케팅박사 마케팅도깨비입니다. 삼성전자 마케팅본부장, 23년 경력 마케팅전문가로서 다음 질문에 전문적으로 답변해주세요.\n\n전문 분야: 브랜드전략, 디지털...",
+          "status": "✅ 성공"
+        }
+      },
+      "startup": {
+        "openai": {
+          "response_length": 238,
+          "quality_score": 6.4,
+          "preview": "OpenAI API 키가 설정되지 않았습니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 위해서는 다각적 관점에서의 분석이 필요합니다. 특히 변화하는 환경에 능동적으로 대응하고, ...",
+          "status": "✅ 성공"
+        },
+        "anthropic": {
+          "response_length": 241,
+          "quality_score": 6.4,
+          "preview": "Anthropic API 키가 설정되지 않았습니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 위해서는 다각적 관점에서의 분석이 필요합니다. 특히 변화하는 환경에 능동적으로 대응하...",
+          "status": "✅ 성공"
+        },
+        "google": {
+          "response_length": 238,
+          "quality_score": 6.4,
+          "preview": "Google API 키가 설정되지 않았습니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 위해서는 다각적 관점에서의 분석이 필요합니다. 특히 변화하는 환경에 능동적으로 대응하고, ...",
+          "status": "✅ 성공"
+        },
+        "local": {
+          "response_length": 344,
+          "quality_score": 7.4,
+          "preview": "로컬 AI 응답: \n당신은 창업학박사 스타트도깨비입니다. 벤처캐피털 대표, 14년 경력 창업전문가로서 다음 질문에 전문적으로 답변해주세요.\n\n전문 분야: 사업기획, 투자유치, 비즈...",
+          "status": "✅ 성공"
+        }
+      },
+      "data_analyst": {
+        "openai": {
+          "response_length": 238,
+          "quality_score": 6.4,
+          "preview": "OpenAI API 키가 설정되지 않았습니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 위해서는 다각적 관점에서의 분석이 필요합니다. 특히 변화하는 환경에 능동적으로 대응하고, ...",
+          "status": "✅ 성공"
+        },
+        "anthropic": {
+          "response_length": 241,
+          "quality_score": 6.4,
+          "preview": "Anthropic API 키가 설정되지 않았습니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 위해서는 다각적 관점에서의 분석이 필요합니다. 특히 변화하는 환경에 능동적으로 대응하...",
+          "status": "✅ 성공"
+        },
+        "google": {
+          "response_length": 238,
+          "quality_score": 6.4,
+          "preview": "Google API 키가 설정되지 않았습니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 위해서는 다각적 관점에서의 분석이 필요합니다. 특히 변화하는 환경에 능동적으로 대응하고, ...",
+          "status": "✅ 성공"
+        },
+        "local": {
+          "response_length": 344,
+          "quality_score": 7.4,
+          "preview": "로컬 AI 응답: \n당신은 데이터과학박사 분석도깨비입니다. 네이버 데이터사이언스팀장, 17년 경력 데이터전문가로서 다음 질문에 전문적으로 답변해주세요.\n\n전문 분야: 빅데이터분석,...",
+          "status": "✅ 성공"
+        }
+      }
+    },
+    "en": {
+      "assistant": {
+        "openai": {
+          "response_length": 288,
+          "quality_score": 6.0,
+          "preview": "OpenAI API 키가 설정되지 않았습니다.\n\n🔬 **기술적 보충**: 최신 연구 동향과 실무 적용 방안을 함께 고려하시기 바랍니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 ...",
+          "status": "✅ 성공"
+        },
+        "anthropic": {
+          "response_length": 291,
+          "quality_score": 6.0,
+          "preview": "Anthropic API 키가 설정되지 않았습니다.\n\n🔬 **기술적 보충**: 최신 연구 동향과 실무 적용 방안을 함께 고려하시기 바랍니다.\n\n🎯 **추가 인사이트**\n고도화된 접...",
+          "status": "✅ 성공"
+        },
+        "google": {
+          "response_length": 288,
+          "quality_score": 6.0,
+          "preview": "Google API 키가 설정되지 않았습니다.\n\n🔬 **기술적 보충**: 최신 연구 동향과 실무 적용 방안을 함께 고려하시기 바랍니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 ...",
+          "status": "✅ 성공"
+        },
+        "local": {
+          "response_length": 394,
+          "quality_score": 7.0,
+          "preview": "로컬 AI 응답: \n당신은 AI Expert Dr. High Goblin입니다. Naver Clova AI Research Director, 20 years AI expert로서 ...",
+          "status": "✅ 성공"
+        }
+      },
+      "marketing": {
+        "openai": {
+          "response_length": 238,
+          "quality_score": 6.0,
+          "preview": "OpenAI API 키가 설정되지 않았습니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 위해서는 다각적 관점에서의 분석이 필요합니다. 특히 변화하는 환경에 능동적으로 대응하고, ...",
+          "status": "✅ 성공"
+        },
+        "anthropic": {
+          "response_length": 241,
+          "quality_score": 6.0,
+          "preview": "Anthropic API 키가 설정되지 않았습니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 위해서는 다각적 관점에서의 분석이 필요합니다. 특히 변화하는 환경에 능동적으로 대응하...",
+          "status": "✅ 성공"
+        },
+        "google": {
+          "response_length": 238,
+          "quality_score": 6.0,
+          "preview": "Google API 키가 설정되지 않았습니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 위해서는 다각적 관점에서의 분석이 필요합니다. 특히 변화하는 환경에 능동적으로 대응하고, ...",
+          "status": "✅ 성공"
+        },
+        "local": {
+          "response_length": 344,
+          "quality_score": 7.0,
+          "preview": "로컬 AI 응답: \n당신은 Marketing Dr. Marketing Goblin입니다. Samsung Electronics Marketing Director, 23 years m...",
+          "status": "✅ 성공"
+        }
+      },
+      "startup": {
+        "openai": {
+          "response_length": 238,
+          "quality_score": 6.0,
+          "preview": "OpenAI API 키가 설정되지 않았습니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 위해서는 다각적 관점에서의 분석이 필요합니다. 특히 변화하는 환경에 능동적으로 대응하고, ...",
+          "status": "✅ 성공"
+        },
+        "anthropic": {
+          "response_length": 241,
+          "quality_score": 6.0,
+          "preview": "Anthropic API 키가 설정되지 않았습니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 위해서는 다각적 관점에서의 분석이 필요합니다. 특히 변화하는 환경에 능동적으로 대응하...",
+          "status": "✅ 성공"
+        },
+        "google": {
+          "response_length": 238,
+          "quality_score": 6.0,
+          "preview": "Google API 키가 설정되지 않았습니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 위해서는 다각적 관점에서의 분석이 필요합니다. 특히 변화하는 환경에 능동적으로 대응하고, ...",
+          "status": "✅ 성공"
+        },
+        "local": {
+          "response_length": 344,
+          "quality_score": 7.0,
+          "preview": "로컬 AI 응답: \n당신은 Startup Dr. Startup Goblin입니다. Venture Capital CEO, 14 years startup expert로서 다음 질문에 ...",
+          "status": "✅ 성공"
+        }
+      },
+      "data_analyst": {
+        "openai": {
+          "response_length": 238,
+          "quality_score": 6.0,
+          "preview": "OpenAI API 키가 설정되지 않았습니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 위해서는 다각적 관점에서의 분석이 필요합니다. 특히 변화하는 환경에 능동적으로 대응하고, ...",
+          "status": "✅ 성공"
+        },
+        "anthropic": {
+          "response_length": 241,
+          "quality_score": 6.0,
+          "preview": "Anthropic API 키가 설정되지 않았습니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 위해서는 다각적 관점에서의 분석이 필요합니다. 특히 변화하는 환경에 능동적으로 대응하...",
+          "status": "✅ 성공"
+        },
+        "google": {
+          "response_length": 238,
+          "quality_score": 6.0,
+          "preview": "Google API 키가 설정되지 않았습니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 위해서는 다각적 관점에서의 분석이 필요합니다. 특히 변화하는 환경에 능동적으로 대응하고, ...",
+          "status": "✅ 성공"
+        },
+        "local": {
+          "response_length": 344,
+          "quality_score": 7.0,
+          "preview": "로컬 AI 응답: \n당신은 Data Science Dr. Analysis Goblin입니다. Naver Data Science Team Leader, 17 years data ex...",
+          "status": "✅ 성공"
+        }
+      }
+    },
+    "zh": {
+      "assistant": {
+        "openai": {
+          "response_length": 288,
+          "quality_score": 6.0,
+          "preview": "OpenAI API 키가 설정되지 않았습니다.\n\n🔬 **기술적 보충**: 최신 연구 동향과 실무 적용 방안을 함께 고려하시기 바랍니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 ...",
+          "status": "✅ 성공"
+        },
+        "anthropic": {
+          "response_length": 291,
+          "quality_score": 6.0,
+          "preview": "Anthropic API 키가 설정되지 않았습니다.\n\n🔬 **기술적 보충**: 최신 연구 동향과 실무 적용 방안을 함께 고려하시기 바랍니다.\n\n🎯 **추가 인사이트**\n고도화된 접...",
+          "status": "✅ 성공"
+        },
+        "google": {
+          "response_length": 288,
+          "quality_score": 6.0,
+          "preview": "Google API 키가 설정되지 않았습니다.\n\n🔬 **기술적 보충**: 최신 연구 동향과 실무 적용 방안을 함께 고려하시기 바랍니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 ...",
+          "status": "✅ 성공"
+        },
+        "local": {
+          "response_length": 394,
+          "quality_score": 7.0,
+          "preview": "로컬 AI 응답: \n당신은 人工智能博士 高级小鬼입니다. 네이버 클로바 AI연구소장, 20년 경력 AI전문가로서 다음 질문에 전문적으로 답변해주세요.\n\n전문 분야: 머신러닝, 딥러닝...",
+          "status": "✅ 성공"
+        }
+      },
+      "marketing": {
+        "openai": {
+          "response_length": 238,
+          "quality_score": 6.0,
+          "preview": "OpenAI API 키가 설정되지 않았습니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 위해서는 다각적 관점에서의 분석이 필요합니다. 특히 변화하는 환경에 능동적으로 대응하고, ...",
+          "status": "✅ 성공"
+        },
+        "anthropic": {
+          "response_length": 241,
+          "quality_score": 6.0,
+          "preview": "Anthropic API 키가 설정되지 않았습니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 위해서는 다각적 관점에서의 분석이 필요합니다. 특히 변화하는 환경에 능동적으로 대응하...",
+          "status": "✅ 성공"
+        },
+        "google": {
+          "response_length": 238,
+          "quality_score": 6.0,
+          "preview": "Google API 키가 설정되지 않았습니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 위해서는 다각적 관점에서의 분석이 필요합니다. 특히 변화하는 환경에 능동적으로 대응하고, ...",
+          "status": "✅ 성공"
+        },
+        "local": {
+          "response_length": 344,
+          "quality_score": 7.0,
+          "preview": "로컬 AI 응답: \n당신은 营销学博士 营销小鬼입니다. 삼성전자 마케팅본부장, 23년 경력 마케팅전문가로서 다음 질문에 전문적으로 답변해주세요.\n\n전문 분야: 브랜드전략, 디지털마케...",
+          "status": "✅ 성공"
+        }
+      },
+      "startup": {
+        "openai": {
+          "response_length": 238,
+          "quality_score": 6.0,
+          "preview": "OpenAI API 키가 설정되지 않았습니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 위해서는 다각적 관점에서의 분석이 필요합니다. 특히 변화하는 환경에 능동적으로 대응하고, ...",
+          "status": "✅ 성공"
+        },
+        "anthropic": {
+          "response_length": 241,
+          "quality_score": 6.0,
+          "preview": "Anthropic API 키가 설정되지 않았습니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 위해서는 다각적 관점에서의 분석이 필요합니다. 특히 변화하는 환경에 능동적으로 대응하...",
+          "status": "✅ 성공"
+        },
+        "google": {
+          "response_length": 238,
+          "quality_score": 6.0,
+          "preview": "Google API 키가 설정되지 않았습니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 위해서는 다각적 관점에서의 분석이 필요합니다. 특히 변화하는 환경에 능동적으로 대응하고, ...",
+          "status": "✅ 성공"
+        },
+        "local": {
+          "response_length": 344,
+          "quality_score": 7.0,
+          "preview": "로컬 AI 응답: \n당신은 创业学博士 创业小鬼입니다. 벤처캐피털 대표, 14년 경력 창업전문가로서 다음 질문에 전문적으로 답변해주세요.\n\n전문 분야: 사업기획, 투자유치, 비즈니스...",
+          "status": "✅ 성공"
+        }
+      },
+      "data_analyst": {
+        "openai": {
+          "response_length": 238,
+          "quality_score": 6.0,
+          "preview": "OpenAI API 키가 설정되지 않았습니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 위해서는 다각적 관점에서의 분석이 필요합니다. 특히 변화하는 환경에 능동적으로 대응하고, ...",
+          "status": "✅ 성공"
+        },
+        "anthropic": {
+          "response_length": 241,
+          "quality_score": 6.0,
+          "preview": "Anthropic API 키가 설정되지 않았습니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 위해서는 다각적 관점에서의 분석이 필요합니다. 특히 변화하는 환경에 능동적으로 대응하...",
+          "status": "✅ 성공"
+        },
+        "google": {
+          "response_length": 238,
+          "quality_score": 6.0,
+          "preview": "Google API 키가 설정되지 않았습니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 위해서는 다각적 관점에서의 분석이 필요합니다. 특히 변화하는 환경에 능동적으로 대응하고, ...",
+          "status": "✅ 성공"
+        },
+        "local": {
+          "response_length": 344,
+          "quality_score": 7.4,
+          "preview": "로컬 AI 응답: \n당신은 数据科学博士 分析小鬼입니다. 네이버 데이터사이언스팀장, 17년 경력 데이터전문가로서 다음 질문에 전문적으로 답변해주세요.\n\n전문 분야: 빅데이터분석, 통...",
+          "status": "✅ 성공"
+        }
+      }
+    },
+    "ja": {
+      "assistant": {
+        "openai": {
+          "response_length": 288,
+          "quality_score": 6.0,
+          "preview": "OpenAI API 키가 설정되지 않았습니다.\n\n🔬 **기술적 보충**: 최신 연구 동향과 실무 적용 방안을 함께 고려하시기 바랍니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 ...",
+          "status": "✅ 성공"
+        },
+        "anthropic": {
+          "response_length": 291,
+          "quality_score": 6.0,
+          "preview": "Anthropic API 키가 설정되지 않았습니다.\n\n🔬 **기술적 보충**: 최신 연구 동향과 실무 적용 방안을 함께 고려하시기 바랍니다.\n\n🎯 **추가 인사이트**\n고도화된 접...",
+          "status": "✅ 성공"
+        },
+        "google": {
+          "response_length": 288,
+          "quality_score": 6.0,
+          "preview": "Google API 키가 설정되지 않았습니다.\n\n🔬 **기술적 보충**: 최신 연구 동향과 실무 적용 방안을 함께 고려하시기 바랍니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 ...",
+          "status": "✅ 성공"
+        },
+        "local": {
+          "response_length": 394,
+          "quality_score": 7.0,
+          "preview": "로컬 AI 응답: \n당신은 人工知能博士 ハイ小鬼입니다. 네이버 클로바 AI연구소장, 20년 경력 AI전문가로서 다음 질문에 전문적으로 답변해주세요.\n\n전문 분야: 머신러닝, 딥러닝...",
+          "status": "✅ 성공"
+        }
+      },
+      "marketing": {
+        "openai": {
+          "response_length": 238,
+          "quality_score": 6.0,
+          "preview": "OpenAI API 키가 설정되지 않았습니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 위해서는 다각적 관점에서의 분석이 필요합니다. 특히 변화하는 환경에 능동적으로 대응하고, ...",
+          "status": "✅ 성공"
+        },
+        "anthropic": {
+          "response_length": 241,
+          "quality_score": 6.0,
+          "preview": "Anthropic API 키가 설정되지 않았습니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 위해서는 다각적 관점에서의 분석이 필요합니다. 특히 변화하는 환경에 능동적으로 대응하...",
+          "status": "✅ 성공"
+        },
+        "google": {
+          "response_length": 238,
+          "quality_score": 6.0,
+          "preview": "Google API 키가 설정되지 않았습니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 위해서는 다각적 관점에서의 분석이 필요합니다. 특히 변화하는 환경에 능동적으로 대응하고, ...",
+          "status": "✅ 성공"
+        },
+        "local": {
+          "response_length": 344,
+          "quality_score": 7.0,
+          "preview": "로컬 AI 응답: \n당신은 マーケティング博士 マーケティング小鬼입니다. 삼성전자 마케팅본부장, 23년 경력 마케팅전문가로서 다음 질문에 전문적으로 답변해주세요.\n\n전문 분야: 브랜드...",
+          "status": "✅ 성공"
+        }
+      },
+      "startup": {
+        "openai": {
+          "response_length": 238,
+          "quality_score": 6.0,
+          "preview": "OpenAI API 키가 설정되지 않았습니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 위해서는 다각적 관점에서의 분석이 필요합니다. 특히 변화하는 환경에 능동적으로 대응하고, ...",
+          "status": "✅ 성공"
+        },
+        "anthropic": {
+          "response_length": 241,
+          "quality_score": 6.0,
+          "preview": "Anthropic API 키가 설정되지 않았습니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 위해서는 다각적 관점에서의 분석이 필요합니다. 특히 변화하는 환경에 능동적으로 대응하...",
+          "status": "✅ 성공"
+        },
+        "google": {
+          "response_length": 238,
+          "quality_score": 6.0,
+          "preview": "Google API 키가 설정되지 않았습니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 위해서는 다각적 관점에서의 분석이 필요합니다. 특히 변화하는 환경에 능동적으로 대응하고, ...",
+          "status": "✅ 성공"
+        },
+        "local": {
+          "response_length": 344,
+          "quality_score": 7.0,
+          "preview": "로컬 AI 응답: \n당신은 起業学博士 スタートアップ小鬼입니다. 벤처캐피털 대표, 14년 경력 창업전문가로서 다음 질문에 전문적으로 답변해주세요.\n\n전문 분야: 사업기획, 투자유치,...",
+          "status": "✅ 성공"
+        }
+      },
+      "data_analyst": {
+        "openai": {
+          "response_length": 238,
+          "quality_score": 6.0,
+          "preview": "OpenAI API 키가 설정되지 않았습니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 위해서는 다각적 관점에서의 분석이 필요합니다. 특히 변화하는 환경에 능동적으로 대응하고, ...",
+          "status": "✅ 성공"
+        },
+        "anthropic": {
+          "response_length": 241,
+          "quality_score": 6.0,
+          "preview": "Anthropic API 키가 설정되지 않았습니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 위해서는 다각적 관점에서의 분석이 필요합니다. 특히 변화하는 환경에 능동적으로 대응하...",
+          "status": "✅ 성공"
+        },
+        "google": {
+          "response_length": 238,
+          "quality_score": 6.0,
+          "preview": "Google API 키가 설정되지 않았습니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 위해서는 다각적 관점에서의 분석이 필요합니다. 특히 변화하는 환경에 능동적으로 대응하고, ...",
+          "status": "✅ 성공"
+        },
+        "local": {
+          "response_length": 344,
+          "quality_score": 7.0,
+          "preview": "로컬 AI 응답: \n당신은 データサイエンス博士 アナリシス小鬼입니다. 네이버 데이터사이언스팀장, 17년 경력 데이터전문가로서 다음 질문에 전문적으로 답변해주세요.\n\n전문 분야: 빅데...",
+          "status": "✅ 성공"
+        }
+      }
+    }
+  },
+  "performance_analysis": {
+    "language_performance": {
+      "ko": {
+        "avg_length": 277.75,
+        "avg_quality": 6.775000000000002,
+        "success_rate": 100.0
+      },
+      "en": {
+        "avg_length": 277.75,
+        "avg_quality": 6.25,
+        "success_rate": 100.0
+      },
+      "zh": {
+        "avg_length": 277.75,
+        "avg_quality": 6.275,
+        "success_rate": 100.0
+      },
+      "ja": {
+        "avg_length": 277.75,
+        "avg_quality": 6.25,
+        "success_rate": 100.0
+      }
+    },
+    "model_performance": {
+      "openai": {
+        "avg_quality": 6.125,
+        "test_count": 16
+      },
+      "anthropic": {
+        "avg_quality": 6.125,
+        "test_count": 16
+      },
+      "google": {
+        "avg_quality": 6.125,
+        "test_count": 16
+      },
+      "local": {
+        "avg_quality": 7.175,
+        "test_count": 16
+      }
+    },
+    "expert_adaptability": {
+      "assistant": {
+        "avg_quality": 6.45,
+        "consistency": 0.7692307692307693
+      },
+      "marketing": {
+        "avg_quality": 6.375,
+        "consistency": 0.7692307692307693
+      },
+      "startup": {
+        "avg_quality": 6.35,
+        "consistency": 0.8108108108108107
+      },
+      "data_analyst": {
+        "avg_quality": 6.375,
+        "consistency": 0.8108108108108107
+      }
+    }
+  },
+  "recommendations": [
+    "🤖 최적 AI 모델: local (품질 7.2/10)",
+    "👨‍💼 다국어 일관성 우수: startup 전문가 (일관성 0.81)",
+    "🌐 문화적 맥락을 고려한 응답 스타일 차별화 필요",
+    "📚 언어별 전문 용어집 및 표현 가이드 구축 권장",
+    "🔄 다국어 피드백 수집 시스템 구축으로 지속적 개선",
+    "🎯 지역별 특화 전문가 추가 고려 (예: 아시아 문화 전문가)",
+    "⚡ 실시간 번역 및 로컬라이제이션 자동화 시스템 구축"
+  ]
+}

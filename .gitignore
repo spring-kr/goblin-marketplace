@@ -89,3 +89,4 @@ models/
 *.md
 !README.md
 !서비스_배포_가이드.md
+.vercel

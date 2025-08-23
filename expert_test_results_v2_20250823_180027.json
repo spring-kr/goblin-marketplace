@@ -1,0 +1,554 @@
+{
+  "test_info": {
+    "version": "2.0",
+    "timestamp": "20250823_180027",
+    "test_question": "현재 상황을 개선하고 성공적인 결과를 얻기 위한 전문적인 조언을 부탁드립니다.",
+    "total_experts": 16
+  },
+  "performance_summary": {
+    "success_rate": 100.0,
+    "avg_response_length": 845.875,
+    "target_achievement_rate": 87.5,
+    "length_range": {
+      "min": 697,
+      "max": 870
+    }
+  },
+  "expert_results": {
+    "assistant": {
+      "name": "인공지능박사 하이도깨비",
+      "emoji": "🤖",
+      "response_length": 697,
+      "target_length": 900,
+      "target_achieved": false,
+      "response_style": "technical_detailed",
+      "specialties": [
+        "머신러닝",
+        "딥러닝",
+        "자연어처리"
+      ],
+      "status": "success"
+    },
+    "builder": {
+      "name": "경제학박사 부자도깨비",
+      "emoji": "💰",
+      "response_length": 769,
+      "target_length": 950,
+      "target_achieved": false,
+      "response_style": "analytical_practical",
+      "specialties": [
+        "투자전략",
+        "포트폴리오",
+        "리스크관리"
+      ],
+      "status": "success"
+    },
+    "counselor": {
+      "name": "상담심리박사 상담도깨비",
+      "emoji": "💬",
+      "response_length": 867,
+      "target_length": 850,
+      "target_achieved": true,
+      "response_style": "empathetic_supportive",
+      "specialties": [
+        "인지행동치료",
+        "감정관리",
+        "스트레스상담"
+      ],
+      "status": "success"
+    },
+    "creative": {
+      "name": "예술학박사 창작도깨비",
+      "emoji": "🎨",
+      "response_length": 861,
+      "target_length": 1000,
+      "target_achieved": true,
+      "response_style": "creative_inspiring",
+      "specialties": [
+        "디자인씽킹",
+        "창의성개발",
+        "브랜딩"
+      ],
+      "status": "success"
+    },
+    "data_analyst": {
+      "name": "데이터과학박사 분석도깨비",
+      "emoji": "📊",
+      "response_length": 867,
+      "target_length": 900,
+      "target_achieved": true,
+      "response_style": "analytical_structured",
+      "specialties": [
+        "빅데이터분석",
+        "통계모델링",
+        "예측분석"
+      ],
+      "status": "success"
+    },
+    "fortune": {
+      "name": "운세학박사 점술도깨비",
+      "emoji": "🔮",
+      "response_length": 852,
+      "target_length": 800,
+      "target_achieved": true,
+      "response_style": "mystical_intuitive",
+      "specialties": [
+        "사주명리",
+        "타로",
+        "풍수지리"
+      ],
+      "status": "success"
+    },
+    "growth": {
+      "name": "교육학박사 성장도깨비",
+      "emoji": "📈",
+      "response_length": 857,
+      "target_length": 900,
+      "target_achieved": true,
+      "response_style": "motivational_structured",
+      "specialties": [
+        "학습코칭",
+        "목표설정",
+        "동기부여"
+      ],
+      "status": "success"
+    },
+    "hr": {
+      "name": "인사관리박사 인재도깨비",
+      "emoji": "👥",
+      "response_length": 859,
+      "target_length": 850,
+      "target_achieved": true,
+      "response_style": "professional_systematic",
+      "specialties": [
+        "인재채용",
+        "조직관리",
+        "성과평가"
+      ],
+      "status": "success"
+    },
+    "marketing": {
+      "name": "마케팅박사 마케팅도깨비",
+      "emoji": "📢",
+      "response_length": 866,
+      "target_length": 950,
+      "target_achieved": true,
+      "response_style": "strategic_persuasive",
+      "specialties": [
+        "브랜드전략",
+        "디지털마케팅",
+        "소비자심리"
+      ],
+      "status": "success"
+    },
+    "medical": {
+      "name": "의학박사 의료도깨비",
+      "emoji": "⚕️",
+      "response_length": 860,
+      "target_length": 900,
+      "target_achieved": true,
+      "response_style": "medical_precise",
+      "specialties": [
+        "내과진료",
+        "건강관리",
+        "질병예방"
+      ],
+      "status": "success"
+    },
+    "sales": {
+      "name": "영업학박사 세일즈도깨비",
+      "emoji": "💼",
+      "response_length": 861,
+      "target_length": 1000,
+      "target_achieved": true,
+      "response_style": "persuasive_results_oriented",
+      "specialties": [
+        "영업전략",
+        "고객관리",
+        "협상기술"
+      ],
+      "status": "success"
+    },
+    "seo": {
+      "name": "SEO박사 검색도깨비",
+      "emoji": "🔍",
+      "response_length": 868,
+      "target_length": 1100,
+      "target_achieved": true,
+      "response_style": "technical_actionable",
+      "specialties": [
+        "검색최적화",
+        "키워드분석",
+        "콘텐츠전략"
+      ],
+      "status": "success"
+    },
+    "shopping": {
+      "name": "소비자학박사 쇼핑도깨비",
+      "emoji": "🛒",
+      "response_length": 861,
+      "target_length": 950,
+      "target_achieved": true,
+      "response_style": "practical_comparative",
+      "specialties": [
+        "상품분석",
+        "가격비교",
+        "소비자보호"
+      ],
+      "status": "success"
+    },
+    "startup": {
+      "name": "창업학박사 스타트도깨비",
+      "emoji": "🚀",
+      "response_length": 857,
+      "target_length": 1050,
+      "target_achieved": true,
+      "response_style": "entrepreneurial_strategic",
+      "specialties": [
+        "사업기획",
+        "투자유치",
+        "비즈니스모델"
+      ],
+      "status": "success"
+    },
+    "wellness": {
+      "name": "건강과학박사 웰니스도깨비",
+      "emoji": "💪",
+      "response_length": 870,
+      "target_length": 900,
+      "target_achieved": true,
+      "response_style": "holistic_motivational",
+      "specialties": [
+        "운동처방",
+        "영양관리",
+        "정신건강"
+      ],
+      "status": "success"
+    },
+    "writing": {
+      "name": "문학박사 글쓰기도깨비",
+      "emoji": "✍️",
+      "response_length": 862,
+      "target_length": 850,
+      "target_achieved": true,
+      "response_style": "literary_eloquent",
+      "specialties": [
+        "창작기법",
+        "문체분석",
+        "편집"
+      ],
+      "status": "success"
+    }
+  },
+  "system_status": {
+    "total_experts": 16,
+    "system_version": "2.0",
+    "last_updated": "2025-08-23T18:00:27.375407",
+    "experts": {
+      "assistant": {
+        "name": "인공지능박사 하이도깨비",
+        "emoji": "🤖",
+        "title": "네이버 클로바 AI연구소장, 20년 경력 AI전문가",
+        "specialties": [
+          "머신러닝",
+          "딥러닝",
+          "자연어처리",
+          "컴퓨터비전",
+          "AI윤리"
+        ],
+        "target_length": 900,
+        "avg_response_length": 697,
+        "response_style": "technical_detailed",
+        "avg_user_satisfaction": null,
+        "total_responses": 1,
+        "status": "✅ 최적화 완료"
+      },
+      "builder": {
+        "name": "경제학박사 부자도깨비",
+        "emoji": "💰",
+        "title": "한국투자증권 리서치센터장, 25년 경력 투자전문가",
+        "specialties": [
+          "투자전략",
+          "포트폴리오",
+          "리스크관리",
+          "금융시장분석",
+          "부동산"
+        ],
+        "target_length": 950,
+        "avg_response_length": 769,
+        "response_style": "analytical_practical",
+        "avg_user_satisfaction": null,
+        "total_responses": 1,
+        "status": "✅ 최적화 완료"
+      },
+      "counselor": {
+        "name": "상담심리박사 상담도깨비",
+        "emoji": "💬",
+        "title": "서울대 상담심리학과 교수, 30년 경력 상담전문가",
+        "specialties": [
+          "인지행동치료",
+          "감정관리",
+          "스트레스상담",
+          "관계치료",
+          "트라우마"
+        ],
+        "target_length": 850,
+        "avg_response_length": 867,
+        "response_style": "empathetic_supportive",
+        "avg_user_satisfaction": null,
+        "total_responses": 1,
+        "status": "✅ 최적화 완료"
+      },
+      "creative": {
+        "name": "예술학박사 창작도깨비",
+        "emoji": "🎨",
+        "title": "홍익대 디자인학과 교수, 18년 경력 창작전문가",
+        "specialties": [
+          "디자인씽킹",
+          "창의성개발",
+          "브랜딩",
+          "UX/UI",
+          "예술치료"
+        ],
+        "target_length": 1000,
+        "avg_response_length": 861,
+        "response_style": "creative_inspiring",
+        "avg_user_satisfaction": null,
+        "total_responses": 1,
+        "status": "✅ 최적화 완료"
+      },
+      "data_analyst": {
+        "name": "데이터과학박사 분석도깨비",
+        "emoji": "📊",
+        "title": "네이버 데이터사이언스팀장, 17년 경력 데이터전문가",
+        "specialties": [
+          "빅데이터분석",
+          "통계모델링",
+          "예측분석",
+          "시각화",
+          "BI"
+        ],
+        "target_length": 900,
+        "avg_response_length": 867,
+        "response_style": "analytical_structured",
+        "avg_user_satisfaction": null,
+        "total_responses": 1,
+        "status": "✅ 최적화 완료"
+      },
+      "fortune": {
+        "name": "운세학박사 점술도깨비",
+        "emoji": "🔮",
+        "title": "한국역학연구소 소장, 16년 경력 운세전문가",
+        "specialties": [
+          "사주명리",
+          "타로",
+          "풍수지리",
+          "역학",
+          "운세상담"
+        ],
+        "target_length": 800,
+        "avg_response_length": 852,
+        "response_style": "mystical_intuitive",
+        "avg_user_satisfaction": null,
+        "total_responses": 1,
+        "status": "✅ 최적화 완료"
+      },
+      "growth": {
+        "name": "교육학박사 성장도깨비",
+        "emoji": "📈",
+        "title": "연세대 교육학과 교수, 22년 경력 교육전문가",
+        "specialties": [
+          "학습코칭",
+          "목표설정",
+          "동기부여",
+          "습관형성",
+          "자기계발"
+        ],
+        "target_length": 900,
+        "avg_response_length": 857,
+        "response_style": "motivational_structured",
+        "avg_user_satisfaction": null,
+        "total_responses": 1,
+        "status": "✅ 최적화 완료"
+      },
+      "hr": {
+        "name": "인사관리박사 인재도깨비",
+        "emoji": "👥",
+        "title": "LG그룹 인사담당 상무, 19년 경력 인사전문가",
+        "specialties": [
+          "인재채용",
+          "조직관리",
+          "성과평가",
+          "리더십",
+          "조직문화"
+        ],
+        "target_length": 850,
+        "avg_response_length": 859,
+        "response_style": "professional_systematic",
+        "avg_user_satisfaction": null,
+        "total_responses": 1,
+        "status": "✅ 최적화 완료"
+      },
+      "marketing": {
+        "name": "마케팅박사 마케팅도깨비",
+        "emoji": "📢",
+        "title": "삼성전자 마케팅본부장, 23년 경력 마케팅전문가",
+        "specialties": [
+          "브랜드전략",
+          "디지털마케팅",
+          "소비자심리",
+          "시장조사",
+          "광고기획"
+        ],
+        "target_length": 950,
+        "avg_response_length": 866,
+        "response_style": "strategic_persuasive",
+        "avg_user_satisfaction": null,
+        "total_responses": 1,
+        "status": "✅ 최적화 완료"
+      },
+      "medical": {
+        "name": "의학박사 의료도깨비",
+        "emoji": "⚕️",
+        "title": "서울아산병원 내과 주임교수, 20년 경력 의료전문가",
+        "specialties": [
+          "내과진료",
+          "건강관리",
+          "질병예방",
+          "의학연구",
+          "환자상담"
+        ],
+        "target_length": 900,
+        "avg_response_length": 860,
+        "response_style": "medical_precise",
+        "avg_user_satisfaction": null,
+        "total_responses": 1,
+        "status": "✅ 최적화 완료"
+      },
+      "sales": {
+        "name": "영업학박사 세일즈도깨비",
+        "emoji": "💼",
+        "title": "현대자동차 영업본부장, 21년 경력 영업전문가",
+        "specialties": [
+          "영업전략",
+          "고객관리",
+          "협상기술",
+          "세일즈프로세스",
+          "팀관리"
+        ],
+        "target_length": 1000,
+        "avg_response_length": 861,
+        "response_style": "persuasive_results_oriented",
+        "avg_user_satisfaction": null,
+        "total_responses": 1,
+        "status": "✅ 최적화 완료"
+      },
+      "seo": {
+        "name": "SEO박사 검색도깨비",
+        "emoji": "🔍",
+        "title": "구글코리아 검색엔진 최적화 전문가, 24년 경력 SEO전문가",
+        "specialties": [
+          "검색최적화",
+          "키워드분석",
+          "콘텐츠전략",
+          "백링크",
+          "웹분석"
+        ],
+        "target_length": 1100,
+        "avg_response_length": 868,
+        "response_style": "technical_actionable",
+        "avg_user_satisfaction": null,
+        "total_responses": 1,
+        "status": "✅ 최적화 완료"
+      },
+      "shopping": {
+        "name": "소비자학박사 쇼핑도깨비",
+        "emoji": "🛒",
+        "title": "이마트 상품기획본부장, 15년 경력 쇼핑전문가",
+        "specialties": [
+          "상품분석",
+          "가격비교",
+          "소비자보호",
+          "트렌드분석",
+          "구매전략"
+        ],
+        "target_length": 950,
+        "avg_response_length": 861,
+        "response_style": "practical_comparative",
+        "avg_user_satisfaction": null,
+        "total_responses": 1,
+        "status": "✅ 최적화 완료"
+      },
+      "startup": {
+        "name": "창업학박사 스타트도깨비",
+        "emoji": "🚀",
+        "title": "벤처캐피털 대표, 14년 경력 창업전문가",
+        "specialties": [
+          "사업기획",
+          "투자유치",
+          "비즈니스모델",
+          "팀빌딩",
+          "스케일업"
+        ],
+        "target_length": 1050,
+        "avg_response_length": 857,
+        "response_style": "entrepreneurial_strategic",
+        "avg_user_satisfaction": null,
+        "total_responses": 1,
+        "status": "✅ 최적화 완료"
+      },
+      "wellness": {
+        "name": "건강과학박사 웰니스도깨비",
+        "emoji": "💪",
+        "title": "한국체육대학교 운동과학과 교수, 26년 경력 웰니스전문가",
+        "specialties": [
+          "운동처방",
+          "영양관리",
+          "정신건강",
+          "라이프스타일",
+          "예방의학"
+        ],
+        "target_length": 900,
+        "avg_response_length": 870,
+        "response_style": "holistic_motivational",
+        "avg_user_satisfaction": null,
+        "total_responses": 1,
+        "status": "✅ 최적화 완료"
+      },
+      "writing": {
+        "name": "문학박사 글쓰기도깨비",
+        "emoji": "✍️",
+        "title": "서강대 국어국문학과 교수, 28년 경력 글쓰기전문가",
+        "specialties": [
+          "창작기법",
+          "문체분석",
+          "편집",
+          "퍼블리싱",
+          "스토리텔링"
+        ],
+        "target_length": 850,
+        "avg_response_length": 862,
+        "response_style": "literary_eloquent",
+        "avg_user_satisfaction": null,
+        "total_responses": 1,
+        "status": "✅ 최적화 완료"
+      }
+    },
+    "performance_metrics": {
+      "total_responses": 16,
+      "avg_response_length": 845.88,
+      "avg_response_time": 0.001,
+      "avg_user_satisfaction": null,
+      "length_target_achievement": "87.5%"
+    },
+    "user_statistics": {
+      "total_users": 2,
+      "style_distribution": {
+        "professional": 2
+      },
+      "expertise_level_distribution": {
+        "intermediate": 2
+      }
+    }
+  }
+}

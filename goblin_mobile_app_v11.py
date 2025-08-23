@@ -373,7 +373,7 @@ application = app
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5012))
-    
+
     print("📱 도깨비마을장터 모바일 앱 v11.6 서버 시작")
     print(f"📍 서버 포트: {port}")
     print("🌟 PWA + 오프라인 모드 + 푸시 알림 지원")

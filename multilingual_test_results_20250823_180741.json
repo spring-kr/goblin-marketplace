@@ -1,0 +1,518 @@
+{
+  "test_info": {
+    "timestamp": "20250823_180741",
+    "languages_tested": [
+      "SupportedLanguage.KOREAN",
+      "SupportedLanguage.ENGLISH",
+      "SupportedLanguage.CHINESE",
+      "SupportedLanguage.JAPANESE"
+    ],
+    "experts_tested": [
+      "assistant",
+      "marketing",
+      "startup",
+      "data_analyst"
+    ],
+    "ai_models_tested": [
+      "openai",
+      "anthropic",
+      "google",
+      "local"
+    ]
+  },
+  "detailed_results": {
+    "ko": {
+      "assistant": {
+        "openai": {
+          "response_length": 288,
+          "quality_score": 6.8,
+          "preview": "OpenAI API 키가 설정되지 않았습니다.\n\n🔬 **기술적 보충**: 최신 연구 동향과 실무 적용 방안을 함께 고려하시기 바랍니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 ...",
+          "status": "✅ 성공"
+        },
+        "anthropic": {
+          "response_length": 291,
+          "quality_score": 6.8,
+          "preview": "Anthropic API 키가 설정되지 않았습니다.\n\n🔬 **기술적 보충**: 최신 연구 동향과 실무 적용 방안을 함께 고려하시기 바랍니다.\n\n🎯 **추가 인사이트**\n고도화된 접...",
+          "status": "✅ 성공"
+        },
+        "google": {
+          "response_length": 288,
+          "quality_score": 6.8,
+          "preview": "Google API 키가 설정되지 않았습니다.\n\n🔬 **기술적 보충**: 최신 연구 동향과 실무 적용 방안을 함께 고려하시기 바랍니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 ...",
+          "status": "✅ 성공"
+        },
+        "local": {
+          "response_length": 394,
+          "quality_score": 7.8,
+          "preview": "로컬 AI 응답: \n당신은 인공지능박사 하이도깨비입니다. 네이버 클로바 AI연구소장, 20년 경력 AI전문가로서 다음 질문에 전문적으로 답변해주세요.\n\n전문 분야: 머신러닝, 딥러...",
+          "status": "✅ 성공"
+        }
+      },
+      "marketing": {
+        "openai": {
+          "response_length": 29,
+          "quality_score": 5.0,
+          "preview": "❌ 'marketing' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        },
+        "anthropic": {
+          "response_length": 29,
+          "quality_score": 5.0,
+          "preview": "❌ 'marketing' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        },
+        "google": {
+          "response_length": 29,
+          "quality_score": 5.0,
+          "preview": "❌ 'marketing' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        },
+        "local": {
+          "response_length": 29,
+          "quality_score": 5.0,
+          "preview": "❌ 'marketing' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        }
+      },
+      "startup": {
+        "openai": {
+          "response_length": 27,
+          "quality_score": 5.0,
+          "preview": "❌ 'startup' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        },
+        "anthropic": {
+          "response_length": 27,
+          "quality_score": 5.0,
+          "preview": "❌ 'startup' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        },
+        "google": {
+          "response_length": 27,
+          "quality_score": 5.0,
+          "preview": "❌ 'startup' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        },
+        "local": {
+          "response_length": 27,
+          "quality_score": 5.0,
+          "preview": "❌ 'startup' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        }
+      },
+      "data_analyst": {
+        "openai": {
+          "response_length": 32,
+          "quality_score": 5.0,
+          "preview": "❌ 'data_analyst' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        },
+        "anthropic": {
+          "response_length": 32,
+          "quality_score": 5.0,
+          "preview": "❌ 'data_analyst' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        },
+        "google": {
+          "response_length": 32,
+          "quality_score": 5.0,
+          "preview": "❌ 'data_analyst' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        },
+        "local": {
+          "response_length": 32,
+          "quality_score": 5.0,
+          "preview": "❌ 'data_analyst' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        }
+      }
+    },
+    "en": {
+      "assistant": {
+        "openai": {
+          "response_length": 288,
+          "quality_score": 6.0,
+          "preview": "OpenAI API 키가 설정되지 않았습니다.\n\n🔬 **기술적 보충**: 최신 연구 동향과 실무 적용 방안을 함께 고려하시기 바랍니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 ...",
+          "status": "✅ 성공"
+        },
+        "anthropic": {
+          "response_length": 291,
+          "quality_score": 6.0,
+          "preview": "Anthropic API 키가 설정되지 않았습니다.\n\n🔬 **기술적 보충**: 최신 연구 동향과 실무 적용 방안을 함께 고려하시기 바랍니다.\n\n🎯 **추가 인사이트**\n고도화된 접...",
+          "status": "✅ 성공"
+        },
+        "google": {
+          "response_length": 288,
+          "quality_score": 6.0,
+          "preview": "Google API 키가 설정되지 않았습니다.\n\n🔬 **기술적 보충**: 최신 연구 동향과 실무 적용 방안을 함께 고려하시기 바랍니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 ...",
+          "status": "✅ 성공"
+        },
+        "local": {
+          "response_length": 394,
+          "quality_score": 7.0,
+          "preview": "로컬 AI 응답: \n당신은 AI Expert Dr. High Goblin입니다. Naver Clova AI Research Director, 20 years AI expert로서 ...",
+          "status": "✅ 성공"
+        }
+      },
+      "marketing": {
+        "openai": {
+          "response_length": 29,
+          "quality_score": 5.0,
+          "preview": "❌ 'marketing' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        },
+        "anthropic": {
+          "response_length": 29,
+          "quality_score": 5.0,
+          "preview": "❌ 'marketing' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        },
+        "google": {
+          "response_length": 29,
+          "quality_score": 5.0,
+          "preview": "❌ 'marketing' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        },
+        "local": {
+          "response_length": 29,
+          "quality_score": 5.0,
+          "preview": "❌ 'marketing' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        }
+      },
+      "startup": {
+        "openai": {
+          "response_length": 27,
+          "quality_score": 5.0,
+          "preview": "❌ 'startup' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        },
+        "anthropic": {
+          "response_length": 27,
+          "quality_score": 5.0,
+          "preview": "❌ 'startup' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        },
+        "google": {
+          "response_length": 27,
+          "quality_score": 5.0,
+          "preview": "❌ 'startup' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        },
+        "local": {
+          "response_length": 27,
+          "quality_score": 5.0,
+          "preview": "❌ 'startup' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        }
+      },
+      "data_analyst": {
+        "openai": {
+          "response_length": 32,
+          "quality_score": 5.0,
+          "preview": "❌ 'data_analyst' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        },
+        "anthropic": {
+          "response_length": 32,
+          "quality_score": 5.0,
+          "preview": "❌ 'data_analyst' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        },
+        "google": {
+          "response_length": 32,
+          "quality_score": 5.0,
+          "preview": "❌ 'data_analyst' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        },
+        "local": {
+          "response_length": 32,
+          "quality_score": 5.0,
+          "preview": "❌ 'data_analyst' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        }
+      }
+    },
+    "zh": {
+      "assistant": {
+        "openai": {
+          "response_length": 288,
+          "quality_score": 6.0,
+          "preview": "OpenAI API 키가 설정되지 않았습니다.\n\n🔬 **기술적 보충**: 최신 연구 동향과 실무 적용 방안을 함께 고려하시기 바랍니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 ...",
+          "status": "✅ 성공"
+        },
+        "anthropic": {
+          "response_length": 291,
+          "quality_score": 6.0,
+          "preview": "Anthropic API 키가 설정되지 않았습니다.\n\n🔬 **기술적 보충**: 최신 연구 동향과 실무 적용 방안을 함께 고려하시기 바랍니다.\n\n🎯 **추가 인사이트**\n고도화된 접...",
+          "status": "✅ 성공"
+        },
+        "google": {
+          "response_length": 288,
+          "quality_score": 6.0,
+          "preview": "Google API 키가 설정되지 않았습니다.\n\n🔬 **기술적 보충**: 최신 연구 동향과 실무 적용 방안을 함께 고려하시기 바랍니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 ...",
+          "status": "✅ 성공"
+        },
+        "local": {
+          "response_length": 394,
+          "quality_score": 7.0,
+          "preview": "로컬 AI 응답: \n당신은 人工智能博士 高级小鬼입니다. 네이버 클로바 AI연구소장, 20년 경력 AI전문가로서 다음 질문에 전문적으로 답변해주세요.\n\n전문 분야: 머신러닝, 딥러닝...",
+          "status": "✅ 성공"
+        }
+      },
+      "marketing": {
+        "openai": {
+          "response_length": 29,
+          "quality_score": 5.0,
+          "preview": "❌ 'marketing' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        },
+        "anthropic": {
+          "response_length": 29,
+          "quality_score": 5.0,
+          "preview": "❌ 'marketing' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        },
+        "google": {
+          "response_length": 29,
+          "quality_score": 5.0,
+          "preview": "❌ 'marketing' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        },
+        "local": {
+          "response_length": 29,
+          "quality_score": 5.0,
+          "preview": "❌ 'marketing' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        }
+      },
+      "startup": {
+        "openai": {
+          "response_length": 27,
+          "quality_score": 5.0,
+          "preview": "❌ 'startup' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        },
+        "anthropic": {
+          "response_length": 27,
+          "quality_score": 5.0,
+          "preview": "❌ 'startup' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        },
+        "google": {
+          "response_length": 27,
+          "quality_score": 5.0,
+          "preview": "❌ 'startup' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        },
+        "local": {
+          "response_length": 27,
+          "quality_score": 5.0,
+          "preview": "❌ 'startup' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        }
+      },
+      "data_analyst": {
+        "openai": {
+          "response_length": 32,
+          "quality_score": 5.0,
+          "preview": "❌ 'data_analyst' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        },
+        "anthropic": {
+          "response_length": 32,
+          "quality_score": 5.0,
+          "preview": "❌ 'data_analyst' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        },
+        "google": {
+          "response_length": 32,
+          "quality_score": 5.0,
+          "preview": "❌ 'data_analyst' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        },
+        "local": {
+          "response_length": 32,
+          "quality_score": 5.0,
+          "preview": "❌ 'data_analyst' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        }
+      }
+    },
+    "ja": {
+      "assistant": {
+        "openai": {
+          "response_length": 288,
+          "quality_score": 6.0,
+          "preview": "OpenAI API 키가 설정되지 않았습니다.\n\n🔬 **기술적 보충**: 최신 연구 동향과 실무 적용 방안을 함께 고려하시기 바랍니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 ...",
+          "status": "✅ 성공"
+        },
+        "anthropic": {
+          "response_length": 291,
+          "quality_score": 6.0,
+          "preview": "Anthropic API 키가 설정되지 않았습니다.\n\n🔬 **기술적 보충**: 최신 연구 동향과 실무 적용 방안을 함께 고려하시기 바랍니다.\n\n🎯 **추가 인사이트**\n고도화된 접...",
+          "status": "✅ 성공"
+        },
+        "google": {
+          "response_length": 288,
+          "quality_score": 6.0,
+          "preview": "Google API 키가 설정되지 않았습니다.\n\n🔬 **기술적 보충**: 최신 연구 동향과 실무 적용 방안을 함께 고려하시기 바랍니다.\n\n🎯 **추가 인사이트**\n고도화된 접근을 ...",
+          "status": "✅ 성공"
+        },
+        "local": {
+          "response_length": 394,
+          "quality_score": 7.0,
+          "preview": "로컬 AI 응답: \n당신은 人工知能博士 ハイ小鬼입니다. 네이버 클로바 AI연구소장, 20년 경력 AI전문가로서 다음 질문에 전문적으로 답변해주세요.\n\n전문 분야: 머신러닝, 딥러닝...",
+          "status": "✅ 성공"
+        }
+      },
+      "marketing": {
+        "openai": {
+          "response_length": 29,
+          "quality_score": 5.0,
+          "preview": "❌ 'marketing' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        },
+        "anthropic": {
+          "response_length": 29,
+          "quality_score": 5.0,
+          "preview": "❌ 'marketing' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        },
+        "google": {
+          "response_length": 29,
+          "quality_score": 5.0,
+          "preview": "❌ 'marketing' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        },
+        "local": {
+          "response_length": 29,
+          "quality_score": 5.0,
+          "preview": "❌ 'marketing' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        }
+      },
+      "startup": {
+        "openai": {
+          "response_length": 27,
+          "quality_score": 5.0,
+          "preview": "❌ 'startup' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        },
+        "anthropic": {
+          "response_length": 27,
+          "quality_score": 5.0,
+          "preview": "❌ 'startup' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        },
+        "google": {
+          "response_length": 27,
+          "quality_score": 5.0,
+          "preview": "❌ 'startup' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        },
+        "local": {
+          "response_length": 27,
+          "quality_score": 5.0,
+          "preview": "❌ 'startup' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        }
+      },
+      "data_analyst": {
+        "openai": {
+          "response_length": 32,
+          "quality_score": 5.0,
+          "preview": "❌ 'data_analyst' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        },
+        "anthropic": {
+          "response_length": 32,
+          "quality_score": 5.0,
+          "preview": "❌ 'data_analyst' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        },
+        "google": {
+          "response_length": 32,
+          "quality_score": 5.0,
+          "preview": "❌ 'data_analyst' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        },
+        "local": {
+          "response_length": 32,
+          "quality_score": 5.0,
+          "preview": "❌ 'data_analyst' 전문가를 찾을 수 없습니다.",
+          "status": "✅ 성공"
+        }
+      }
+    }
+  },
+  "performance_analysis": {
+    "language_performance": {
+      "ko": {
+        "avg_length": 100.8125,
+        "avg_quality": 5.5125,
+        "success_rate": 100.0
+      },
+      "en": {
+        "avg_length": 100.8125,
+        "avg_quality": 5.3125,
+        "success_rate": 100.0
+      },
+      "zh": {
+        "avg_length": 100.8125,
+        "avg_quality": 5.3125,
+        "success_rate": 100.0
+      },
+      "ja": {
+        "avg_length": 100.8125,
+        "avg_quality": 5.3125,
+        "success_rate": 100.0
+      }
+    },
+    "model_performance": {
+      "openai": {
+        "avg_quality": 5.3,
+        "test_count": 16
+      },
+      "anthropic": {
+        "avg_quality": 5.3,
+        "test_count": 16
+      },
+      "google": {
+        "avg_quality": 5.3,
+        "test_count": 16
+      },
+      "local": {
+        "avg_quality": 5.55,
+        "test_count": 16
+      }
+    },
+    "expert_adaptability": {
+      "assistant": {
+        "avg_quality": 6.45,
+        "consistency": 0.7692307692307693
+      },
+      "marketing": {
+        "avg_quality": 5.0,
+        "consistency": 1.0
+      },
+      "startup": {
+        "avg_quality": 5.0,
+        "consistency": 1.0
+      },
+      "data_analyst": {
+        "avg_quality": 5.0,
+        "consistency": 1.0
+      }
+    }
+  },
+  "recommendations": [
+    "🤖 최적 AI 모델: local (품질 5.5/10)",
+    "👨‍💼 다국어 일관성 우수: marketing 전문가 (일관성 1.00)",
+    "🌐 문화적 맥락을 고려한 응답 스타일 차별화 필요",
+    "📚 언어별 전문 용어집 및 표현 가이드 구축 권장",
+    "🔄 다국어 피드백 수집 시스템 구축으로 지속적 개선",
+    "🎯 지역별 특화 전문가 추가 고려 (예: 아시아 문화 전문가)",
+    "⚡ 실시간 번역 및 로컬라이제이션 자동화 시스템 구축"
+  ]
+}

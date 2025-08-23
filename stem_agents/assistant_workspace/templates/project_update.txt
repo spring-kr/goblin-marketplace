@@ -1,0 +1,14 @@
+제목: 프로젝트 진행 상황 업데이트
+
+안녕하세요,
+
+프로젝트 진행 상황을 공유드립니다.
+
+📊 진행률: {progress_percentage}%
+✅ 완료 작업: {completed_tasks}
+🔄 진행 중인 작업: {ongoing_tasks}
+📅 다음 마일스톤: {next_milestone}
+
+궁금한 점이 있으시면 언제든 연락주세요.
+
+감사합니다.
