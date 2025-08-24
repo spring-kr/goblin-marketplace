@@ -1,0 +1,60 @@
+# Vercel 빌드에서 제외할 파일들
+
+# 데이터베이스 파일들
+*.db
+*.sqlite
+*.sqlite3
+
+# 테스트 파일들
+tests/
+test_*.py
+*_test.py
+test_results_*.json
+test_summary_*.json
+
+# 로컬 개발 파일들
+*.log
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env
+.venv
+
+# 도깨비 관련 대용량 파일들 (Vercel 배포시 불필요)
+goblins/databases/
+goblins/backups/
+goblins/logs/
+
+# 메모리 시스템 데이터 (서버리스에서 불필요)
+memory_systems/data/
+memory_systems/logs/
+memory_systems/backups/
+
+# 개발 관련 파일들
+.git/
+.gitignore
+README.md
+docs/
+
+# 임시 파일들
+*.tmp
+*.temp
+temp/
+tmp/
+
+# 미디어 파일들 (용량 절약)
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.mp4
+*.avi
+*.mov
+
+# 백업 파일들
+backup/
+backups/

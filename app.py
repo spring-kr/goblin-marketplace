@@ -2,9 +2,15 @@ from flask import Flask, render_template, request, jsonify
 import os
 from datetime import datetime, timedelta
 
-# Vercel 환경 감지
-VERCEL_ENV = os.getenv("VERCEL_ENV") is not None
+# Vercel 환경 감지 (더 엄격한 체크)
+VERCEL_ENV = (
+    os.getenv("VERCEL") == "1" or 
+    os.getenv("VERCEL_ENV") is not None or 
+    os.getenv("VERCEL_URL") is not None
+)
 IS_PRODUCTION = os.getenv("VERCEL_ENV") == "production"
+
+print(f"🔍 환경 감지: VERCEL_ENV={VERCEL_ENV}, IS_PRODUCTION={IS_PRODUCTION}")
 
 # 1000자 고급 AI 시스템 임포트 (Vercel 최적화)
 try:
