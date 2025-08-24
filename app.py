@@ -651,6 +651,61 @@ def chat():
         )
 
 
+@app.route("/api/chat/advanced", methods=["POST"])
+def chat_advanced():
+    """고급 AI 채팅 API"""
+    try:
+        data = request.get_json()
+        message = data.get("message", "")
+        expert = data.get("expert", "AI전문가")
+        
+        if not message:
+            return jsonify({"error": "메시지가 필요합니다.", "success": False}), 400
+        
+        print(f"🧠 고급 AI 요청: {expert} - {message[:50]}...")
+        
+        # 고급 AI 응답 생성
+        response = real_ai_manager.get_expert_response(expert, message)
+        
+        return jsonify({
+            "response": response,
+            "expert": expert,
+            "success": True,
+            "timestamp": datetime.now().isoformat(),
+            "version": APP_VERSION,
+        })
+        
+    except Exception as e:
+        print(f"❌ 고급 AI 채팅 오류: {e}")
+        return jsonify({
+            "error": "죄송합니다. 일시적인 오류가 발생했습니다.",
+            "success": False
+        }), 500
+
+
+@app.route("/api/performance", methods=["POST"])
+def performance_analytics():
+    """성능 분석 API"""
+    try:
+        data = request.get_json()
+        
+        # 성능 데이터 로깅
+        print(f"📊 성능 데이터: {data}")
+        
+        return jsonify({
+            "status": "success",
+            "message": "성능 데이터가 기록되었습니다.",
+            "timestamp": datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        print(f"❌ 성능 분석 오류: {e}")
+        return jsonify({
+            "error": "성능 분석 오류가 발생했습니다.",
+            "success": False
+        }), 500
+
+
 @app.route("/experts")
 def get_experts():
     """전문가 목록 반환"""
