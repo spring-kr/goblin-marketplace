@@ -1,0 +1,17 @@
+{
+  "functions": {
+    "api_new/index.py": {
+      "runtime": "@vercel/python@4.1.0"
+    }
+  },
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/api_new/index.py"
+    }
+  ],
+  "env": {
+    "PYTHONPATH": ".",
+    "FLASK_ENV": "production"
+  }
+}
