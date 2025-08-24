@@ -1107,14 +1107,13 @@ def chat_advanced():
             
         else:
             # 전문적인 질문 - 상세한 전문가 응답
-            # 후속 질문인 경우 컨텍스트 정보 추가
-            enhanced_message = message
             if previous_topic:
-                enhanced_message = f"이전 질문 '{previous_topic}'에 대한 후속 질문: {message}"
-                print(f"🔗 컨텍스트 연결: {previous_topic} → {message}")
-            
-            # 고급 AI 응답 생성 (컨텍스트 강화된 메시지 사용)
-            response = real_ai_manager.get_expert_response(enhanced_message, expert_name)
+                # 후속 질문인 경우 컨텍스트 기반 응답 생성
+                print(f"🔗 후속 질문 처리: {previous_topic} → {message}")
+                response = real_ai_manager._generate_contextual_response(message, expert_name, previous_topic)
+            else:
+                # 새로운 질문인 경우 일반 전문가 응답
+                response = real_ai_manager.get_expert_response(message, expert_name)
             
             # 🧠 감정 기반 공감 메시지 추가
             response_with_empathy = f"{empathy_response}\n\n{response}"
