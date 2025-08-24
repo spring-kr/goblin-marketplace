@@ -1,8 +1,7 @@
 {
   "functions": {
     "app.py": {
-      "runtime": "@vercel/python",
-      "maxDuration": 10
+      "runtime": "@vercel/python@4.1.0"
     }
   },
   "routes": [
