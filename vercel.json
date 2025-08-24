@@ -1,14 +1,11 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "app.py",
-      "use": "@vercel/python",
-      "config": {
-        "maxLambdaSize": "15mb"
-      }
+  "functions": {
+    "app.py": {
+      "runtime": "@vercel/python",
+      "maxDuration": 10
     }
-  ],
+  },
   "routes": [
     {
       "src": "/(.*)",
@@ -17,13 +14,8 @@
   ],
   "env": {
     "PYTHONPATH": ".",
-    "FLASK_ENV": "production",
+    "FLASK_ENV": "production", 
     "VERCEL_ENV": "production",
     "LIGHTWEIGHT_MODE": "true"
-  },
-  "functions": {
-    "app.py": {
-      "maxDuration": 10
-    }
   }
 }
