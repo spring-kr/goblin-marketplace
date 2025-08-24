@@ -2007,7 +2007,7 @@ def index():
         print(f"🔍 Flask 앱 템플릿 폴더: {app.template_folder}")
 
         # 실제 배포 홈페이지를 기본값으로 사용 (로컬 테스트도 동일한 환경)
-        use_simple_index = os.environ.get("USE_SIMPLE_INDEX", "false").lower() == "true"
+        use_simple_index = os.environ.get("USE_SIMPLE_INDEX", "true").lower() == "true"
 
         if use_simple_index:
             print("🔧 테스트 모드: index.html 사용 (환경 변수 USE_SIMPLE_INDEX=true)")
