@@ -145,27 +145,297 @@ def index():
         import traceback
         print(f"❌ 상세 오류: {traceback.format_exc()}")
         
-        # 템플릿 오류 시 간단한 HTML 반환
+        # 템플릿 오류 시 실제 홈페이지 HTML을 직접 반환
         return f"""
-        <!DOCTYPE html>
-        <html lang="ko">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>🏰 도깨비마을장터 v{APP_VERSION}</title>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>� 도깨비마을장터 통합 대시보드 v{APP_VERSION}</title>
+    
+    <!-- Vercel Analytics -->
+    <script defer src="https://analytics.eu.vercel-insights.com/script.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }}
+
+        body {{
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+        }}
+
+        .container {{
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }}
+
+        header {{
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }}
+
+        h1 {{
+            color: white;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }}
+
+        .subtitle {{
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }}
+
+        .status-bar {{
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }}
+
+        .status-item {{
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+        }}
+
+        .main-grid {{
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }}
+
+        .card {{
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }}
+
+        .card h2 {{
+            color: #4a5568;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }}
+
+        .expert-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }}
+
+        .expert-card {{
+            background: linear-gradient(135deg, #4299e1 0%, #667eea 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }}
+
+        .expert-card:hover {{
+            transform: translateY(-5px);
+        }}
+
+        .chat-section {{
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 25px;
+        }}
+
+        .chat-input {{
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }}
+
+        .chat-button {{
+            background: linear-gradient(135deg, #4299e1 0%, #667eea 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }}
+
+        .chat-button:hover {{
+            transform: translateY(-2px);
+        }}
+
+        @media (max-width: 768px) {{
+            .main-grid {{
+                grid-template-columns: 1fr;
+            }}
             
-            <!-- Vercel Analytics -->
-            <script defer src="https://analytics.eu.vercel-insights.com/script.js"></script>
-        </head>
-        <body style="font-family: Arial; text-align: center; padding: 50px;">
-            <h1>🏰 도깨비마을장터</h1>
-            <h2>⚠️ 백업 모드 - 템플릿 로딩 오류 v{APP_VERSION}</h2>
-            <p>AI 전문가 시스템이 활성화되었습니다.</p>
-            <p>현재 시간: {datetime.now().isoformat()}</p>
-            <p>오류: {str(e)}</p>
-            <button onclick="location.reload()">🔄 페이지 새로고침</button>
-        </body>
-        </html>
+            .expert-grid {{
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }}
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>� 도깨비마을장터 통합 대시보드</h1>
+            <div class="subtitle">16명의 박사급 AI 전문가와 함께하는 스마트 솔루션</div>
+            <div class="status-bar">
+                <div class="status-item">✅ AI 시스템 활성화</div>
+                <div class="status-item">🔄 실시간 연결</div>
+                <div class="status-item">📊 데이터 분석 준비</div>
+                <div class="status-item">🛡️ 서버리스 모드</div>
+            </div>
+        </header>
+
+        <div class="main-grid">
+            <div class="card">
+                <h2>🤖 AI 전문가 팀</h2>
+                <div class="expert-grid">
+                    <div class="expert-card" onclick="selectExpert('AI전문가')">
+                        <div>🧠</div>
+                        <div>AI전문가</div>
+                    </div>
+                    <div class="expert-card" onclick="selectExpert('마케팅왕')">
+                        <div>📈</div>
+                        <div>마케팅왕</div>
+                    </div>
+                    <div class="expert-card" onclick="selectExpert('의료AI전문가')">
+                        <div>⚕️</div>
+                        <div>의료AI전문가</div>
+                    </div>
+                    <div class="expert-card" onclick="selectExpert('재테크박사')">
+                        <div>💰</div>
+                        <div>재테크박사</div>
+                    </div>
+                    <div class="expert-card" onclick="selectExpert('창업컨설턴트')">
+                        <div>🚀</div>
+                        <div>창업컨설턴트</div>
+                    </div>
+                    <div class="expert-card" onclick="selectExpert('개발자멘토')">
+                        <div>💻</div>
+                        <div>개발자멘토</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📊 실시간 대시보드</h2>
+                <div style="text-align: center; padding: 40px;">
+                    <div style="font-size: 3em;">📈</div>
+                    <div>실시간 데이터 분석</div>
+                    <div style="margin-top: 20px; color: #666;">
+                        AI 전문가와 상담하여<br>
+                        맞춤형 솔루션을 받아보세요
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-section">
+            <h2>💬 AI 전문가와 상담하기</h2>
+            <div>
+                <input type="text" id="userQuery" placeholder="궁금한 것을 물어보세요..." class="chat-input">
+                <button onclick="sendMessage()" class="chat-button">💬 질문하기</button>
+            </div>
+            <div id="chatResponse" style="margin-top: 20px; padding: 20px; background: #f7fafc; border-radius: 10px; min-height: 100px;">
+                <div style="color: #666; text-align: center;">
+                    AI 전문가가 대기 중입니다. 질문을 입력해주세요! 🤖
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedExpert = 'AI전문가';
+
+        function selectExpert(expertName) {{
+            selectedExpert = expertName;
+            document.querySelectorAll('.expert-card').forEach(card => {{
+                card.style.opacity = '0.7';
+            }});
+            event.target.closest('.expert-card').style.opacity = '1';
+            document.getElementById('chatResponse').innerHTML = 
+                `<div style="color: #4299e1; font-weight: bold;">${{expertName}} 전문가가 선택되었습니다! 질문을 입력해주세요.</div>`;
+        }}
+
+        async function sendMessage() {{
+            const query = document.getElementById('userQuery').value.trim();
+            if (!query) {{
+                alert('질문을 입력해주세요!');
+                return;
+            }}
+
+            const responseDiv = document.getElementById('chatResponse');
+            responseDiv.innerHTML = '<div style="color: #666;">🤔 AI 전문가가 생각 중입니다...</div>';
+
+            try {{
+                const response = await fetch('/chat', {{
+                    method: 'POST',
+                    headers: {{
+                        'Content-Type': 'application/json',
+                    }},
+                    body: JSON.stringify({{
+                        query: query,
+                        expert_name: selectedExpert
+                    }})
+                }});
+
+                const data = await response.json();
+                
+                if (data.success) {{
+                    responseDiv.innerHTML = `
+                        <div style="margin-bottom: 10px;">
+                            <strong style="color: #4299e1;">${{selectedExpert}}:</strong>
+                        </div>
+                        <div style="line-height: 1.6;">${{data.response}}</div>
+                    `;
+                }} else {{
+                    responseDiv.innerHTML = '<div style="color: #e53e3e;">오류가 발생했습니다. 다시 시도해주세요.</div>';
+                }}
+            }} catch (error) {{
+                responseDiv.innerHTML = '<div style="color: #e53e3e;">네트워크 오류가 발생했습니다.</div>';
+            }}
+
+            document.getElementById('userQuery').value = '';
+        }}
+
+        // Enter 키로 메시지 전송
+        document.getElementById('userQuery').addEventListener('keypress', function(e) {{
+            if (e.key === 'Enter') {{
+                sendMessage();
+            }}
+        }});
+    </script>
+</body>
+</html>
         """
 
 
