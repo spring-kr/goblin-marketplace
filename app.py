@@ -523,6 +523,47 @@ def track_analytics_event():
         return jsonify({"success": False, "error": str(e)}), 500
 
 
+@app.route("/api/goblins", methods=["GET"])
+def get_goblins():
+    """도깨비 목록 API"""
+    try:
+        # 서버리스 환경에서는 고정된 도깨비 목록 반환
+        goblins = [
+            {"id": 1, "name": "AI전문가", "emoji": "🧠", "description": "AI와 머신러닝 전문가"},
+            {"id": 2, "name": "마케팅왕", "emoji": "📈", "description": "디지털 마케팅 전문가"},
+            {"id": 3, "name": "의료AI전문가", "emoji": "⚕️", "description": "의료 AI 전문가"},
+            {"id": 4, "name": "재테크박사", "emoji": "💰", "description": "투자 및 재무 전문가"},
+            {"id": 5, "name": "창업컨설턴트", "emoji": "🚀", "description": "스타트업 및 창업 전문가"},
+            {"id": 6, "name": "개발자멘토", "emoji": "💻", "description": "프로그래밍 및 개발 전문가"},
+        ]
+        
+        print(f"🎯 도깨비 목록 요청 - {len(goblins)}명 반환")
+        
+        return jsonify({
+            "success": True,
+            "goblins": goblins,
+            "count": len(goblins),
+            "timestamp": datetime.now().isoformat()
+        })
+    except Exception as e:
+        print(f"❌ 도깨비 목록 오류: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/favicon.ico")
+def favicon():
+    """파비콘 요청 처리"""
+    try:
+        # static 폴더에서 파비콘 찾기
+        if os.path.exists("static/favicon.ico"):
+            return app.send_static_file("favicon.ico")
+        else:
+            # 기본 파비콘 반환 (404 대신)
+            return "", 204
+    except Exception:
+        return "", 204
+
+
 if __name__ == "__main__":
     print("🖥️ 로컬 환경에서 실행 중...")
     app.run(debug=True, host="0.0.0.0", port=5000)
