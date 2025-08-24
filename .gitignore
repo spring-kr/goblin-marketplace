@@ -29,6 +29,18 @@ ENV/
 *.db
 *.sqlite3
 
+# Memory Systems (로컬 전문가 데이터베이스)
+memory_systems/
+
+# Goblin Systems (로컬 도깨비 데이터베이스)
+goblins/
+
+# Tests (로컬 테스트 파일들)
+tests/
+
+# Utils (로컬 유틸리티 파일들)
+utils/
+
 # Log files
 *.log
 
@@ -69,6 +81,13 @@ debug_*.py
 *_backup_*.py
 *_복사본.py
 
+# Backup management system
+backups/
+*backup*/
+
+# Goblin database files
+goblins/
+
 # Output files
 *.png
 *.jpg
@@ -83,12 +102,16 @@ models/
 !advanced_memory_system_v11.py
 !advanced_goblin_adapter_v11.py
 
-# Korean files (temporary exclusion)
+# Korean files (docs 폴더 정리 완료)
 *한글*
 *도깨비*
 *.md
 !README.md
-!서비스_배포_가이드.md
+!docs/README.md
+!docs/guides/*.md
+!docs/system/*.md
+docs/reports/
+docs/backups/
 .vercel
 
 # 개발/테스트 파일들 (추가)
