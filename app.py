@@ -124,7 +124,7 @@ def not_found(error):
 
 @app.route("/")
 def index():
-    """메인 페이지 - 통합 대시보드"""
+    """메인 페이지 - 도깨비마을장터 v11.5 완전체"""
     try:
         print(f"🔍 템플릿 로딩 시도 - 현재 디렉토리: {os.getcwd()}")
         print(f"🔍 현재 디렉토리 파일 목록: {os.listdir('.')}")
@@ -137,8 +137,8 @@ def index():
         
         print(f"🔍 Flask 앱 템플릿 폴더: {app.template_folder}")
         
-        # 통합 대시보드 템플릿 로딩
-        return render_template("unified_dashboard_v12.html")
+        # 도깨비마을장터 v11 완전체 템플릿 로딩 (아바타 포함)
+        return render_template("goblin_market_v11.html")
     except Exception as e:
         print(f"❌ 템플릿 로딩 오류: {e}")
         print(f"❌ 오류 타입: {type(e).__name__}")
