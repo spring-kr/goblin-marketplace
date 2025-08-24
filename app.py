@@ -72,26 +72,38 @@ app.secret_key = os.getenv("SECRET_KEY", "goblin_marketplace_secret_key_2024")
 
 print(f"🌟 도깨비 마을 장터 v{APP_VERSION} - 완전 서버리스 모드")
 
+
 # 전역 에러 핸들러 추가
 @app.errorhandler(500)
 def internal_error(error):
     """500 Internal Server Error 핸들러"""
     print(f"❌ Internal Server Error: {error}")
-    return jsonify({
-        "error": "Internal Server Error",
-        "message": "서버에서 오류가 발생했습니다.",
-        "version": APP_VERSION,
-        "timestamp": datetime.now().isoformat()
-    }), 500
+    return (
+        jsonify(
+            {
+                "error": "Internal Server Error",
+                "message": "서버에서 오류가 발생했습니다.",
+                "version": APP_VERSION,
+                "timestamp": datetime.now().isoformat(),
+            }
+        ),
+        500,
+    )
+
 
 @app.errorhandler(404)
 def not_found(error):
     """404 Not Found 핸들러"""
-    return jsonify({
-        "error": "Not Found", 
-        "message": "요청한 페이지를 찾을 수 없습니다.",
-        "version": APP_VERSION
-    }), 404
+    return (
+        jsonify(
+            {
+                "error": "Not Found",
+                "message": "요청한 페이지를 찾을 수 없습니다.",
+                "version": APP_VERSION,
+            }
+        ),
+        404,
+    )
 
 
 @app.route("/")
