@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_from_directory
 import os
 import requests
 import urllib.parse
@@ -6,6 +6,16 @@ from bs4 import BeautifulSoup
 import time
 import re
 from datetime import datetime
+from werkzeug.utils import secure_filename
+
+# 📄 문서 분석 시스템 임포트
+try:
+    from document_analyzer_v1 import get_document_analyzer, analyze_file
+    DOCUMENT_ANALYSIS_AVAILABLE = True
+    print("✅ 문서 분석 시스템 로드 성공!")
+except Exception as e:
+    print(f"⚠️ 문서 분석 시스템 로드 실패: {e}")
+    DOCUMENT_ANALYSIS_AVAILABLE = False
 
 # ⚡ 강제 서버리스 모드 (SQLite 완전 차단) - v4.0 COMPLETE REDEPLOY
 VERCEL_ENV = True
@@ -1260,6 +1270,14 @@ app = Flask(__name__,
            template_folder=template_dir,
            static_folder=static_dir)
 
+# 파일 업로드 설정
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB 제한
+app.config['UPLOAD_FOLDER'] = 'uploads'
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'docx', 'doc', 'xlsx', 'xls', 'pptx', 'ppt', 'csv'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 print(f"🔍 Flask 앱 초기화:")
 print(f"   - 템플릿 폴더: {template_dir}")
 print(f"   - 정적 파일 폴더: {static_dir}")
@@ -1949,6 +1967,175 @@ def get_goblins():
     except Exception as e:
         print(f"❌ 도깨비 목록 오류: {e}")
         return jsonify({"status": "error", "error": str(e)}), 500
+
+
+# 📄 파일 업로드 및 분석 엔드포인트
+@app.route("/api/upload", methods=["POST"])
+def upload_and_analyze():
+    """파일 업로드 및 분석"""
+    try:
+        if not DOCUMENT_ANALYSIS_AVAILABLE:
+            return jsonify({
+                "status": "error",
+                "error": "문서 분석 시스템이 사용할 수 없습니다."
+            }), 503
+        
+        # 파일 확인
+        if 'file' not in request.files:
+            return jsonify({
+                "status": "error", 
+                "error": "파일이 선택되지 않았습니다."
+            }), 400
+        
+        file = request.files['file']
+        expert_type = request.form.get('expert_type', 'general')
+        
+        if file.filename == '':
+            return jsonify({
+                "status": "error",
+                "error": "파일명이 없습니다."
+            }), 400
+        
+        if not allowed_file(file.filename):
+            return jsonify({
+                "status": "error",
+                "error": f"지원되지 않는 파일 형식입니다. 지원 형식: {', '.join(ALLOWED_EXTENSIONS)}"
+            }), 400
+        
+        # 파일 크기 확인 (16MB 제한)
+        file_content = file.read()
+        if len(file_content) > 16 * 1024 * 1024:
+            return jsonify({
+                "status": "error",
+                "error": "파일이 너무 큽니다. 16MB 이하의 파일만 업로드 가능합니다."
+            }), 400
+        
+        # 보안을 위한 파일명 정리
+        filename = secure_filename(file.filename or 'uploaded_file')
+        
+        print(f"📄 파일 업로드: {filename} ({len(file_content):,} bytes)")
+        
+        # 문서 분석 수행
+        analysis_result = analyze_file(file_content, filename, expert_type)
+        
+        if "error" in analysis_result:
+            return jsonify({
+                "status": "error",
+                "error": analysis_result["error"]
+            }), 500
+        
+        # 성공 응답 - JavaScript에서 쉽게 처리할 수 있는 형식으로 반환
+        response_data = {
+            "status": "success", 
+            "filename": analysis_result.get("filename", filename),
+            "file_type": analysis_result.get("file_type", "Unknown"),
+            "file_size": analysis_result.get("file_size", len(file_content)),
+            "text_length": analysis_result.get("extracted_text_length", 0),
+            "analysis": analysis_result.get("summary", "문서를 분석했습니다."),
+            "keywords": analysis_result.get("keywords", []),
+            "key_points": analysis_result.get("key_points", []),
+            "insights": analysis_result.get("insights", []),
+            "expert_analysis": analysis_result.get("expert_analysis", {}),
+            "confidence_score": analysis_result.get("confidence_score", 0.8),
+            "analysis_time": analysis_result.get("analysis_time", 0),
+            "timestamp": datetime.now().isoformat()
+        }
+        
+        print(f"✅ 분석 완료: {filename} - {response_data['analysis'][:100]}...")
+        
+        return jsonify(response_data)
+        
+    except Exception as e:
+        print(f"❌ 파일 업로드/분석 오류: {e}")
+        return jsonify({
+            "status": "error",
+            "error": f"파일 처리 중 오류가 발생했습니다: {str(e)}"
+        }), 500
+
+
+@app.route("/api/supported-formats", methods=["GET"])
+def get_supported_formats():
+    """지원되는 파일 형식 목록"""
+    if not DOCUMENT_ANALYSIS_AVAILABLE:
+        return jsonify({
+            "status": "error",
+            "error": "문서 분석 시스템이 사용할 수 없습니다."
+        }), 503
+    
+    try:
+        analyzer = get_document_analyzer()
+        return jsonify({
+            "status": "success",
+            "supported_formats": analyzer.supported_types,
+            "max_file_size": "16MB",
+            "features": {
+                "pdf_support": analyzer.supported_types.get('.pdf') is not None,
+                "ocr_support": hasattr(analyzer, 'extract_text_from_image'),
+                "ai_analysis": analyzer.ai_manager is not None
+            }
+        })
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "error": str(e)
+        }), 500
+
+
+@app.route("/api/analyze-text", methods=["POST"])
+def analyze_text_content():
+    """텍스트 직접 분석 (파일 업로드 없이)"""
+    try:
+        if not DOCUMENT_ANALYSIS_AVAILABLE:
+            return jsonify({
+                "status": "error",
+                "error": "문서 분석 시스템이 사용할 수 없습니다."
+            }), 503
+        
+        data = request.get_json()
+        if not data or 'text' not in data:
+            return jsonify({
+                "status": "error",
+                "error": "분석할 텍스트가 제공되지 않았습니다."
+            }), 400
+        
+        text = data['text']
+        expert_type = data.get('expert_type', 'general')
+        
+        if len(text.strip()) < 10:
+            return jsonify({
+                "status": "error",
+                "error": "분석할 텍스트가 너무 짧습니다."
+            }), 400
+        
+        # 임시 텍스트 파일로 처리
+        filename = "text_input.txt"
+        file_content = text.encode('utf-8')
+        
+        print(f"📝 텍스트 분석: {len(text)} 글자")
+        
+        # 분석 수행
+        analysis_result = analyze_file(file_content, filename, expert_type)
+        
+        if "error" in analysis_result:
+            return jsonify({
+                "status": "error",
+                "error": analysis_result["error"]
+            }), 500
+        
+        return jsonify({
+            "status": "success",
+            "message": "텍스트 분석이 완료되었습니다!",
+            "analysis": analysis_result,
+            "timestamp": datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        print(f"❌ 텍스트 분석 오류: {e}")
+        return jsonify({
+            "status": "error",
+            "error": f"텍스트 분석 중 오류가 발생했습니다: {str(e)}"
+        }), 500
+
 
 
 @app.route("/favicon.ico")
