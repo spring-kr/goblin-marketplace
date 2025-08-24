@@ -48,6 +48,36 @@ tmp/
 
 # 미디어 파일들 (용량 절약)
 *.png
+
+# AI 모델 파일들 (대용량 - Vercel 제한 초과)
+*.pt
+*.pth
+*.pkl
+*.joblib
+*.model
+*.bin
+derma_bert_*.pt
+ortho_bert_*.pt
+disease_progression_lstm.pkl
+simple_emotion_pipeline.*
+
+# 토크나이저 파일들 (대용량)
+tokenizer.json
+vocab.txt
+special_tokens_map.json
+
+# 백업 파일들 (배포시 불필요)
+*_backup_*.py
+app_backup_*.py
+*_corrupted_backup.py
+BACKUP_REPORT_*.md
+
+# 추가 개발 파일들
+*.html
+auto_test.html
+complete_*.html
+expert_test.html
+simple_3d_test.html
 *.jpg
 *.jpeg
 *.gif

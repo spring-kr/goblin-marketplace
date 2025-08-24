@@ -28,14 +28,16 @@ print("🛡️ SQLite 완전 차단 - 메모리 시스템 완전 비활성화")
 print("🔥 CACHE KILLER - 42분 다운타임 해결")
 print("=" * 60)
 
-# 🧠 고급 AI 엔진 임포트 시도
+# 🚀 Vercel 경량 AI 엔진 임포트 (대용량 모델 대신)
 try:
-    from advanced_ai_engine_v12 import AdvancedAIEngine
-    print("✅ 고급 AI 엔진 v12.0 임포트 성공!")
-    ADVANCED_AI_AVAILABLE = True
+    from lightweight_ai_engine import get_ai_response, get_expert_capabilities, health_check
+    print("✅ 경량 AI 엔진 v1.0 임포트 성공! (Vercel 최적화)")
+    LIGHTWEIGHT_AI_AVAILABLE = True
+    ADVANCED_AI_AVAILABLE = False  # 대용량 모델 비활성화
 except Exception as e:
-    print(f"⚠️ 고급 AI 엔진 임포트 실패: {e}")
+    print(f"⚠️ 경량 AI 엔진 임포트 실패: {e}")
     print("🔄 기본 AI 시스템으로 폴백")
+    LIGHTWEIGHT_AI_AVAILABLE = False
     ADVANCED_AI_AVAILABLE = False
 
 # 👥 1단계: 16명 전문가 시스템 임포트
@@ -58,6 +60,71 @@ except Exception as e:
     print("🔄 v1.0 전문가 시스템으로 폴백")
     EXPERTS_V2_AVAILABLE = False
 
+# 👥 3단계: 멀티모달 전문가 시스템 임포트 (다중 AI 모델 + 다국어)
+try:
+    from experts.complete_16_experts_v3_multimodel_20250823 import EnhancedComplete16ExpertAI_v3
+    print("✅ 멀티모달 16명 전문가 시스템 v3.0 임포트 성공!")
+    EXPERTS_V3_AVAILABLE = True
+except Exception as e:
+    print(f"⚠️ 멀티모달 전문가 시스템 임포트 실패: {e}")
+    print("🔄 v2.0 전문가 시스템으로 폴백")
+    EXPERTS_V3_AVAILABLE = False
+
+# 👥 4단계: 품질 개선 멀티모달 전문가 시스템 임포트 (이미지/음성/비디오)
+try:
+    from experts.complete_16_experts_v4_improved_quality_20250823_190858 import MultimodalExpertAI
+    print("✅ 품질 개선 멀티모달 전문가 시스템 v4.0 임포트 성공!")
+    EXPERTS_V4_AVAILABLE = True
+except Exception as e:
+    print(f"⚠️ 품질 개선 전문가 시스템 임포트 실패: {e}")
+    print("🔄 v3.0 전문가 시스템으로 폴백")
+    EXPERTS_V4_AVAILABLE = False
+
+# 👥 5단계: 글로벌 확장 전문가 시스템 임포트 
+try:
+    from experts.complete_16_experts_v5_global_expansion_20250823 import GlobalExpertSystemV5
+    print("✅ 글로벌 확장 전문가 시스템 v5.0 임포트 성공!")
+    EXPERTS_V5_AVAILABLE = True
+except Exception as e:
+    print(f"⚠️ 글로벌 확장 전문가 시스템 임포트 실패: {e}")
+    EXPERTS_V5_AVAILABLE = False
+
+# 👥 6단계: 궁극적 글로벌 전문가 시스템 임포트
+try:
+    from experts.complete_16_experts_v6_ultimate_global_20250823 import ComprehensiveExpertSystemV6
+    print("✅ 궁극적 글로벌 전문가 시스템 v6.0 임포트 성공!")
+    EXPERTS_V6_AVAILABLE = True
+except Exception as e:
+    print(f"⚠️ 궁극적 글로벌 전문가 시스템 임포트 실패: {e}")
+    EXPERTS_V6_AVAILABLE = False
+
+# 👥 7단계: 실시간 멀티모달 전문가 시스템 임포트
+try:
+    from experts.complete_16_experts_v7_real_time_multimodal_20250823 import GlobalExpertSystemV7
+    print("✅ 실시간 멀티모달 전문가 시스템 v7.0 임포트 성공!")
+    EXPERTS_V7_AVAILABLE = True
+except Exception as e:
+    print(f"⚠️ 실시간 멀티모달 전문가 시스템 임포트 실패: {e}")
+    EXPERTS_V7_AVAILABLE = False
+
+# 👥 8단계: 코스믹 멀티모달 전문가 시스템 임포트
+try:
+    from experts.complete_16_experts_v8_cosmic_multimodal_20250823 import UniversalAISystemV8
+    print("✅ 코스믹 멀티모달 전문가 시스템 v8.0 임포트 성공!")
+    EXPERTS_V8_AVAILABLE = True
+except Exception as e:
+    print(f"⚠️ 코스믹 멀티모달 전문가 시스템 임포트 실패: {e}")
+    EXPERTS_V8_AVAILABLE = False
+
+# 👥 9단계: DNA 개인화 전문가 시스템 임포트 (최종 단계)
+try:
+    from experts.complete_16_experts_v9_dna_personalized_20250823 import DNAPersonalizedExpertSystem
+    print("✅ DNA 개인화 전문가 시스템 v9.0 임포트 성공!")
+    EXPERTS_V9_AVAILABLE = True
+except Exception as e:
+    print(f"⚠️ DNA 개인화 전문가 시스템 임포트 실패: {e}")
+    EXPERTS_V9_AVAILABLE = False
+
 print(f"🚀🚀🚀 COMPLETE REDEPLOY MODE v{APP_VERSION} 🚀🚀🚀")
 print(f"🔍 환경 정보: CWD={os.getcwd()}")
 print("⚠️ WARNING: ZERO DB ACCESS - PURE SERVERLESS MODE")
@@ -71,44 +138,154 @@ class UltraLightAIManager:
     """완전 서버리스 최적화 고급 AI 매니저"""
 
     def __init__(self):
-        # 🚀 2단계: Enhanced 16명 전문가 시스템 (개인화 + 성능 모니터링)
-        if EXPERTS_V2_AVAILABLE:
+        # 🌟 3단계: 멀티모달 16명 전문가 시스템 초기화 (v3.0 최우선)
+        if EXPERTS_V3_AVAILABLE:
             try:
-                self.expert_ai_v2 = EnhancedComplete16ExpertAI(db_path="expert_ai_v2.db")
-                print("🚀 Enhanced 16명 전문가 시스템 v2.0 활성화!")
-                self.use_16_experts_v2 = True
-                self.use_16_experts = False  # v1은 비활성화
-                # 16명 전문가 리스트 (2단계 Enhanced)
+                self.expert_ai_v3 = EnhancedComplete16ExpertAI_v3(db_path="expert_ai_v3.db")
+                print("🌟 멀티모달 16명 전문가 시스템 v3.0 활성화!")
+                self.use_16_experts_v3 = True
+                self.use_16_experts_v2 = False  # v2는 비활성화
+                self.use_16_experts = False     # v1은 비활성화
+                # 32명 전문가 리스트 (3단계 멀티모달 + v9 DNA 개인화) - 최종 중복 제거 완료
                 self.experts = {
-                    "assistant": "인공지능박사 하이도깨비 🤖",
-                    "builder": "경제학박사 부자도깨비 💰", 
-                    "counselor": "상담심리박사 상담도깨비 💬",
-                    "creative": "예술학박사 창작도깨비 🎨",
-                    "data_analyst": "데이터과학박사 분석도깨비 📊",
-                    "fortune": "운세학박사 점술도깨비 🔮",
-                    "growth": "교육학박사 성장도깨비 📈",
-                    "hr": "인사관리박사 인재도깨비 👥",
-                    "marketing": "마케팅박사 마케팅도깨비 📢",
-                    "medical": "의학박사 의료도깨비 🏥",
-                    "sales": "영업학박사 세일도깨비 💼",
-                    "seo": "SEO박사 검색도깨비 🔍",
-                    "shopping": "쇼핑박사 구매도깨비 🛒",
-                    "startup": "창업학박사 스타트도깨비 🚀",
-                    "wellness": "웰니스박사 건강도깨비 🌿",
-                    "writing": "문학박사 글쓰기도깨비 ✍️",
+                    # 기본 11명 전문가 (v1.0) - 중복 제거 후
+                    "assistant": "인공지능도깨비 🤖",
+                    # "builder": "경제학박사 부자도깨비 💰", # business와 중복
+                    # "counselor": "상담심리박사 상담도깨비 💬", # psychology와 중복
+                    # "creative": "예술학박사 창작도깨비 🎨", # design과 중복
+                    "data_analyst": "데이터분석도깨비 📊",
+                    "fortune": "점술도깨비 🔮",
+                    # "growth": "교육학박사 성장도깨비 📈", # education과 중복
+                    "hr": "인사관리도깨비 👥",
+                    "marketing": "마케팅도깨비 📢",
+                    # "medical": "의학박사 의료도깨비 🏥", # biotech와 통합
+                    "sales": "영업도깨비 💼",
+                    "seo": "검색도깨비 🔍",
+                    "shopping": "쇼핑도깨비 🛒",
+                    "startup": "창업도깨비 🚀",
+                    "wellness": "건강도깨비 🌿",
+                    "writing": "글쓰기도깨비 ✍️",
+                    
+                    # v9.0 DNA 개인화 전문가 15명 추가 (통합/개선)
+                    "tech": "IT기술도깨비 💻",
+                    "business": "경영도깨비 📊", # builder 통합
+                    "education": "교육도깨비 📚", # growth 통합
+                    "psychology": "심리상담도깨비 🧠", # counselor 통합
+                    "legal": "법률도깨비 ⚖️",
+                    "finance": "금융도깨비 💰",
+                    "design": "디자인도깨비 🎨", # creative 통합
+                    "sports": "스포츠도깨비 🏃‍♂️",
+                    "nutrition": "영양도깨비 🥗",
+                    "language": "언어도깨비 🗣️",
+                    "music": "음악도깨비 🎵",
+                    "travel": "여행도깨비 ✈️",
+                    "environment": "환경도깨비 🌱",
+                    "agriculture": "농업도깨비 🌾",
+                    "logistics": "물류도깨비 🚚",
+                    
+                    # 글로벌 기술 전문가 4명
+                    "energy": "에너지도깨비 ⚡",
+                    "biotech": "바이오도깨비 🧬", # medical 통합
+                    "security": "보안도깨비 🔒",
+                    "aerospace": "항공우주도깨비 🚀",
+                    
+                    # 미래 기술 전문가 2명
+                    "quantum": "양자물리도깨비 ⚛️",
+                    "nano": "나노기술도깨비 🔬",
                 }
             except Exception as e:
-                print(f"⚠️ Enhanced 전문가 시스템 초기화 실패: {e}")
-                print("🔄 v1.0으로 폴백 시도...")
-                self.use_16_experts_v2 = False
-                self._try_v1_fallback()
+                print(f"⚠️ 멀티모달 전문가 시스템 초기화 실패: {e}")
+                print("🔄 v2.0으로 폴백 시도...")
+                self.use_16_experts_v3 = False
+                self._try_v2_fallback()
+        elif EXPERTS_V2_AVAILABLE:
+            # v3.0이 없으면 v2.0 사용
+            self.use_16_experts_v3 = False
+            self._try_v2_fallback()
         elif EXPERTS_V1_AVAILABLE:
-            # v2.0이 없으면 v1.0 사용
+            # v3.0, v2.0이 없으면 v1.0 사용
+            self.use_16_experts_v3 = False
+            self.use_16_experts_v2 = False
             self._try_v1_fallback()
         else:
             self.use_16_experts = False
             self.use_16_experts_v2 = False
+            self.use_16_experts_v3 = False
             self._init_fallback_experts()
+        
+        # 경량 AI 엔진 초기화 (Vercel 최적화)
+        if LIGHTWEIGHT_AI_AVAILABLE:
+            try:
+                print("🚀 경량 AI 엔진 v1.0 활성화! (Vercel 최적화)")
+                self.use_lightweight_ai = True
+                self.use_advanced_ai = False  # 대용량 모델 비활성화
+            except Exception as e:
+                print(f"⚠️ 경량 AI 엔진 초기화 실패: {e}")
+                self.use_lightweight_ai = False
+        else:
+            self.use_lightweight_ai = False
+            
+        print("✅ 서버리스 AI 시스템 활성화!")
+    
+    def _try_v2_fallback(self):
+        """v2.0 Enhanced 전문가 시스템으로 폴백"""
+        try:
+            self.expert_ai_v2 = EnhancedComplete16ExpertAI(db_path="expert_ai_v2.db")
+            print("🚀 Enhanced 16명 전문가 시스템 v2.0 활성화!")
+            self.use_16_experts_v2 = True
+            self.use_16_experts = False  # v1은 비활성화
+            # 32명 전문가 리스트 (2단계 Enhanced + v9 DNA 확장) - 최종 중복 제거 완료
+            self.experts = {
+                # 기본 11명 전문가 (v1.0) - 중복 제거 후
+                "assistant": "인공지능도깨비 🤖",
+                # "builder": "경제학박사 부자도깨비 💰", # business와 중복
+                # "counselor": "상담심리박사 상담도깨비 💬", # psychology와 중복
+                # "creative": "예술학박사 창작도깨비 🎨", # design과 중복
+                "data_analyst": "데이터분석도깨비 📊",
+                "fortune": "점술도깨비 🔮",
+                # "growth": "교육학박사 성장도깨비 📈", # education과 중복
+                "hr": "인사관리도깨비 👥",
+                "marketing": "마케팅도깨비 📢",
+                # "medical": "의학박사 의료도깨비 🏥", # biotech와 통합
+                "sales": "영업도깨비 💼",
+                "seo": "검색도깨비 🔍",
+                "shopping": "쇼핑도깨비 🛒",
+                "startup": "창업도깨비 🚀",
+                "wellness": "건강도깨비 🌿",
+                "writing": "글쓰기도깨비 ✍️",
+                
+                # v9.0 DNA 개인화 전문가 15명 추가 (통합/개선)
+                "tech": "IT기술도깨비 💻",
+                "business": "경영도깨비 📊", # builder 통합
+                "education": "교육도깨비 📚", # growth 통합
+                "psychology": "심리상담도깨비 🧠", # counselor 통합
+                "legal": "법률도깨비 ⚖️",
+                "finance": "금융도깨비 💰",
+                "design": "디자인도깨비 🎨", # creative 통합
+                "sports": "스포츠도깨비 🏃‍♂️",
+                "nutrition": "영양도깨비 🥗",
+                "language": "언어도깨비 🗣️",
+                "music": "음악도깨비 🎵",
+                "travel": "여행도깨비 ✈️",
+                "environment": "환경도깨비 🌱",
+                "agriculture": "농업도깨비 🌾",
+                "logistics": "물류도깨비 🚚",
+                
+                # 글로벌 기술 전문가 4명
+                "energy": "에너지도깨비 ⚡",
+                "biotech": "바이오도깨비 🧬", # medical 통합
+                "security": "보안도깨비 🔒",
+                "aerospace": "항공우주도깨비 🚀",
+                
+                # 미래 기술 전문가 2명
+                "quantum": "양자물리도깨비 ⚛️",
+                "nano": "나노기술도깨비 🔬",
+            }
+        except Exception as e:
+            print(f"⚠️ v2.0 Enhanced 전문가 시스템도 실패: {e}")
+            print("🔄 v1.0으로 폴백 시도...")
+            self.use_16_experts_v2 = False
+            self._try_v1_fallback()
     
     def _try_v1_fallback(self):
         """v1.0 전문가 시스템으로 폴백"""
@@ -117,24 +294,52 @@ class UltraLightAIManager:
             print("🎯 16명 전문가 AI 시스템 v1.0 활성화!")
             self.use_16_experts = True
             self.use_16_experts_v2 = False
-            # 16명 전문가 리스트 (1단계)
+            # 32명 전문가 리스트 (1단계 + v9 DNA 확장) - 최종 중복 제거 완료
             self.experts = {
-                "assistant": "인공지능박사 하이도깨비 🤖",
-                "builder": "경제학박사 부자도깨비 💰", 
-                "counselor": "상담심리박사 상담도깨비 💬",
-                "creative": "예술학박사 창작도깨비 🎨",
-                "data_analyst": "데이터과학박사 분석도깨비 📊",
-                "fortune": "운세학박사 점술도깨비 🔮",
-                "growth": "교육학박사 성장도깨비 📈",
-                "hr": "인사관리박사 인재도깨비 👥",
-                "marketing": "마케팅박사 마케팅도깨비 📢",
-                "medical": "의학박사 의료도깨비 🏥",
-                "sales": "영업학박사 세일도깨비 💼",
-                "seo": "SEO박사 검색도깨비 🔍",
-                "shopping": "쇼핑박사 구매도깨비 🛒",
-                "startup": "창업학박사 스타트도깨비 🚀",
-                "wellness": "웰니스박사 건강도깨비 🌿",
-                "writing": "문학박사 글쓰기도깨비 ✍️",
+                # 기본 11명 전문가 (v1.0) - 중복 제거 후
+                "assistant": "인공지능도깨비 🤖",
+                # "builder": "경제학박사 부자도깨비 💰", # business와 중복
+                # "counselor": "상담심리박사 상담도깨비 💬", # psychology와 중복
+                # "creative": "예술학박사 창작도깨비 🎨", # design과 중복
+                "data_analyst": "데이터분석도깨비 📊",
+                "fortune": "점술도깨비 🔮",
+                # "growth": "교육학박사 성장도깨비 📈", # education과 중복
+                "hr": "인사관리도깨비 👥",
+                "marketing": "마케팅도깨비 📢",
+                # "medical": "의학박사 의료도깨비 🏥", # biotech와 통합
+                "sales": "영업도깨비 💼",
+                "seo": "검색도깨비 🔍",
+                "shopping": "쇼핑도깨비 🛒",
+                "startup": "창업도깨비 🚀",
+                "wellness": "건강도깨비 🌿",
+                "writing": "글쓰기도깨비 ✍️",
+                
+                # v9.0 DNA 개인화 전문가 15명 추가 (통합/개선)
+                "tech": "IT기술도깨비 💻",
+                "business": "경영도깨비 📊", # builder 통합
+                "education": "교육도깨비 📚", # growth 통합
+                "psychology": "심리상담도깨비 🧠", # counselor 통합
+                "legal": "법률도깨비 ⚖️",
+                "finance": "금융도깨비 💰",
+                "design": "디자인도깨비 🎨", # creative 통합
+                "sports": "스포츠도깨비 🏃‍♂️",
+                "nutrition": "영양도깨비 🥗",
+                "language": "언어도깨비 🗣️",
+                "music": "음악도깨비 🎵",
+                "travel": "여행도깨비 ✈️",
+                "environment": "환경도깨비 🌱",
+                "agriculture": "농업도깨비 🌾",
+                "logistics": "물류도깨비 🚚",
+                
+                # 글로벌 기술 전문가 4명
+                "energy": "에너지도깨비 ⚡",
+                "biotech": "바이오도깨비 🧬", # medical 통합
+                "security": "보안도깨비 🔒",
+                "aerospace": "항공우주도깨비 🚀",
+                
+                # 미래 기술 전문가 2명
+                "quantum": "양자물리도깨비 ⚛️",
+                "nano": "나노기술도깨비 🔬",
             }
         except Exception as e:
             print(f"⚠️ v1.0 전문가 시스템도 실패: {e}")
@@ -145,38 +350,13 @@ class UltraLightAIManager:
     def _init_fallback_experts(self):
         """기본 6명 전문가로 폴백"""
         self.experts = {
-            "AI전문가": "AI와 머신러닝 전문가",
-            "마케팅왕": "디지털 마케팅 전문가",
-            "의료AI전문가": "의료 AI 전문가",
-            "재테크박사": "투자 및 재무 전문가",
-            "창업컨설턴트": "스타트업 및 창업 전문가",
-            "개발자멘토": "프로그래밍 및 개발 전문가",
+            "AI전문가": "AI도깨비 🤖",
+            "마케팅왕": "마케팅도깨비 📢",
+            "의료AI전문가": "의료도깨비 🏥",
+            "재테크박사": "재테크도깨비 💰",
+            "창업컨설턴트": "창업도깨비 🚀",
+            "개발자멘토": "개발도깨비 💻",
         }
-        else:
-            self.use_16_experts = False
-            # 기본 6명 전문가
-            self.experts = {
-                "AI전문가": "AI와 머신러닝 전문가",
-                "마케팅왕": "디지털 마케팅 전문가",
-                "의료AI전문가": "의료 AI 전문가",
-                "재테크박사": "투자 및 재무 전문가",
-                "창업컨설턴트": "스타트업 및 창업 전문가",
-                "개발자멘토": "프로그래밍 및 개발 전문가",
-            }
-        
-        # 고급 AI 엔진 초기화 시도
-        if ADVANCED_AI_AVAILABLE:
-            try:
-                self.advanced_engine = AdvancedAIEngine()
-                print("🧠 고급 AI 엔진 v12.0 활성화!")
-                self.use_advanced_ai = True
-            except Exception as e:
-                print(f"⚠️ 고급 AI 엔진 초기화 실패: {e}")
-                self.use_advanced_ai = False
-        else:
-            self.use_advanced_ai = False
-            
-        print("✅ 서버리스 AI 시스템 활성화!")
 
     def get_casual_response(self, query):
         """일반적인 대화에 대한 자연스러운 응답"""
@@ -238,8 +418,8 @@ class UltraLightAIManager:
         # 기본 응답
         return '네, 무엇을 도와드릴까요? 궁금한 것이 있으시면 언제든 물어보세요! 😊'
 
-    def get_expert_response(self, query, expert_name="assistant", mode="deep"):
-        """🎯 1단계: 16명 전문가 시스템 응답 생성"""
+    def get_expert_response(self, query, expert_name="assistant", mode="deep", user_id="default_user"):
+        """🚀 2단계: Enhanced 16명 전문가 시스템 응답 생성 (개인화 + 성능 모니터링)"""
         
         print(f"🔧 모드 설정: {mode} ({'심화탐구' if mode == 'deep' else '창의협업' if mode == 'creative' else '기본'})")
         
@@ -248,18 +428,42 @@ class UltraLightAIManager:
             print(f"💬 일반 대화 감지: '{query}' → 캐주얼 응답 생성")
             return self.get_casual_response(query)
         
-        # 🎯 16명 전문가 시스템 사용 (1단계)
-        if self.use_16_experts:
+        # 🚀 2단계: Enhanced 16명 전문가 시스템 사용 (v2.0 우선)
+        if hasattr(self, 'use_16_experts_v2') and self.use_16_experts_v2:
             try:
-                print(f"🎯 16명 전문가 '{expert_name}' 응답 생성 중...")
-                expert_response = self.expert_ai.generate_expert_response(query, expert_name)
+                print(f"🚀 Enhanced 전문가 '{expert_name}' 응답 생성 중...")
+                # 사용자 프로필 가져오기 또는 생성
+                if user_id not in self.expert_ai_v2.user_profiles:
+                    from experts.complete_16_experts_v2_enhanced_20250823 import UserProfile
+                    self.expert_ai_v2.user_profiles[user_id] = UserProfile(
+                        user_id=user_id,
+                        preferred_style="professional",
+                        expertise_level="intermediate"
+                    )
+                
+                expert_response = self.expert_ai_v2.get_enhanced_expert_response(
+                    query, expert_name, user_id=user_id
+                )
                 if expert_response and expert_response != "죄송합니다. 해당 전문 분야를 찾을 수 없습니다.":
-                    print(f"✅ 16명 전문가 응답 성공!")
+                    print(f"✅ Enhanced 전문가 응답 성공! (길이: {len(expert_response)}자)")
                     return expert_response
                 else:
-                    print(f"⚠️ 16명 전문가 응답 실패, 기본 시스템으로 폴백")
+                    print(f"⚠️ Enhanced 전문가 응답 실패, v1.0으로 폴백")
             except Exception as e:
-                print(f"⚠️ 16명 전문가 시스템 오류: {e}")
+                print(f"⚠️ Enhanced 전문가 시스템 오류: {e}")
+        
+        # 🎯 1단계: 16명 전문가 시스템 사용 (v1.0 폴백)
+        if hasattr(self, 'use_16_experts') and self.use_16_experts:
+            try:
+                print(f"🎯 v1.0 전문가 '{expert_name}' 응답 생성 중...")
+                expert_response = self.expert_ai.generate_expert_response(query, expert_name)
+                if expert_response and expert_response != "죄송합니다. 해당 전문 분야를 찾을 수 없습니다.":
+                    print(f"✅ v1.0 전문가 응답 성공!")
+                    return expert_response
+                else:
+                    print(f"⚠️ v1.0 전문가 응답 실패, 기본 시스템으로 폴백")
+            except Exception as e:
+                print(f"⚠️ v1.0 전문가 시스템 오류: {e}")
         
         # 폴백: 기본 전문가 시스템 사용
         print(f"🔄 기본 전문가 시스템으로 폴백: {expert_name}")
@@ -428,17 +632,23 @@ tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
                 context["search_info"] = search_info
                 print(f"🔍 검색 정보 활용하여 응답 생성: {len(search_info)}자")
             
-            # 모드별 응답 생성 방식 결정
-            if hasattr(self.advanced_engine, 'generate_expert_response'):
-                ai_response = self.advanced_engine.generate_expert_response(
-                    query=query,
-                    expert_type=expert_name,
-                    context=context
+            # 모드별 응답 생성 방식 결정 (경량 AI 엔진 사용)
+            if self.use_lightweight_ai:
+                # 경량 AI 엔진으로 응답 생성
+                expert_type = "technical" if "기술" in expert_name else "business" if "마케팅" in expert_name or "경영" in expert_name else "general"
+                ai_response = get_ai_response(
+                    user_input=query,
+                    expert_type=expert_type,
+                    expert_name=expert_name
                 )
                 
-                # AI 엔진이 성공하면 그 결과 사용
-                if ai_response and len(ai_response) > 100:
-                    print(f"✅ 고급 AI 엔진 응답 성공: {len(ai_response)}자 ({mode} 모드)")
+                # 검색 정보가 있으면 추가
+                if search_info:
+                    ai_response += f"\n\n📚 관련 정보:\n{search_info[:300]}..."
+                
+                # 경량 엔진 응답이 성공하면 그 결과 사용
+                if ai_response and len(ai_response) > 20:
+                    print(f"✅ 경량 AI 엔진 응답 성공: {len(ai_response)}자 ({mode} 모드)")
                     return ai_response
                 
         except Exception as e:
@@ -1773,37 +1983,49 @@ def index():
 
 @app.route("/chat", methods=["POST"])
 def chat():
-    """🎯 1단계: 16명 전문가 AI 채팅 엔드포인트"""
+    """🚀 2단계: Enhanced 16명 전문가 AI 채팅 엔드포인트 (개인화 + 성능 모니터링)"""
     try:
         data = request.get_json()
         query = data.get("message", "")
         expert = data.get("expert", "assistant")  # 기본값을 assistant로 변경
         mode = data.get("mode", "deep")  # 모드 정보 받기 (기본값: deep)
+        user_id = data.get("user_id", f"user_{int(time.time())}")  # 사용자 ID (v2.0 개인화용)
 
         if not query.strip():
             return jsonify({"error": "메시지를 입력해주세요"}), 400
 
-        print(f"🎯 16명 전문가 채팅 요청: {expert} - {query[:50]}... (모드: {mode})")
+        print(f"🚀 Enhanced 전문가 채팅 요청: {expert} - {query[:50]}... (모드: {mode}, 사용자: {user_id})")
 
-        # 🎯 1단계: 16명 전문가 AI 응답 생성
-        response = real_ai_manager.get_expert_response(query, expert, mode)
+        # 🚀 2단계: Enhanced 16명 전문가 AI 응답 생성 (사용자 ID 포함)
+        response = real_ai_manager.get_expert_response(query, expert, mode, user_id)
 
-        # 16명 전문가 시스템이 사용되었는지 확인
-        used_16_experts = real_ai_manager.use_16_experts
+        # 사용된 전문가 시스템 확인
+        if hasattr(real_ai_manager, 'use_16_experts_v2') and real_ai_manager.use_16_experts_v2:
+            expert_system_info = "Enhanced 16명 전문가 시스템 v2.0"
+            system_version = "V2-ENHANCED"
+        elif hasattr(real_ai_manager, 'use_16_experts') and real_ai_manager.use_16_experts:
+            expert_system_info = "16명 전문가 시스템 v1.0"
+            system_version = "V1-BASIC"
+        else:
+            expert_system_info = "기본 6명 전문가 시스템"
+            system_version = "FALLBACK"
         
         return jsonify(
             {
                 "response": response,
                 "expert": expert,
+                "user_id": user_id,
                 "timestamp": datetime.now().isoformat(),
                 "success": True,
-                "version": f"{APP_VERSION}-16EXPERTS-V1",
-                "expert_system": "16명 전문가 시스템 v1.0" if used_16_experts else "기본 전문가 시스템",
+                "version": f"{APP_VERSION}-16EXPERTS-{system_version}",
+                "expert_system": expert_system_info,
+                "response_length": len(response),
+                "mode": mode,
             }
         )
 
     except Exception as e:
-        print(f"❌ 채팅 오류: {e}")
+        print(f"❌ Enhanced 채팅 오류: {e}")
         return (
             jsonify(
                 {"error": "죄송합니다. 일시적인 오류가 발생했습니다.", "success": False}
@@ -1968,19 +2190,47 @@ def performance_analytics():
 
 @app.route("/experts")
 def get_experts():
-    """🎯 1단계: 16명 전문가 목록 반환"""
-    expert_system_info = "16명 전문가 시스템 v1.0" if real_ai_manager.use_16_experts else "기본 전문가 시스템"
+    """🚀 2단계: Enhanced 16명 전문가 목록 반환 (개인화 + 성능 모니터링)"""
     
-    return jsonify(
-        {
-            "experts": list(real_ai_manager.experts.keys()),
-            "expert_details": real_ai_manager.experts if real_ai_manager.use_16_experts else None,
-            "success": True,
-            "version": f"{APP_VERSION}-16EXPERTS-V1",
-            "expert_system": expert_system_info,
-            "total_experts": len(real_ai_manager.experts),
+    # v2.0 Enhanced 시스템 정보
+    if hasattr(real_ai_manager, 'use_16_experts_v2') and real_ai_manager.use_16_experts_v2:
+        expert_system_info = "Enhanced 16명 전문가 시스템 v2.0 (개인화 + 성능 모니터링)"
+        system_version = "V2-ENHANCED"
+        # v2.0 상태 정보 가져오기
+        try:
+            v2_status = real_ai_manager.expert_ai_v2.get_expert_status_v2()
+        except:
+            v2_status = {"error": "v2.0 상태 정보 로드 실패"}
+    # v1.0 기본 시스템 정보  
+    elif hasattr(real_ai_manager, 'use_16_experts') and real_ai_manager.use_16_experts:
+        expert_system_info = "16명 전문가 시스템 v1.0"
+        system_version = "V1-BASIC"
+        v2_status = None
+    else:
+        expert_system_info = "기본 6명 전문가 시스템"
+        system_version = "FALLBACK"
+        v2_status = None
+    
+    response_data = {
+        "experts": list(real_ai_manager.experts.keys()),
+        "expert_details": real_ai_manager.experts,
+        "success": True,
+        "version": f"{APP_VERSION}-16EXPERTS-{system_version}",
+        "expert_system": expert_system_info,
+        "total_experts": len(real_ai_manager.experts),
+    }
+    
+    # v2.0 시스템인 경우 추가 정보 포함
+    if v2_status:
+        response_data["v2_enhanced_features"] = {
+            "personalization": "사용자 프로필 기반 개인화",
+            "performance_monitoring": "응답 품질 실시간 모니터링", 
+            "adaptive_learning": "사용자 피드백 기반 학습",
+            "length_optimization": "800-1200자 최적화",
+            "status": v2_status
         }
-    )
+    
+    return jsonify(response_data)
 
 
 @app.route("/health")
