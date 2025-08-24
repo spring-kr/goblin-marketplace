@@ -207,7 +207,8 @@ class UltraLightAIManager:
             "의료AI전문가": "⚕️",
             "재테크박사": "💰",
             "창업컨설턴트": "🚀",
-            "개발자멘토": "💻"
+            "개발자멘토": "💻",
+            "블록체인도깨비": "⛓️"
         }
         return emojis.get(expert_name, "🎯")
     
@@ -285,6 +286,28 @@ class UltraLightAIManager:
 
             **장기 투자 관점:**
             단기적 시장 변동에 일희일비하기보다는 장기적 관점에서 경제 성장, 기업 가치 증대, 복리 효과를 활용한 자산 증식에 집중하는 것이 바람직합니다. 지속적인 학습과 시장 모니터링을 통해 투자 전략을 개선해 나가는 것이 중요합니다.
+            """,
+            
+            "블록체인도깨비": f"""
+            **{query}**에 대한 블록체인 전문가의 심층적 분석입니다.
+
+            블록체인 기술은 탈중앙화된 분산 원장 기술로, 중앙 기관 없이도 신뢰할 수 있는 거래와 데이터 저장을 가능하게 하는 혁신적인 기술입니다. 비트코인의 기반 기술로 시작되었지만, 현재는 금융을 넘어 다양한 산업 분야로 확산되고 있습니다.
+
+            **블록체인 핵심 원리:**
+            - 분산 원장: 중앙 서버 없이 네트워크 참여자들이 동일한 데이터를 공유하고 검증합니다
+            - 암호화: 해시 함수와 디지털 서명을 통해 데이터의 무결성과 보안을 보장합니다
+            - 합의 메커니즘: PoW, PoS 등 다양한 방식으로 네트워크 참여자들이 거래를 검증합니다
+            - 불변성: 한번 기록된 데이터는 네트워크 합의 없이는 변경이 불가능합니다
+
+            **주요 활용 분야:**
+            - 디지털 화폐: 비트코인, 이더리움 등 암호화폐의 기반 기술
+            - 스마트 컨트랙트: 계약 조건이 자동으로 실행되는 프로그래밍 가능한 계약
+            - 공급망 관리: 제품의 원산지부터 소비자까지 전 과정 추적 가능
+            - 디지털 신원 인증: 개인 정보 보호와 신원 확인을 동시에 해결
+            - NFT: 디지털 자산의 소유권과 진위성을 증명하는 기술
+
+            **미래 전망과 과제:**
+            블록체인 기술은 웹3.0 시대의 핵심 인프라로 발전할 가능성이 높습니다. 하지만 확장성, 에너지 효율성, 규제 프레임워크 등 해결해야 할 과제들도 존재합니다. 향후 이러한 문제들이 해결되면서 더욱 실용적이고 광범위한 적용이 가능할 것으로 예상됩니다.
             """
         }
         
@@ -323,6 +346,30 @@ class UltraLightAIManager:
     def generate_response(self, query, expert_name="AI전문가"):
         """호환성을 위한 메서드"""
         return self.get_expert_response(query, expert_name)
+
+
+def select_expert_by_query(query):
+    """질문 내용을 분석하여 적절한 전문가 선택"""
+    query_lower = query.lower()
+    
+    # 키워드 기반 전문가 매칭
+    if any(keyword in query_lower for keyword in ['블록체인', 'blockchain', '암호화폐', '비트코인', 'crypto']):
+        return "블록체인도깨비"
+    elif any(keyword in query_lower for keyword in ['마케팅', 'marketing', '광고', '브랜딩', '홍보']):
+        return "마케팅왕"
+    elif any(keyword in query_lower for keyword in ['의료', '건강', '병원', '의사', '치료', '진단']):
+        return "의료AI전문가"
+    elif any(keyword in query_lower for keyword in ['투자', '재테크', '주식', '펀드', '금융', '돈']):
+        return "재테크박사"
+    elif any(keyword in query_lower for keyword in ['창업', '스타트업', '사업', '비즈니스', '기업']):
+        return "창업컨설턴트"
+    elif any(keyword in query_lower for keyword in ['개발', '프로그래밍', '코딩', '개발자', '프로그램']):
+        return "개발자멘토"
+    elif any(keyword in query_lower for keyword in ['ai', '인공지능', '머신러닝', '딥러닝', '알고리즘']):
+        return "AI전문가"
+    else:
+        # 기본값: AI전문가
+        return "AI전문가"
 
 
 # 🔒 전역 변수 초기화 (완전 서버리스 모드)
@@ -725,7 +772,7 @@ def chat():
         if not query.strip():
             return jsonify({"error": "메시지를 입력해주세요"}), 400
 
-        # AI 응답 생성
+        # AI 응답 생성 (매개변수 순서 수정)
         response = real_ai_manager.get_expert_response(query, expert)
 
         return jsonify(
@@ -761,11 +808,12 @@ def chat_advanced():
         
         print(f"🧠 고급 AI 요청: 도깨비{goblin_id} - {message[:50]}...")
         
-        # 기본 전문가명 설정
-        expert_name = "AI전문가"
+        # 질문 내용으로 적절한 전문가 자동 선택
+        expert_name = select_expert_by_query(message)
+        print(f"🎯 선택된 전문가: {expert_name}")
         
-        # 고급 AI 응답 생성
-        response = real_ai_manager.get_expert_response(expert_name, message)
+        # 고급 AI 응답 생성 (매개변수 순서 수정)
+        response = real_ai_manager.get_expert_response(message, expert_name)
         
         return jsonify({
             "status": "success",
