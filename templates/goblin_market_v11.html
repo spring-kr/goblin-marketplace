@@ -735,9 +735,9 @@
                     mode: currentMode
                 });
                 
-                // 시뮬레이션 응답 (고급 AI 분석)
+                // 고급 AI API 호출
                 setTimeout(() => {
-                    simulateAdvancedResponse(message, goblinId);
+                    callAdvancedAI(message, goblinId);
                 }, 1000);
             }
             
@@ -958,6 +958,47 @@
                 sendMessage();
             }
         });
+
+        // 실제 1000자 고급 AI API 호출
+        async function callAdvancedAI(message, goblinId) {
+            try {
+                const response = await fetch('/api/chat/advanced', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        goblin_id: parseInt(goblinId)
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    console.log('🎉 1000자 AI 응답 생성 완료:', data.result.response_length + '자');
+                    
+                    handleChatResponse({
+                        success: true,
+                        result: {
+                            response: data.result.response,
+                            conversation_id: data.result.conversation_id,
+                            goblin_id: goblinId,
+                            expert_type: data.result.expert_type,
+                            response_length: data.result.response_length,
+                            timestamp: data.result.timestamp
+                        }
+                    });
+                } else {
+                    throw new Error(data.message || '알 수 없는 오류가 발생했습니다.');
+                }
+            } catch (error) {
+                console.error('❌ 고급 AI 호출 실패:', error);
+                
+                // 실패 시 기존 시뮬레이션으로 폴백
+                simulateAdvancedResponse(message, goblinId);
+            }
+        }
 
         // 고급 AI 시뮬레이션 함수들
         function simulateAdvancedResponse(message, goblinId) {

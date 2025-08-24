@@ -2,6 +2,17 @@ from flask import Flask, render_template, request, jsonify
 import os
 from datetime import datetime, timedelta
 
+# 1000자 고급 AI 시스템 임포트
+try:
+    from complete_16_experts_improved import RealAIManager
+    real_ai_manager = RealAIManager()
+    AI_SYSTEM_ENABLED = True
+    print("🎉 1000자 고급 AI 시스템이 활성화되었습니다!")
+except ImportError as e:
+    print(f"⚠️ 고급 AI 시스템을 불러올 수 없습니다: {e}")
+    real_ai_manager = None
+    AI_SYSTEM_ENABLED = False
+
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "goblin_marketplace_secret_key_2024")
 
@@ -579,12 +590,75 @@ def socket_status():
     )
 
 
+@app.route("/api/chat/advanced", methods=["POST"])
+def advanced_chat():
+    """1000자 고급 AI 시스템과 연동된 채팅 API"""
+    try:
+        data = request.get_json()
+        message = data.get("message", "")
+        goblin_id = data.get("goblin_id", 1)
+        
+        if not AI_SYSTEM_ENABLED:
+            return jsonify({
+                "status": "error",
+                "message": "고급 AI 시스템이 비활성화되어 있습니다."
+            })
+            
+        # 도깨비 ID를 전문가 타입으로 매핑
+        goblin_to_expert_mapping = {
+            1: "assistant",      # AI전문가
+            2: "data_analyst",   # 데이터과학박사  
+            3: "builder",        # 블록체인개발자 -> 투자전문가로 매핑
+            4: "assistant",      # 보안전문가 -> AI전문가로 매핑
+            5: "assistant",      # 로봇공학자 -> AI전문가로 매핑
+            6: "assistant",      # 양자컴퓨팅전문가 -> AI전문가로 매핑
+            7: "assistant",      # 우주항공공학자 -> AI전문가로 매핑
+            8: "medical",        # 바이오기술자 -> 의료전문가로 매핑
+            9: "assistant",      # 나노기술자 -> AI전문가로 매핑
+            10: "assistant",     # 인공지능박사도깨비
+            11: "builder",       # 경영학박사도깨비 -> 투자전문가로 매핑
+            12: "medical",       # 의학박사도깨비
+            13: "assistant",     # 법학박사도깨비 -> AI전문가로 매핑
+            14: "growth",        # 교육학박사도깨비
+            15: "counselor",     # 심리학박사도깨비
+            16: "assistant",     # 언어학박사도깨비 -> AI전문가로 매핑
+            17: "creative"       # 철학박사도깨비 -> 창작전문가로 매핑
+        }
+        
+        expert_type = goblin_to_expert_mapping.get(goblin_id, "assistant")
+        
+        # 1000자 AI 시스템으로 응답 생성
+        if real_ai_manager:
+            response = real_ai_manager.generate_response(message, expert_type)
+        else:
+            response = f"🤖 고급 AI 시스템이 일시적으로 비활성화되어 있습니다. '{message}'에 대한 기본 응답을 제공합니다."
+        
+        return jsonify({
+            "status": "success",
+            "result": {
+                "response": response,
+                "conversation_id": f"advanced_{datetime.now().timestamp()}",
+                "goblin_id": goblin_id,
+                "expert_type": expert_type,
+                "response_length": len(response),
+                "timestamp": datetime.now().isoformat()
+            }
+        })
+        
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": f"AI 응답 생성 중 오류가 발생했습니다: {str(e)}"
+        })
+
+
 @app.route("/api/test")
 def api_test():
     return {
         "status": "success",
         "message": "도깨비마을장터 API 테스트 성공!",
         "experts": 39,
+        "advanced_ai": AI_SYSTEM_ENABLED,
     }
 
 
