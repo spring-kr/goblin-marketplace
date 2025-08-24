@@ -59,6 +59,66 @@ class UltraLightAIManager:
             
         print("✅ 서버리스 AI 시스템 활성화!")
 
+    def get_casual_response(self, query):
+        """일반적인 대화에 대한 자연스러운 응답"""
+        query_lower = query.lower().strip()
+        
+        # 인사말 응답
+        greetings = {
+            '안녕': '안녕하세요! 😊 무엇을 도와드릴까요?',
+            '안녕하세요': '안녕하세요! 반갑습니다. 궁금한 것이 있으시면 언제든 물어보세요!',
+            '안녕하십니까': '안녕하십니까! 정중한 인사 감사합니다. 어떤 도움이 필요하신가요?',
+            'hello': 'Hello! Nice to meet you! How can I help you today?',
+            'hi': 'Hi there! 👋 What would you like to know?',
+            '하이': '하이! 👋 반가워요. 뭐든 물어보세요!',
+            '좋은 아침': '좋은 아침입니다! ☀️ 활기찬 하루 되세요!',
+            '좋은 오후': '좋은 오후입니다! 🌤️ 편안한 시간 보내세요!',
+            '좋은 저녁': '좋은 저녁입니다! 🌙 따뜻한 밤 되세요!',
+            '반갑습니다': '저도 반갑습니다! 😊 어떤 주제에 대해 이야기하고 싶으신가요?'
+        }
+        
+        # 감사 인사 응답
+        thanks_responses = {
+            '고마워': '천만에요! 😊 또 궁금한 게 있으면 언제든 물어보세요!',
+            '감사': '별말씀을요! 도움이 되어 기뻐요. 🙂',
+            '고맙습니다': '별말씀을요! 언제든 도와드릴게요.',
+            '감사합니다': '도움이 되어 다행입니다! 또 궁금한 게 있으시면 말씀해 주세요.'
+        }
+        
+        # 미안 사과 응답
+        apology_responses = {
+            '미안': '괜찮아요! 😊 무슨 일이든 편하게 말씀해 주세요.',
+            '죄송': '전혀 괜찮습니다! 언제든 편하게 이야기해요.',
+            '미안해': '괜찮아요! 무엇을 도와드릴까요?',
+            '죄송합니다': '전혀 괜찮습니다! 어떤 도움이 필요하신가요?'
+        }
+        
+        # 직접 매칭 시도
+        for keyword, response in greetings.items():
+            if keyword in query_lower:
+                return response
+                
+        for keyword, response in thanks_responses.items():
+            if keyword in query_lower:
+                return response
+                
+        for keyword, response in apology_responses.items():
+            if keyword in query_lower:
+                return response
+        
+        # 일반적인 질문에 대한 응답
+        if '뭐해' in query_lower or '뭐하고' in query_lower:
+            return '저는 여러분의 질문에 답변하는 AI예요! 궁금한 게 있으시면 무엇이든 물어보세요. 😊'
+        
+        if '어떻게 지내' in query_lower:
+            return '저는 항상 준비되어 있어요! 😊 오늘 어떤 도움이 필요하신가요?'
+        
+        if '잘 지내' in query_lower:
+            return '네, 잘 지내고 있어요! 감사합니다. 😊 어떤 이야기를 나누고 싶으신가요?'
+        
+        # 기본 응답
+        return '네, 무엇을 도와드릴까요? 궁금한 것이 있으시면 언제든 물어보세요! 😊'
+
     def get_expert_response(self, query, expert_name="AI전문가"):
         """고급 AI 응답 생성"""
         
@@ -455,8 +515,48 @@ tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
         return self.get_expert_response(query, expert_name)
 
 
+def is_casual_conversation(query):
+    """일반적인 대화인지 전문적인 질문인지 판단"""
+    query_lower = query.lower().strip()
+    
+    # 기본 인사말들
+    casual_greetings = [
+        '안녕', '안녕하세요', '안녕하십니까', 'hello', 'hi', '하이',
+        '좋은 아침', '좋은 오후', '좋은 저녁', '수고하세요',
+        '처음 뵙겠습니다', '반갑습니다', '만나서 반갑습니다'
+    ]
+    
+    # 간단한 일상 대화
+    casual_phrases = [
+        '어떻게 지내', '뭐해', '뭐하고 있어', '잘 지내', '괜찮아',
+        '고마워', '감사', '미안', '죄송', '알겠어', '알았어',
+        '네', '아니오', '예', '응', '음', '그래', '맞아', '틀려',
+        '날씨', '오늘', '내일', '어제', '시간', '몇시'
+    ]
+    
+    # 짧은 질문들 (10자 이하면서 전문 키워드가 없는 경우)
+    if len(query_lower) <= 10:
+        return True
+    
+    # 기본 인사말 체크
+    for greeting in casual_greetings:
+        if greeting in query_lower:
+            return True
+    
+    # 일상 대화 체크
+    for phrase in casual_phrases:
+        if phrase in query_lower:
+            return True
+            
+    return False
+
+
 def select_expert_by_query(query):
     """질문 내용을 분석하여 적절한 전문가 선택"""
+    # 먼저 일반 대화인지 확인
+    if is_casual_conversation(query):
+        return "일반대화"
+    
     query_lower = query.lower()
     
     # 키워드 기반 전문가 매칭
@@ -980,20 +1080,31 @@ def chat_advanced():
         expert_name, previous_topic = get_context_aware_expert_selection(message, conversation_id)
         print(f"🎯 선택된 전문가: {expert_name}")
         
-        # 후속 질문인 경우 컨텍스트 정보 추가
-        enhanced_message = message
-        if previous_topic:
-            enhanced_message = f"이전 질문 '{previous_topic}'에 대한 후속 질문: {message}"
-            print(f"🔗 컨텍스트 연결: {previous_topic} → {message}")
-        
-        # 고급 AI 응답 생성 (컨텍스트 강화된 메시지 사용)
-        response = real_ai_manager.get_expert_response(enhanced_message, expert_name)
-        
-        # 🧠 감정 기반 공감 메시지 추가
-        response_with_empathy = f"{empathy_response}\n\n{response}"
-        
-        # 🧬 DNA 개인화 적용
-        final_response = dna_system.apply_dna_personalization(response_with_empathy, user_id)
+        # 일반 대화인지 전문 질문인지 판단
+        if expert_name == "일반대화":
+            # 일반적인 대화 - 간단하고 자연스러운 응답
+            response = real_ai_manager.get_casual_response(message)
+            print(f"💬 일반 대화 모드: {response[:50]}...")
+            
+            # 감정 분석은 적용하지만 DNA 개인화는 생략
+            final_response = f"{empathy_response}\n\n{response}"
+            
+        else:
+            # 전문적인 질문 - 상세한 전문가 응답
+            # 후속 질문인 경우 컨텍스트 정보 추가
+            enhanced_message = message
+            if previous_topic:
+                enhanced_message = f"이전 질문 '{previous_topic}'에 대한 후속 질문: {message}"
+                print(f"🔗 컨텍스트 연결: {previous_topic} → {message}")
+            
+            # 고급 AI 응답 생성 (컨텍스트 강화된 메시지 사용)
+            response = real_ai_manager.get_expert_response(enhanced_message, expert_name)
+            
+            # 🧠 감정 기반 공감 메시지 추가
+            response_with_empathy = f"{empathy_response}\n\n{response}"
+            
+            # 🧬 DNA 개인화 적용
+            final_response = dna_system.apply_dna_personalization(response_with_empathy, user_id)
         
         # 대화 컨텍스트 저장
         manage_conversation_context(conversation_id, message, expert_name, final_response)
@@ -1010,7 +1121,8 @@ def chat_advanced():
                 "context_used": previous_topic is not None,
                 "emotion_detected": detected_emotion,
                 "empathy_applied": True,
-                "dna_personalized": True
+                "dna_personalized": expert_name != "일반대화",
+                "is_casual_chat": expert_name == "일반대화"
             },
             "version": APP_VERSION,
         })
