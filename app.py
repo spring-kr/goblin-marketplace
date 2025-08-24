@@ -703,84 +703,76 @@ def track_analytics_event():
 
 @app.route("/api/goblins", methods=["GET"])
 def get_goblins():
-    """도깨비 목록 API"""
+    """도깨비 목록 API - 전체 39명"""
     try:
-        # 서버리스 환경에서는 고정된 도깨비 목록 반환
+        # 서버리스 환경에서는 고정된 도깨비 목록 반환 (전체 39명)
         experts = [
-            {
-                "id": 1, 
-                "name": "AI전문가", 
-                "emoji": "🧠", 
-                "description": "AI와 머신러닝 전문가", 
-                "specialty": "인공지능 & 머신러닝",
-                "personality": "논리적이고 분석적인 사고",
-                "avatar": "/static/avatar_ai_philosopher_happy_203828.png",
-                "free": True,
-                "price": 0
-            },
-            {
-                "id": 2, 
-                "name": "마케팅왕", 
-                "emoji": "📈", 
-                "description": "디지털 마케팅 전문가", 
-                "specialty": "디지털 마케팅 & 광고",
-                "personality": "창의적이고 전략적인 사고",
-                "avatar": "/static/avatar_quantum_physicist_curious_194718.png",
-                "free": True,
-                "price": 0
-            },
-            {
-                "id": 3, 
-                "name": "의료AI전문가", 
-                "emoji": "⚕️", 
-                "description": "의료 AI 전문가", 
-                "specialty": "의료 AI & 헬스케어",
-                "personality": "신중하고 정확한 진단",
-                "avatar": "/static/avatar_ai_philosopher_neutral_202955.png",
-                "free": True,
-                "price": 0
-            },
-            {
-                "id": 4, 
-                "name": "재테크박사", 
-                "emoji": "💰", 
-                "description": "투자 및 재무 전문가", 
-                "specialty": "투자 & 재무관리",
-                "personality": "신중하고 수익성 중심",
-                "avatar": "/static/avatar_ai_philosopher_happy_204241.png",
-                "free": True,
-                "price": 0
-            },
-            {
-                "id": 5, 
-                "name": "창업컨설턴트", 
-                "emoji": "🚀", 
-                "description": "스타트업 및 창업 전문가", 
-                "specialty": "창업 & 비즈니스 전략",
-                "personality": "도전적이고 혁신적인 사고",
-                "avatar": "/static/avatar_ai_philosopher_curious_194719.png",
-                "free": True,
-                "price": 0
-            },
-            {
-                "id": 6, 
-                "name": "개발자멘토", 
-                "emoji": "💻", 
-                "description": "프로그래밍 및 개발 전문가", 
-                "specialty": "소프트웨어 개발 & 프로그래밍",
-                "personality": "체계적이고 실용적인 접근",
-                "avatar": "/static/avatar_ai_philosopher_neutral_204651.png",
-                "free": True,
-                "price": 0
-            },
+            # 🤖 AI & Technology (9명)
+            {"id": 1, "name": "AI전문가", "emoji": "🤖", "description": "AI 연구 및 개발 전문", "specialty": "인공지능 & 머신러닝", "personality": "논리적이고 분석적인 사고", "avatar": "/static/avatar_ai_philosopher_happy_203828.png", "free": True, "price": 0, "category": "ai_tech"},
+            {"id": 2, "name": "AI도깨비", "emoji": "🧠", "description": "AI 응용 및 구현 전문", "specialty": "AI 응용 기술", "personality": "창의적이고 혁신적인 사고", "avatar": "/static/avatar_ai_philosopher_neutral_202955.png", "free": True, "price": 0, "category": "ai_tech"},
+            {"id": 3, "name": "블록체인도깨비", "emoji": "⛓️", "description": "블록체인 및 암호화폐 전문", "specialty": "블록체인 & 암호화폐", "personality": "신중하고 보안 중심", "avatar": "/static/avatar_quantum_physicist_curious_194718.png", "free": True, "price": 0, "category": "ai_tech"},
+            {"id": 4, "name": "데이터과학박사도깨비", "emoji": "📊", "description": "빅데이터 분석 및 ML 전문", "specialty": "데이터 사이언스", "personality": "체계적이고 분석적", "avatar": "/static/avatar_ai_philosopher_happy_204241.png", "free": True, "price": 0, "category": "ai_tech"},
+            {"id": 5, "name": "게임개발도깨비", "emoji": "🎮", "description": "게임 기획 및 개발 전문", "specialty": "게임 개발", "personality": "재미있고 창의적", "avatar": "/static/avatar_ai_philosopher_curious_194719.png", "free": True, "price": 0, "category": "ai_tech"},
+            {"id": 6, "name": "양자컴퓨팅도깨비", "emoji": "⚛️", "description": "양자컴퓨팅 연구 전문", "specialty": "양자 컴퓨팅", "personality": "미래지향적이고 과학적", "avatar": "/static/avatar_ai_philosopher_neutral_204651.png", "free": True, "price": 0, "category": "ai_tech"},
+            {"id": 7, "name": "로봇공학도깨비", "emoji": "🤖", "description": "로봇 설계 및 제어 전문", "specialty": "로봇 공학", "personality": "정밀하고 실용적", "avatar": "/static/avatar_ai_philosopher_happy_203148.png", "free": True, "price": 0, "category": "ai_tech"},
+            {"id": 8, "name": "사이버보안도깨비", "emoji": "🛡️", "description": "정보보안 및 해킹 방어 전문", "specialty": "사이버 보안", "personality": "신중하고 경계심 강함", "avatar": "/static/avatar_ai_philosopher_happy_203548.png", "free": True, "price": 0, "category": "ai_tech"},
+            {"id": 9, "name": "우주항공도깨비", "emoji": "🚀", "description": "항공우주 기술 전문", "specialty": "우주 항공", "personality": "도전적이고 모험적", "avatar": "/static/avatar_ai_philosopher_happy_203813.png", "free": True, "price": 0, "category": "ai_tech"},
+
+            # 💼 Business (13명)
+            {"id": 10, "name": "마케팅왕", "emoji": "📈", "description": "마케팅 전략 및 브랜딩 전문", "specialty": "디지털 마케팅 & 광고", "personality": "창의적이고 전략적인 사고", "avatar": "/static/avatar_quantum_physicist_curious_194718.png", "free": True, "price": 0, "category": "business"},
+            {"id": 11, "name": "경영학박사도깨비", "emoji": "💼", "description": "기업 경영 전략 전문", "specialty": "경영 전략", "personality": "체계적이고 리더십 있음", "avatar": "/static/avatar_ai_philosopher_happy_204241.png", "free": True, "price": 0, "category": "business"},
+            {"id": 12, "name": "컨설팅박사도깨비", "emoji": "🎯", "description": "경영 컨설팅 전문", "specialty": "경영 컨설팅", "personality": "분석적이고 해결 지향적", "avatar": "/static/avatar_ai_philosopher_neutral_202955.png", "free": True, "price": 0, "category": "business"},
+            {"id": 13, "name": "경제학박사도깨비", "emoji": "📊", "description": "거시/미시 경제 분석 전문", "specialty": "경제 분석", "personality": "논리적이고 예측적", "avatar": "/static/avatar_ai_philosopher_curious_194719.png", "free": True, "price": 0, "category": "business"},
+            {"id": 14, "name": "재테크박사", "emoji": "💰", "description": "개인 투자 및 재테크 전문", "specialty": "투자 & 재무관리", "personality": "신중하고 수익성 중심", "avatar": "/static/avatar_ai_philosopher_happy_204241.png", "free": True, "price": 0, "category": "business"},
+            {"id": 15, "name": "국제무역도깨비", "emoji": "🌍", "description": "글로벌 무역 및 수출입 전문", "specialty": "국제 무역", "personality": "글로벌하고 개방적", "avatar": "/static/avatar_ai_philosopher_neutral_204651.png", "free": True, "price": 0, "category": "business"},
+            {"id": 16, "name": "인사관리박사도깨비", "emoji": "👥", "description": "인사 관리 및 조직 개발 전문", "specialty": "인사 관리", "personality": "소통 지향적이고 배려심 있음", "avatar": "/static/avatar_ai_philosopher_happy_203148.png", "free": True, "price": 0, "category": "business"},
+            {"id": 17, "name": "정책개발도깨비", "emoji": "🏛️", "description": "정책 기획 및 공공 정책 전문", "specialty": "정책 개발", "personality": "공익 지향적이고 체계적", "avatar": "/static/avatar_ai_philosopher_happy_203548.png", "free": True, "price": 0, "category": "business"},
+            {"id": 18, "name": "영업학박사도깨비", "emoji": "💪", "description": "영업 전략 및 고객 관리 전문", "specialty": "영업 전략", "personality": "적극적이고 설득력 있음", "avatar": "/static/avatar_ai_philosopher_happy_203813.png", "free": True, "price": 0, "category": "business"},
+            {"id": 19, "name": "쇼핑박사도깨비", "emoji": "🛍️", "description": "소비자 트렌드 및 쇼핑 전문", "specialty": "소비자 트렌드", "personality": "트렌드에 민감하고 실용적", "avatar": "/static/avatar_ai_philosopher_happy_203828.png", "free": True, "price": 0, "category": "business"},
+            {"id": 20, "name": "창업학박사도깨비", "emoji": "🚀", "description": "창업 전략 및 스타트업 전문", "specialty": "창업 전략", "personality": "도전적이고 혁신적", "avatar": "/static/avatar_ai_philosopher_curious_194719.png", "free": True, "price": 0, "category": "business"},
+            {"id": 21, "name": "창업컨설턴트", "emoji": "🚀", "description": "창업 멘토링 및 투자 전문", "specialty": "창업 & 비즈니스 전략", "personality": "도전적이고 혁신적인 사고", "avatar": "/static/avatar_ai_philosopher_curious_194719.png", "free": True, "price": 0, "category": "business"},
+            {"id": 22, "name": "여행컨설팅도깨비", "emoji": "✈️", "description": "여행 기획 및 관광 전문", "specialty": "여행 컨설팅", "personality": "모험적이고 서비스 정신 있음", "avatar": "/static/avatar_ai_philosopher_neutral_202955.png", "free": True, "price": 0, "category": "business"},
+
+            # 🎨 Creative & Arts (7명)
+            {"id": 23, "name": "예술학박사도깨비", "emoji": "🎨", "description": "미술 및 예술 이론 전문", "specialty": "예술 이론", "personality": "감성적이고 창의적", "avatar": "/static/avatar_ai_philosopher_happy_204241.png", "free": True, "price": 0, "category": "creative"},
+            {"id": 24, "name": "창의기획도깨비", "emoji": "💡", "description": "크리에이티브 디렉션 전문", "specialty": "창의 기획", "personality": "혁신적이고 상상력 풍부", "avatar": "/static/avatar_ai_philosopher_curious_194719.png", "free": True, "price": 0, "category": "creative"},
+            {"id": 25, "name": "문화기획도깨비", "emoji": "🎭", "description": "문화 콘텐츠 기획 전문", "specialty": "문화 기획", "personality": "문화적 감수성이 높음", "avatar": "/static/avatar_ai_philosopher_neutral_202955.png", "free": True, "price": 0, "category": "creative"},
+            {"id": 26, "name": "패션스타일링도깨비", "emoji": "👗", "description": "패션 트렌드 및 스타일링 전문", "specialty": "패션 스타일링", "personality": "세련되고 트렌디", "avatar": "/static/avatar_ai_philosopher_happy_203148.png", "free": True, "price": 0, "category": "creative"},
+            {"id": 27, "name": "음악제작도깨비", "emoji": "🎵", "description": "음악 제작 및 사운드 디자인 전문", "specialty": "음악 제작", "personality": "감성적이고 예술적", "avatar": "/static/avatar_ai_philosopher_happy_203548.png", "free": True, "price": 0, "category": "creative"},
+            {"id": 28, "name": "스토리텔링도깨비", "emoji": "📖", "description": "스토리 창작 및 콘텐츠 기획 전문", "specialty": "스토리텔링", "personality": "상상력 풍부하고 따뜻함", "avatar": "/static/avatar_ai_philosopher_happy_203813.png", "free": True, "price": 0, "category": "creative"},
+            {"id": 29, "name": "문학박사도깨비", "emoji": "✍️", "description": "문학 창작 및 글쓰기 전문", "specialty": "문학 창작", "personality": "깊이 있고 성찰적", "avatar": "/static/avatar_ai_philosopher_happy_203828.png", "free": True, "price": 0, "category": "creative"},
+
+            # 🏥 Healthcare (5명)
+            {"id": 30, "name": "바이오도깨비", "emoji": "🧬", "description": "생명공학 및 바이오 기술 전문", "specialty": "생명공학", "personality": "과학적이고 정밀함", "avatar": "/static/avatar_ai_philosopher_neutral_204651.png", "free": True, "price": 0, "category": "healthcare"},
+            {"id": 31, "name": "건강관리도깨비", "emoji": "💪", "description": "건강 관리 및 피트니스 전문", "specialty": "건강 관리", "personality": "활동적이고 에너지 넘침", "avatar": "/static/avatar_ai_philosopher_happy_203148.png", "free": True, "price": 0, "category": "healthcare"},
+            {"id": 32, "name": "의료AI전문가", "emoji": "⚕️", "description": "의료 AI 및 디지털 헬스케어 전문", "specialty": "의료 AI & 헬스케어", "personality": "신중하고 정확한 진단", "avatar": "/static/avatar_ai_philosopher_neutral_202955.png", "free": True, "price": 0, "category": "healthcare"},
+            {"id": 33, "name": "신약개발도깨비", "emoji": "💊", "description": "신약 개발 및 제약 연구 전문", "specialty": "신약 개발", "personality": "연구 중심적이고 인내심 있음", "avatar": "/static/avatar_ai_philosopher_happy_203548.png", "free": True, "price": 0, "category": "healthcare"},
+            {"id": 34, "name": "웰니스박사도깨비", "emoji": "🧘", "description": "웰니스 및 정신 건강 전문", "specialty": "웰니스", "personality": "평온하고 치유적", "avatar": "/static/avatar_ai_philosopher_happy_203813.png", "free": True, "price": 0, "category": "healthcare"},
+
+            # 📚 Education (3명)
+            {"id": 35, "name": "심리상담도깨비", "emoji": "💭", "description": "심리 상담 및 치료 전문", "specialty": "심리 상담", "personality": "공감적이고 따뜻함", "avatar": "/static/avatar_ai_philosopher_happy_203828.png", "free": True, "price": 0, "category": "education"},
+            {"id": 36, "name": "교육도깨비", "emoji": "📚", "description": "교육 방법론 및 커리큘럼 전문", "specialty": "교육 방법론", "personality": "체계적이고 인내심 있음", "avatar": "/static/avatar_ai_philosopher_curious_194719.png", "free": True, "price": 0, "category": "education"},
+            {"id": 37, "name": "언어교육도깨비", "emoji": "🗣️", "description": "언어 학습 및 교육 전문", "specialty": "언어 교육", "personality": "소통 지향적이고 친근함", "avatar": "/static/avatar_ai_philosopher_neutral_202955.png", "free": True, "price": 0, "category": "education"},
+
+            # 🌱 Lifestyle (2명)
+            {"id": 38, "name": "사회혁신도깨비", "emoji": "🌍", "description": "사회 문제 해결 및 혁신 전문", "specialty": "사회 혁신", "personality": "이상주의적이고 진보적", "avatar": "/static/avatar_ai_philosopher_neutral_204651.png", "free": True, "price": 0, "category": "lifestyle"},
+            {"id": 39, "name": "개발자멘토", "emoji": "💻", "description": "소프트웨어 개발 & 프로그래밍", "specialty": "소프트웨어 개발 & 프로그래밍", "personality": "체계적이고 실용적인 접근", "avatar": "/static/avatar_ai_philosopher_neutral_204651.png", "free": True, "price": 0, "category": "tech"},
         ]
         
-        print(f"🎯 도깨비 목록 요청 - {len(experts)}명 반환")
+        print(f"🎯 도깨비 목록 요청 - 전체 {len(experts)}명 반환")
         
         return jsonify({
             "status": "success",
             "experts": experts,
             "count": len(experts),
+            "categories": {
+                "ai_tech": 9,
+                "business": 13,
+                "creative": 7,
+                "healthcare": 5,
+                "education": 3,
+                "lifestyle": 2
+            },
             "timestamp": datetime.now().isoformat()
         })
     except Exception as e:
