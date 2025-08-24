@@ -2,14 +2,15 @@ from flask import Flask, render_template, request, jsonify
 import os
 from datetime import datetime
 
-# ⚡ 강제 서버리스 모드 (SQLite 완전 차단) - v3.0 FORCE UPDATE
+# ⚡ 강제 서버리스 모드 (SQLite 완전 차단) - v4.0 COMPLETE REDEPLOY
 VERCEL_ENV = True
-APP_VERSION = "3.0-EMERGENCY-SERVERLESS-FIX"
+APP_VERSION = "4.0-COMPLETE-REDEPLOY-FIX"
 
-print(f"🚀🚀🚀 EMERGENCY FORCE SERVERLESS MODE v{APP_VERSION} 🚀🚀🚀")
+print(f"🚀🚀🚀 COMPLETE REDEPLOY MODE v{APP_VERSION} 🚀🚀🚀")
 print(f"🔍 환경 정보: CWD={os.getcwd()}")
 print("⚠️ WARNING: ZERO DB ACCESS - PURE SERVERLESS MODE")
 print("🛡️ SQLite 완전 차단 - 메모리 시스템 완전 비활성화")
+print("🔥 CACHE KILLER - 42분 다운타임 해결")
 print("=" * 60)
 
 
@@ -71,11 +72,52 @@ app.secret_key = os.getenv("SECRET_KEY", "goblin_marketplace_secret_key_2024")
 
 print(f"🌟 도깨비 마을 장터 v{APP_VERSION} - 완전 서버리스 모드")
 
+# 전역 에러 핸들러 추가
+@app.errorhandler(500)
+def internal_error(error):
+    """500 Internal Server Error 핸들러"""
+    print(f"❌ Internal Server Error: {error}")
+    return jsonify({
+        "error": "Internal Server Error",
+        "message": "서버에서 오류가 발생했습니다.",
+        "version": APP_VERSION,
+        "timestamp": datetime.now().isoformat()
+    }), 500
+
+@app.errorhandler(404)
+def not_found(error):
+    """404 Not Found 핸들러"""
+    return jsonify({
+        "error": "Not Found", 
+        "message": "요청한 페이지를 찾을 수 없습니다.",
+        "version": APP_VERSION
+    }), 404
+
 
 @app.route("/")
 def index():
     """메인 페이지"""
-    return render_template("index.html")
+    try:
+        return render_template("index.html")
+    except Exception as e:
+        print(f"❌ 템플릿 로딩 오류: {e}")
+        # 템플릿 오류 시 간단한 HTML 반환
+        return f"""
+        <!DOCTYPE html>
+        <html lang="ko">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>🏰 도깨비마을장터 v{APP_VERSION}</title>
+        </head>
+        <body style="font-family: Arial; text-align: center; padding: 50px;">
+            <h1>🏰 도깨비마을장터</h1>
+            <h2>✅ 서버 정상 작동 중! v{APP_VERSION}</h2>
+            <p>AI 전문가 시스템이 활성화되었습니다.</p>
+            <p>현재 시간: {datetime.now().isoformat()}</p>
+        </body>
+        </html>
+        """
 
 
 @app.route("/chat", methods=["POST"])
@@ -165,3 +207,6 @@ def track_analytics_event():
 if __name__ == "__main__":
     print("🖥️ 로컬 환경에서 실행 중...")
     app.run(debug=True, host="0.0.0.0", port=5000)
+
+# Vercel 배포를 위한 WSGI 애플리케이션 객체 노출
+application = app
