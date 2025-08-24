@@ -683,10 +683,20 @@ def chat_advanced():
         }), 500
 
 
-@app.route("/api/performance", methods=["POST"])
+@app.route("/api/performance", methods=["GET", "POST"])
 def performance_analytics():
     """성능 분석 API"""
     try:
+        if request.method == "GET":
+            # GET 요청 시 빈 성능 데이터 반환
+            return jsonify({
+                "status": "success",
+                "message": "성능 모니터링 활성화됨",
+                "data": {},
+                "timestamp": datetime.now().isoformat()
+            })
+        
+        # POST 요청 처리
         data = request.get_json()
         
         # 성능 데이터 로깅
