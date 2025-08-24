@@ -11,58 +11,38 @@ try:
     print("🎉 1단계: 1000자 고급 AI 시스템이 활성화되었습니다!")
 except ImportError as e:
     print(f"⚠️ 1단계 AI 시스템을 불러올 수 없습니다: {e}")
-    real_ai_manager = None
-    AI_SYSTEM_ENABLED = False
+    # Vercel 환경용 간소화된 시스템 사용
+    try:
+        from simplified_ai_system import SimplifiedAIManager
+        real_ai_manager = SimplifiedAIManager()
+        AI_SYSTEM_ENABLED = True
+        print("🚀 Vercel 환경용 간소화된 AI 시스템이 활성화되었습니다!")
+    except Exception as e2:
+        print(f"⚠️ 간소화된 AI 시스템도 실패: {e2}")
+        real_ai_manager = None
+        AI_SYSTEM_ENABLED = False
 
-# 멀티모달 AI 시스템 임포트 (2단계)
-try:
-    from complete_16_experts_v4_multimodal_20250823 import MultimodalAIManager
-
-    multimodal_ai_manager = MultimodalAIManager()
-    MULTIMODAL_SYSTEM_ENABLED = True
-    print("🎥 2단계: 멀티모달 AI 시스템이 활성화되었습니다!")
-except ImportError as e:
-    print(f"⚠️ 2단계 멀티모달 시스템을 불러올 수 없습니다: {e}")
-    multimodal_ai_manager = None
-    MULTIMODAL_SYSTEM_ENABLED = False
-
-# 메모리 & 학습 시스템 임포트 (3단계)
+# 메모리 & 학습 시스템 임포트 (Vercel 환경 최적화)
 try:
     from advanced_memory_system_v11 import AdvancedMemorySystem
 
     memory_manager = AdvancedMemorySystem()
     MEMORY_SYSTEM_ENABLED = True
-    print("🧠 3단계: 메모리 & 학습 시스템이 활성화되었습니다!")
-except ImportError as e:
-    print(f"⚠️ 3단계 메모리 시스템을 불러올 수 없습니다: {e}")
+    print("🧠 메모리 & 학습 시스템이 활성화되었습니다!")
+except Exception as e:
+    print(f"⚠️ 메모리 시스템을 불러올 수 없습니다: {e}")
     memory_manager = None
     MEMORY_SYSTEM_ENABLED = False
 
-# 글로벌 확장 시스템 임포트 (4단계)
-try:
-    from complete_16_experts_v5_global_expansion_20250823 import GlobalExpertSystemV5
+# 기타 시스템들은 Vercel 환경에서 비활성화
+multimodal_ai_manager = None
+MULTIMODAL_SYSTEM_ENABLED = False
+global_manager = None
+GLOBAL_SYSTEM_ENABLED = False
+dna_manager = None
+DNA_SYSTEM_ENABLED = False
 
-    global_manager = GlobalExpertSystemV5()
-    GLOBAL_SYSTEM_ENABLED = True
-    print("🌍 4단계: 글로벌 확장 시스템이 활성화되었습니다!")
-except ImportError as e:
-    print(f"⚠️ 4단계 글로벌 시스템을 불러올 수 없습니다: {e}")
-    global_manager = None
-    GLOBAL_SYSTEM_ENABLED = False
-
-# DNA 개인화 시스템 임포트 (5단계)
-try:
-    from complete_16_experts_v9_dna_personalized_20250823 import (
-        DNAPersonalizedExpertSystem,
-    )
-
-    dna_manager = DNAPersonalizedExpertSystem()
-    DNA_SYSTEM_ENABLED = True
-    print("🧬 5단계: DNA 개인화 시스템이 활성화되었습니다!")
-except ImportError as e:
-    print(f"⚠️ 5단계 DNA 시스템을 불러올 수 없습니다: {e}")
-    dna_manager = None
-    DNA_SYSTEM_ENABLED = False
+print("🚀 Vercel 환경 최적화 모드로 실행 중...")
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "goblin_marketplace_secret_key_2024")
@@ -892,10 +872,14 @@ def memory_chat():
             )
 
         # 메모리 시스템으로 응답 생성
-        if memory_manager:
-            response = memory_manager.generate_contextual_response(
-                message=message, expert="assistant"  # 기본 전문가 타입
-            )
+        if memory_manager and MEMORY_SYSTEM_ENABLED:
+            try:
+                response = memory_manager.generate_contextual_response(
+                    message=message, expert="assistant"  # 기본 전문가 타입
+                )
+            except Exception as e:
+                print(f"메모리 시스템 오류: {e}")
+                response = f"🧠 메모리 시스템에서 오류가 발생했습니다. 기본 응답: '{message}에 대한 전문적인 답변을 준비하고 있습니다.'"
         else:
             response = f"🧠 메모리 시스템이 일시적으로 비활성화되어 있습니다. 메시지: '{message}'"
 
@@ -1067,10 +1051,14 @@ def ultimate_chat():
 
         # 3단계: 메모리 시스템
         if MEMORY_SYSTEM_ENABLED and memory_manager:
-            stage3_response = memory_manager.generate_contextual_response(
-                message, "assistant"
-            )
-            response_stages.append(f"3단계 메모리: {stage3_response[:100]}...")
+            try:
+                stage3_response = memory_manager.generate_contextual_response(
+                    message, "assistant"
+                )
+                response_stages.append(f"3단계 메모리: {stage3_response[:100]}...")
+            except Exception as e:
+                print(f"메모리 시스템 오류: {e}")
+                response_stages.append(f"3단계 메모리: 오류로 인한 기본 응답")
 
         # 4단계: 글로벌 시스템 (임시 응답)
         if GLOBAL_SYSTEM_ENABLED and global_manager:

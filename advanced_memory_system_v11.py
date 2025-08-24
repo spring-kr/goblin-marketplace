@@ -194,55 +194,69 @@ class AdvancedMemorySystem:
         return experts
 
     def _init_database(self):
-        """SQLite 데이터베이스 초기화"""
-        conn = sqlite3.connect(self.db_file)
-        cursor = conn.cursor()
+        """SQLite 데이터베이스 초기화 (Vercel 환경 최적화)"""
+        try:
+            # Vercel 환경에서는 /tmp 디렉토리 사용
+            import tempfile
+            if not os.path.exists(os.path.dirname(self.db_file)):
+                # 임시 디렉토리에 데이터베이스 생성
+                temp_dir = tempfile.gettempdir()
+                self.db_file = os.path.join(temp_dir, "advanced_memory_v11.db")
+            
+            conn = sqlite3.connect(self.db_file)
+            cursor = conn.cursor()
 
-        # 테이블 생성
-        cursor.execute(
+            # 테이블 생성
+            cursor.execute(
+                """
+                CREATE TABLE IF NOT EXISTS conversations (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    conversation_id TEXT,
+                    user_message TEXT,
+                    bot_response TEXT,
+                    emotion TEXT,
+                    expert TEXT,
+                    timestamp REAL,
+                    context_data TEXT
+                )
             """
-            CREATE TABLE IF NOT EXISTS conversations (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                conversation_id TEXT,
-                user_message TEXT,
-                bot_response TEXT,
-                emotion TEXT,
-                expert TEXT,
-                timestamp REAL,
-                context_data TEXT
             )
-        """
-        )
 
-        cursor.execute(
+            cursor.execute(
+                """
+                CREATE TABLE IF NOT EXISTS feedback (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    conversation_id TEXT,
+                    message_id TEXT,
+                    feedback_type TEXT,
+                    rating INTEGER,
+                    comment TEXT,
+                    timestamp REAL
+                )
             """
-            CREATE TABLE IF NOT EXISTS feedback (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                conversation_id TEXT,
-                message_id TEXT,
-                feedback_type TEXT,
-                rating INTEGER,
-                comment TEXT,
-                timestamp REAL
             )
-        """
-        )
 
-        cursor.execute(
+            cursor.execute(
+                """
+                CREATE TABLE IF NOT EXISTS learning_patterns (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    pattern_type TEXT,
+                    pattern_data TEXT,
+                    confidence REAL,
+                    usage_count INTEGER,
+                    last_updated REAL
+                )
             """
-            CREATE TABLE IF NOT EXISTS learning_patterns (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                pattern_type TEXT,
-                pattern_data TEXT,
-                confidence REAL,
-                usage_count INTEGER,
-                last_updated REAL
             )
-        """
-        )
 
-        conn.commit()
-        conn.close()
+            conn.commit()
+            conn.close()
+            print(f"📁 데이터베이스 초기화 완료: {self.db_file}")
+            
+        except Exception as e:
+            print(f"⚠️ 데이터베이스 초기화 실패 (메모리 모드로 전환): {e}")
+            # 메모리 모드로 전환
+            self.db_file = ":memory:"
 
     def add_feedback(
         self,
@@ -250,7 +264,7 @@ class AdvancedMemorySystem:
         message_id: str,
         feedback_type: FeedbackType,
         rating: int,
-        comment: str = None,
+        comment: str = "",
     ):
         """사용자 피드백 추가 및 실시간 학습"""
 
