@@ -748,22 +748,30 @@
         function handleChatResponse(data) {
             removeLoadingMessage();
             
-            if (data.success) {
+            if (data && data.success && data.result) {
                 const result = data.result;
-                addMessage('goblin', result.response);
-                
-                currentConversationId = result.conversation_id;
-                lastMessageId = 'msg_' + Date.now();
-                
-                // 피드백 버튼 활성화
-                document.querySelector('.feedback-btn').disabled = false;
-                
-                // 전문가 정보 표시 (선택적)
-                if (result.selected_experts) {
-                    addSystemMessage(`🎯 참여 전문가: ${result.selected_experts.join(', ')}`);
+                if (result.response) {
+                    addMessage('goblin', result.response);
+                    
+                    currentConversationId = result.conversation_id || 'sim_' + Date.now();
+                    lastMessageId = 'msg_' + Date.now();
+                    
+                    // 피드백 버튼 활성화
+                    const feedbackBtn = document.querySelector('.feedback-btn');
+                    if (feedbackBtn) {
+                        feedbackBtn.disabled = false;
+                    }
+                    
+                    // 전문가 정보 표시 (선택적)
+                    if (result.selected_experts) {
+                        addSystemMessage(`🎯 참여 전문가: ${result.selected_experts.join(', ')}`);
+                    }
+                } else {
+                    addMessage('goblin', '❌ 응답 데이터가 올바르지 않습니다.');
                 }
             } else {
-                addMessage('goblin', `❌ 오류가 발생했습니다: ${data.error}`);
+                const errorMsg = data && data.error ? data.error : '알 수 없는 오류가 발생했습니다.';
+                addMessage('goblin', `❌ 오류가 발생했습니다: ${errorMsg}`);
             }
             
             // 입력 다시 활성화
@@ -964,9 +972,12 @@
             
             handleChatResponse({
                 success: true,
-                response: randomResponse,
-                goblin_id: goblinId,
-                timestamp: new Date().toISOString()
+                result: {
+                    response: randomResponse,
+                    conversation_id: 'sim_' + Date.now(),
+                    goblin_id: goblinId,
+                    timestamp: new Date().toISOString()
+                }
             });
         }
 
