@@ -1109,10 +1109,22 @@
 
         // 성능 통계 업데이트
         function updatePerformanceStats(data) {
-            if (data.performance) {
-                document.getElementById('total-goblins').textContent = data.performance.total_goblins || 27;
+            try {
+                // 안전한 요소 업데이트
+                const totalGoblinsEl = document.getElementById('total-goblins');
+                if (totalGoblinsEl && data.performance) {
+                    totalGoblinsEl.textContent = data.performance.total_goblins || 39;
+                }
+                
+                const activeUsersEl = document.getElementById('active-users');
+                if (activeUsersEl) {
+                    activeUsersEl.textContent = data.active_users || 0;
+                }
+                
+                console.log('📊 성능 데이터 업데이트 완료:', data);
+            } catch (error) {
+                console.warn('⚠️ 성능 데이터 업데이트 실패:', error);
             }
-            document.getElementById('active-users').textContent = data.active_users || 0;
         }
 
         // 토스트 알림 표시

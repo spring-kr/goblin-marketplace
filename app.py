@@ -657,29 +657,37 @@ def chat_advanced():
     try:
         data = request.get_json()
         message = data.get("message", "")
-        expert = data.get("expert", "AI전문가")
+        goblin_id = data.get("goblin_id", 1)
         
         if not message:
-            return jsonify({"error": "메시지가 필요합니다.", "success": False}), 400
+            return jsonify({"status": "error", "message": "메시지가 필요합니다."}), 400
         
-        print(f"🧠 고급 AI 요청: {expert} - {message[:50]}...")
+        print(f"🧠 고급 AI 요청: 도깨비{goblin_id} - {message[:50]}...")
+        
+        # 기본 전문가명 설정
+        expert_name = "AI전문가"
         
         # 고급 AI 응답 생성
-        response = real_ai_manager.get_expert_response(expert, message)
+        response = real_ai_manager.get_expert_response(expert_name, message)
         
         return jsonify({
-            "response": response,
-            "expert": expert,
-            "success": True,
-            "timestamp": datetime.now().isoformat(),
+            "status": "success",
+            "result": {
+                "response": response,
+                "conversation_id": f"conv_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+                "goblin_id": goblin_id,
+                "expert_type": expert_name,
+                "response_length": len(response),
+                "timestamp": datetime.now().isoformat()
+            },
             "version": APP_VERSION,
         })
         
     except Exception as e:
         print(f"❌ 고급 AI 채팅 오류: {e}")
         return jsonify({
-            "error": "죄송합니다. 일시적인 오류가 발생했습니다.",
-            "success": False
+            "status": "error",
+            "message": "죄송합니다. 일시적인 오류가 발생했습니다."
         }), 500
 
 
