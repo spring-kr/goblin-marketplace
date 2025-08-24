@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, render_template_string
 import os
 from datetime import datetime
 
@@ -124,7 +124,7 @@ def not_found(error):
 
 @app.route("/")
 def index():
-    """메인 페이지"""
+    """메인 페이지 - 통합 대시보드"""
     try:
         print(f"🔍 템플릿 로딩 시도 - 현재 디렉토리: {os.getcwd()}")
         print(f"🔍 현재 디렉토리 파일 목록: {os.listdir('.')}")
@@ -137,17 +137,8 @@ def index():
         
         print(f"🔍 Flask 앱 템플릿 폴더: {app.template_folder}")
         
-        # 템플릿 폴더 확인
-        if app.template_folder:
-            print(f"🔍 템플릿 폴더 존재 여부: {os.path.exists(app.template_folder)}")
-            
-            # 템플릿 파일 존재 확인
-            if os.path.exists(app.template_folder):
-                template_path = os.path.join(app.template_folder, "index.html")
-                print(f"🔍 index.html 경로: {template_path}")
-                print(f"🔍 index.html 존재 여부: {os.path.exists(template_path)}")
-        
-        return render_template("index.html")
+        # 통합 대시보드 템플릿 로딩
+        return render_template("unified_dashboard_v12.html")
     except Exception as e:
         print(f"❌ 템플릿 로딩 오류: {e}")
         print(f"❌ 오류 타입: {type(e).__name__}")
