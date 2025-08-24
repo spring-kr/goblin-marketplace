@@ -28,17 +28,19 @@ print("🛡️ SQLite 완전 차단 - 메모리 시스템 완전 비활성화")
 print("🔥 CACHE KILLER - 42분 다운타임 해결")
 print("=" * 60)
 
-# 🚀 Vercel 경량 AI 엔진 임포트 (대용량 모델 대신)
+# 🚀 Vercel 최적화: 대용량 AI 모델 비활성화
+print("🚀 Vercel 최적화 모드: 대용량 AI 모델 비활성화")
+print("✅ 32명 전문가 시스템은 유지하며 경량화")
+ADVANCED_AI_AVAILABLE = False  # 대용량 모델 비활성화
+
+# 🚀 경량 AI 엔진 임포트 (대용량 모델 대신)
 try:
     from lightweight_ai_engine import get_ai_response, get_expert_capabilities, health_check
     print("✅ 경량 AI 엔진 v1.0 임포트 성공! (Vercel 최적화)")
     LIGHTWEIGHT_AI_AVAILABLE = True
-    ADVANCED_AI_AVAILABLE = False  # 대용량 모델 비활성화
 except Exception as e:
     print(f"⚠️ 경량 AI 엔진 임포트 실패: {e}")
-    print("🔄 기본 AI 시스템으로 폴백")
     LIGHTWEIGHT_AI_AVAILABLE = False
-    ADVANCED_AI_AVAILABLE = False
 
 # 👥 1단계: 16명 전문가 시스템 임포트
 try:
@@ -98,23 +100,31 @@ except Exception as e:
     print(f"⚠️ 궁극적 글로벌 전문가 시스템 임포트 실패: {e}")
     EXPERTS_V6_AVAILABLE = False
 
-# 👥 7단계: 실시간 멀티모달 전문가 시스템 임포트
-try:
-    from experts.complete_16_experts_v7_real_time_multimodal_20250823 import GlobalExpertSystemV7
-    print("✅ 실시간 멀티모달 전문가 시스템 v7.0 임포트 성공!")
-    EXPERTS_V7_AVAILABLE = True
-except Exception as e:
-    print(f"⚠️ 실시간 멀티모달 전문가 시스템 임포트 실패: {e}")
+# 👥 7단계: 실시간 멀티모달 전문가 시스템 임포트 (Vercel 호환성 체크)
+if VERCEL_ENV:
+    print("🚀 Vercel 모드: v7.0 실시간 멀티모달 시스템 비활성화 (음성 라이브러리 호환성)")
     EXPERTS_V7_AVAILABLE = False
+else:
+    try:
+        from experts.complete_16_experts_v7_real_time_multimodal_20250823 import GlobalExpertSystemV7
+        print("✅ 실시간 멀티모달 전문가 시스템 v7.0 임포트 성공!")
+        EXPERTS_V7_AVAILABLE = True
+    except Exception as e:
+        print(f"⚠️ 실시간 멀티모달 전문가 시스템 임포트 실패: {e}")
+        EXPERTS_V7_AVAILABLE = False
 
-# 👥 8단계: 코스믹 멀티모달 전문가 시스템 임포트
-try:
-    from experts.complete_16_experts_v8_cosmic_multimodal_20250823 import UniversalAISystemV8
-    print("✅ 코스믹 멀티모달 전문가 시스템 v8.0 임포트 성공!")
-    EXPERTS_V8_AVAILABLE = True
-except Exception as e:
-    print(f"⚠️ 코스믹 멀티모달 전문가 시스템 임포트 실패: {e}")
+# 👥 8단계: 코스믹 멀티모달 전문가 시스템 임포트 (Vercel 호환성 체크)
+if VERCEL_ENV:
+    print("🚀 Vercel 모드: v8.0 코스믹 멀티모달 시스템 비활성화 (TextBlob 호환성)")
     EXPERTS_V8_AVAILABLE = False
+else:
+    try:
+        from experts.complete_16_experts_v8_cosmic_multimodal_20250823 import UniversalAISystemV8
+        print("✅ 코스믹 멀티모달 전문가 시스템 v8.0 임포트 성공!")
+        EXPERTS_V8_AVAILABLE = True
+    except Exception as e:
+        print(f"⚠️ 코스믹 멀티모달 전문가 시스템 임포트 실패: {e}")
+        EXPERTS_V8_AVAILABLE = False
 
 # 👥 9단계: DNA 개인화 전문가 시스템 임포트 (최종 단계)
 try:
@@ -213,17 +223,16 @@ class UltraLightAIManager:
             self.use_16_experts_v3 = False
             self._init_fallback_experts()
         
-        # 경량 AI 엔진 초기화 (Vercel 최적화)
+        # 🚀 Vercel 최적화: 경량 AI 엔진 활성화 (대용량 모델 대신)
+        print("🚀 Vercel 최적화: 경량 AI 시스템 사용")
+        self.use_advanced_ai = False  # 대용량 모델 비활성화
+        
         if LIGHTWEIGHT_AI_AVAILABLE:
-            try:
-                print("🚀 경량 AI 엔진 v1.0 활성화! (Vercel 최적화)")
-                self.use_lightweight_ai = True
-                self.use_advanced_ai = False  # 대용량 모델 비활성화
-            except Exception as e:
-                print(f"⚠️ 경량 AI 엔진 초기화 실패: {e}")
-                self.use_lightweight_ai = False
+            self.use_lightweight_ai = True
+            print("✅ 경량 AI 엔진 활성화! (32명 전문가 유지)")
         else:
             self.use_lightweight_ai = False
+            print("⚠️ 경량 AI 엔진 비활성화")
             
         print("✅ 서버리스 AI 시스템 활성화!")
     
@@ -632,10 +641,12 @@ tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
                 context["search_info"] = search_info
                 print(f"🔍 검색 정보 활용하여 응답 생성: {len(search_info)}자")
             
-            # 모드별 응답 생성 방식 결정 (경량 AI 엔진 사용)
-            if self.use_lightweight_ai:
-                # 경량 AI 엔진으로 응답 생성
-                expert_type = "technical" if "기술" in expert_name else "business" if "마케팅" in expert_name or "경영" in expert_name else "general"
+            # 🚀 Vercel 최적화: 경량 AI 엔진으로 응답 생성
+            if self.use_lightweight_ai and LIGHTWEIGHT_AI_AVAILABLE:
+                # 전문가 타입 분류
+                expert_type = "technical" if "기술" in expert_name or expert_name in ["assistant", "tech", "data_analyst"] else \
+                             "business" if expert_name in ["marketing", "sales", "business", "startup"] else "general"
+                
                 ai_response = get_ai_response(
                     user_input=query,
                     expert_type=expert_type,
