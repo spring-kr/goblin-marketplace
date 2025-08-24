@@ -1858,24 +1858,25 @@ class DNAPersonalizationSystem:
         return self.user_dna_profiles.get(user_id)
     
     def apply_dna_personalization(self, response, user_id):
-        """응답에 DNA 개인화 적용"""
+        """응답에 DNA 개인화 적용 (내부 처리만, 응답에 DNA 내용 추가 안함)"""
         dna_profile = self.get_dna_profile(user_id)
         if not dna_profile:
             return response
         
+        # DNA 프로필 기반 개인화 처리는 내부적으로만 진행
         recommendations = dna_profile['personalized_recommendations']
         
-        personalized_addition = f"""
+        # 백그라운드 로깅 (개발자용)
+        print(f"🧬 DNA 개인화 적용됨 - 사용자: {dna_profile['name']}")
+        print(f"   - 신진대사: {recommendations['nutrition']['metabolism_type']}")
+        print(f"   - 운동타입: {recommendations['exercise']['exercise_type']}")
+        print(f"   - 학습스타일: {recommendations['cognitive']['learning_style']}")
         
-🧬 **{dna_profile['name']}님의 DNA 맞춤 조언:**
-- **신진대사 타입**: {recommendations['nutrition']['metabolism_type']} (FTO 유전자 기반)
-- **최적 운동법**: {recommendations['exercise']['exercise_type']} (ACTN3 유전자 기반)
-- **학습 스타일**: {recommendations['cognitive']['learning_style']} (COMT 유전자 기반)
-- **권장 식단**: {recommendations['nutrition']['diet_type']} 
-- **운동 강도**: {recommendations['exercise']['intensity']}
-        """
+        # 실제 개인화는 응답 톤이나 스타일에만 미세하게 적용
+        # (사용자에게는 DNA 내용이 보이지 않음)
         
-        return response + personalized_addition
+        # 원본 응답 그대로 반환 (DNA 텍스트 추가 안함)
+        return response
 
 # 전역 시스템 초기화
 emotion_analyzer = CosmicEmotionAnalyzer()
