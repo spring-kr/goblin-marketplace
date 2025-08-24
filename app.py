@@ -631,19 +631,27 @@ def manage_conversation_context(conversation_id, message, expert_name, response)
 def get_context_aware_expert_selection(message, conversation_id):
     """컨텍스트를 고려한 전문가 선택"""
     
-    # 후속 질문 키워드 체크
-    follow_up_keywords = ['구체적으로', '자세히', '더', '추가로', '어떻게', '왜', '방법', '예시', '사례']
+    print(f"🔍 컨텍스트 분석 시작: '{message}' (대화ID: {conversation_id})")
     
-    if any(keyword in message for keyword in follow_up_keywords):
-        # 이전 대화가 있고 후속 질문인 경우 같은 전문가 유지
+    # 후속 질문 키워드 체크
+    follow_up_keywords = ['구체적으로', '자세히', '더', '추가로', '어떻게', '왜', '방법', '예시', '사례', '어떤', '무엇', '설명']
+    
+    has_follow_up_keyword = any(keyword in message for keyword in follow_up_keywords)
+    print(f"🔍 후속 질문 키워드 발견: {has_follow_up_keyword}")
+    
+    if has_follow_up_keyword:
+        # 이전 대화가 있는지 확인
         if conversation_id in conversation_context:
             previous_expert = conversation_context[conversation_id]["current_expert"]
             previous_topic = conversation_context[conversation_id]["current_topic"]
-            print(f"🔄 후속 질문 감지: '{previous_topic}' 관련, {previous_expert} 유지")
+            print(f"🔄 후속 질문 확인: '{previous_topic}' 관련, {previous_expert} 유지")
             return previous_expert, previous_topic
+        else:
+            print(f"⚠️ 후속 질문 키워드는 있지만 이전 컨텍스트 없음")
     
     # 새로운 주제인 경우 새로운 전문가 선택
     expert_name = select_expert_by_query(message)
+    print(f"🆕 새 주제로 판단: {expert_name} 선택")
     return expert_name, None
 
 # �🚫 모든 DB 관련 시스템 완전 비활성화
@@ -1119,6 +1127,16 @@ def chat_advanced():
         print(f"🎯 선택된 전문가: {expert_name}")
         if previous_topic:
             print(f"🎯 이전 주제: {previous_topic}")
+        
+        # 첫 번째 질문인 경우 즉시 컨텍스트 초기화 (후속 질문을 위해)
+        if conversation_id not in conversation_context:
+            conversation_context[conversation_id] = {
+                "messages": [],
+                "current_expert": expert_name,
+                "current_topic": message,
+                "created_at": datetime.now().isoformat()
+            }
+            print(f"📝 컨텍스트 초기화 완료: {expert_name}, '{message}'")
         
         # 일반 대화인지 전문 질문인지 판단
         if expert_name == "일반대화":
