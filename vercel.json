@@ -25,16 +25,5 @@
       "memory": 1024,
       "maxDuration": 30
     }
-  },
-  "outputDirectory": ".",
-  "installCommand": "pip install -r requirements.txt",
-  "buildCommand": "",
-  "includeFiles": [
-    "app.py",
-    "requirements.txt",
-    "templates/**",
-    "static/**",
-    "experts/**",
-    "utils/**"
-  ]
+  }
 }
