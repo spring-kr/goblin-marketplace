@@ -62,6 +62,19 @@ class UltraLightAIManager:
     def get_expert_response(self, query, expert_name="AI전문가"):
         """고급 AI 응답 생성"""
         
+        # 후속 질문 처리
+        if "이전 질문" in query and "후속 질문:" in query:
+            # 컨텍스트가 있는 후속 질문
+            parts = query.split("후속 질문:")
+            if len(parts) == 2:
+                previous_context = parts[0].replace("이전 질문", "").replace("에 대한", "").strip().strip("'\"")
+                current_question = parts[1].strip()
+                
+                print(f"🔗 컨텍스트 기반 응답: {previous_context} → {current_question}")
+                
+                # 후속 질문용 특별 응답 생성
+                return self._generate_contextual_response(current_question, expert_name, previous_context)
+        
         # 항상 고급 응답 시스템 사용 (더 상세한 응답을 위해)
         try:
             return self._generate_advanced_response(query, expert_name)
@@ -69,6 +82,100 @@ class UltraLightAIManager:
             print(f"⚠️ 고급 AI 응답 생성 실패: {e}")
             # 폴백: 기본 응답 사용
             return self._generate_basic_response(query, expert_name)
+    
+    def _generate_contextual_response(self, question, expert_name, previous_context):
+        """컨텍스트 기반 후속 응답 생성"""
+        
+        contextual_responses = {
+            "블록체인도깨비": f"""
+{self._get_expert_emoji(expert_name)} **{expert_name}**의 구체적인 후속 설명:
+
+**'{question}'**에 대해 {previous_context} 맥락에서 더 자세히 설명드리겠습니다.
+
+**🔍 실제 구현 사례:**
+• **금융 분야**: JPMorgan의 JPM Coin, 국제송금 시간 단축 (기존 3-5일 → 실시간)
+• **공급망 관리**: Walmart의 식품 추적 시스템, 오염원 추적 시간 단축 (7일 → 2.2초)
+• **부동산**: 두바이 정부의 블록체인 기반 부동산 거래 시스템
+• **의료**: MedRec 프로젝트로 환자 의료 기록의 안전한 공유
+
+**💼 투자 관점에서의 블록체인:**
+- 시장 규모: 2023년 기준 약 676억 달러, 2030년까지 1조 4천억 달러 전망
+- 주요 투자 분야: DeFi (탈중앙화 금융), NFT, 메타버스, Web3.0
+- 리스크 요인: 규제 불확실성, 기술적 확장성 한계, 에너지 소비 문제
+
+**🛠️ 실무 도입 가이드:**
+1. **기술 검토**: 프라이빗/퍼블릭 블록체인 선택 기준
+2. **파일럿 프로젝트**: 소규모 시범 운영으로 효과 검증
+3. **인프라 구축**: 노드 운영, 보안 체계, 개발 인력 확보
+4. **규제 대응**: 각국 법규 준수, 컴플라이언스 체계 구축
+
+**⚡ 기술적 세부사항:**
+- 해시 함수: SHA-256, 블록 무결성 보장
+- 합의 알고리즘: PoW vs PoS 장단점 비교
+- 스마트 컨트랙트: Solidity 언어, 가스비 최적화
+- 확장성 솔루션: 레이어2 (Lightning Network, Polygon)
+            """,
+            
+            "AI전문가": f"""
+{self._get_expert_emoji(expert_name)} **{expert_name}**의 심화 기술 분석:
+
+**'{question}'**에 대해 {previous_context} 기반으로 기술적 세부사항을 설명드리겠습니다.
+
+**🧠 AI 모델 아키텍처:**
+• **트랜스포머**: Attention 메커니즘으로 장거리 의존성 학습
+• **CNN**: 이미지 인식, 합성곱 레이어를 통한 특징 추출
+• **RNN/LSTM**: 시계열 데이터, 순차적 정보 처리
+• **GAN**: 생성형 AI, 적대적 학습을 통한 데이터 생성
+
+**💻 실제 구현 예시:**
+```python
+# GPT 스타일 텍스트 생성
+import torch
+from transformers import GPT2LMHeadModel, GPT2Tokenizer
+
+model = GPT2LMHeadModel.from_pretrained('gpt2')
+tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
+```
+
+**📊 성능 지표:**
+- BLEU 점수: 기계 번역 품질 측정
+- F1 Score: 분류 모델 정확도
+- Perplexity: 언어 모델 성능
+- IoU: 객체 탐지 정확도
+
+**🚀 최신 연구 동향:**
+- **멀티모달 AI**: CLIP, DALL-E, GPT-4V
+- **강화학습**: AlphaGo, ChatGPT의 RLHF
+- **경량화**: 모바일 AI, 엣지 컴퓨팅 최적화
+- **설명 가능한 AI**: XAI, 의사결정 투명성
+
+**🔧 실무 적용 단계:**
+1. **데이터 수집**: 고품질 학습 데이터 확보
+2. **전처리**: 정규화, 증강, 라벨링
+3. **모델 선택**: 문제에 적합한 아키텍처 선정
+4. **학습**: 하이퍼파라미터 튜닝, 과적합 방지
+5. **배포**: MLOps, 모니터링, A/B 테스트
+            """
+        }
+        
+        # 전문가별 특화 응답이 없으면 기본 후속 응답
+        if expert_name not in contextual_responses:
+            return f"""
+{self._get_expert_emoji(expert_name)} **{expert_name}**의 후속 상세 설명:
+
+**'{question}'**에 대해 {previous_context} 주제를 더 깊이 있게 분석해드리겠습니다.
+
+**🔍 구체적인 사례와 방법론:**
+{self._generate_detailed_response(question, expert_name)}
+
+**💡 실무 적용 가이드:**
+{self._generate_action_plan(question, expert_name)}
+
+**📈 성공 전략:**
+{self._generate_additional_insights(question, expert_name)}
+            """
+        
+        return contextual_responses[expert_name]
     
     def _generate_advanced_response(self, query, expert_name):
         """고급 AI 엔진을 사용한 응답 생성"""
@@ -376,7 +483,54 @@ def select_expert_by_query(query):
 real_ai_manager = UltraLightAIManager()
 AI_SYSTEM_ENABLED = True
 
-# 🚫 모든 DB 관련 시스템 완전 비활성화
+# � 대화 컨텍스트 관리 (메모리 기반)
+conversation_context = {}
+
+def manage_conversation_context(conversation_id, message, expert_name, response):
+    """대화 컨텍스트 관리"""
+    if conversation_id not in conversation_context:
+        conversation_context[conversation_id] = {
+            "messages": [],
+            "current_expert": expert_name,
+            "current_topic": "",
+            "created_at": datetime.now().isoformat()
+        }
+    
+    # 현재 대화 추가
+    conversation_context[conversation_id]["messages"].append({
+        "user": message,
+        "expert": expert_name, 
+        "response": response[:200] + "..." if len(response) > 200 else response,
+        "timestamp": datetime.now().isoformat()
+    })
+    
+    # 최대 10개 대화만 유지 (메모리 관리)
+    if len(conversation_context[conversation_id]["messages"]) > 10:
+        conversation_context[conversation_id]["messages"] = conversation_context[conversation_id]["messages"][-10:]
+    
+    # 현재 주제 업데이트
+    conversation_context[conversation_id]["current_topic"] = message
+    conversation_context[conversation_id]["current_expert"] = expert_name
+
+def get_context_aware_expert_selection(message, conversation_id):
+    """컨텍스트를 고려한 전문가 선택"""
+    
+    # 후속 질문 키워드 체크
+    follow_up_keywords = ['구체적으로', '자세히', '더', '추가로', '어떻게', '왜', '방법', '예시', '사례']
+    
+    if any(keyword in message for keyword in follow_up_keywords):
+        # 이전 대화가 있고 후속 질문인 경우 같은 전문가 유지
+        if conversation_id in conversation_context:
+            previous_expert = conversation_context[conversation_id]["current_expert"]
+            previous_topic = conversation_context[conversation_id]["current_topic"]
+            print(f"🔄 후속 질문 감지: '{previous_topic}' 관련, {previous_expert} 유지")
+            return previous_expert, previous_topic
+    
+    # 새로운 주제인 경우 새로운 전문가 선택
+    expert_name = select_expert_by_query(message)
+    return expert_name, None
+
+# �🚫 모든 DB 관련 시스템 완전 비활성화
 memory_manager = None
 MEMORY_SYSTEM_ENABLED = False
 multimodal_ai_manager = None
@@ -808,22 +962,35 @@ def chat_advanced():
         
         print(f"🧠 고급 AI 요청: 도깨비{goblin_id} - {message[:50]}...")
         
-        # 질문 내용으로 적절한 전문가 자동 선택
-        expert_name = select_expert_by_query(message)
+        # conversation_id가 없으면 생성
+        conversation_id = data.get("conversation_id") or f"conv_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        
+        # 컨텍스트를 고려한 전문가 선택
+        expert_name, previous_topic = get_context_aware_expert_selection(message, conversation_id)
         print(f"🎯 선택된 전문가: {expert_name}")
         
-        # 고급 AI 응답 생성 (매개변수 순서 수정)
-        response = real_ai_manager.get_expert_response(message, expert_name)
+        # 후속 질문인 경우 컨텍스트 정보 추가
+        enhanced_message = message
+        if previous_topic:
+            enhanced_message = f"이전 질문 '{previous_topic}'에 대한 후속 질문: {message}"
+            print(f"🔗 컨텍스트 연결: {previous_topic} → {message}")
+        
+        # 고급 AI 응답 생성 (컨텍스트 강화된 메시지 사용)
+        response = real_ai_manager.get_expert_response(enhanced_message, expert_name)
+        
+        # 대화 컨텍스트 저장
+        manage_conversation_context(conversation_id, message, expert_name, response)
         
         return jsonify({
             "status": "success",
             "result": {
                 "response": response,
-                "conversation_id": f"conv_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+                "conversation_id": conversation_id,
                 "goblin_id": goblin_id,
                 "expert_type": expert_name,
                 "response_length": len(response),
-                "timestamp": datetime.now().isoformat()
+                "timestamp": datetime.now().isoformat(),
+                "context_used": previous_topic is not None
             },
             "version": APP_VERSION,
         })
