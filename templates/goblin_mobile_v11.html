@@ -76,6 +76,40 @@
             50% { opacity: 0.5; }
         }
 
+        /* AI 대화 모드 버튼들 */
+        .mode-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+        }
+
+        .mode-btn {
+            flex-shrink: 0;
+            padding: 0.5rem 1rem;
+            border: 2px solid #5a67d8;
+            border-radius: 20px;
+            background: transparent;
+            color: #5a67d8;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .mode-btn:hover {
+            background: rgba(90,103,216,0.1);
+            transform: translateY(-1px);
+        }
+
+        .mode-btn.active {
+            background: #5a67d8;
+            color: white;
+            box-shadow: 0 2px 8px rgba(90,103,216,0.3);
+        }
+
         /* 탭 네비게이션 */
         .tab-navigation {
             display: flex;
@@ -517,8 +551,16 @@
         <!-- 헤더 -->
         <div class="mobile-header">
             <div class="header-content">
-                <div class="app-title">🏆 도깨비마을장터</div>
+                <div class="app-title">🤖 AI도깨비와 대화 중</div>
                 <div class="status-indicator"></div>
+            </div>
+            
+            <!-- AI 대화 모드 버튼들 -->
+            <div class="mode-buttons">
+                <button class="mode-btn active" onclick="setMode('single')">단일대화</button>
+                <button class="mode-btn" onclick="setMode('continuous')">연속대화</button>
+                <button class="mode-btn" onclick="setMode('situation')">상황탐구</button>
+                <button class="mode-btn" onclick="setMode('creative')">창의협업</button>
             </div>
         </div>
 
@@ -616,6 +658,11 @@
         let currentConversationId = null;
         let deferredPrompt;
         let notificationsEnabled = false;
+        
+        // AI 대화 모드 관련 변수
+        let currentMode = 'single'; // 현재 대화 모드
+        let conversationHistory = []; // 연속대화를 위한 히스토리
+        let currentContext = null; // 상황탐구/창의협업을 위한 컨텍스트
 
         // 배너 숨기기 함수
         function hideBanner() {
@@ -636,6 +683,37 @@
             console.log('🧙‍♂️ 도깨비 목록 로드 시작...');
             loadGoblins();
         });
+
+                }
+
+        // AI 대화 모드 설정
+        function setMode(mode) {
+            currentMode = mode;
+            
+            // 모드 버튼 업데이트
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // 모드별 안내 메시지
+            const modeMessages = {
+                'single': '💬 단일대화: 각 질문을 독립적으로 처리합니다',
+                'continuous': '🔄 연속대화: 이전 대화 맥락을 기억합니다',
+                'situation': '🔍 상황탐구: 구체적인 상황을 분석하고 해결책 제시',
+                'creative': '💡 창의협업: 창의적인 아이디어를 함께 발전시킵니다'
+            };
+            
+            showToast(modeMessages[mode], 'info');
+            
+            // 연속대화가 아니면 히스토리 초기화
+            if (mode !== 'continuous') {
+                conversationHistory = [];
+                currentContext = null;
+            }
+            
+            console.log(`🎯 대화 모드 변경: ${mode}`);
+        }
 
         // 모바일 앱 초기화
         function initMobileApp() {
@@ -880,11 +958,25 @@
             input.disabled = true;
             document.getElementById('send-btn').disabled = true;
             
-            // 소켓으로 메시지 전송
-            socket.emit('quick_chat', {
+            // 소켓으로 메시지 전송 (모드 정보 포함)
+            const messageData = {
                 goblin_id: selectedGoblin.id,
-                message: message
-            });
+                message: message,
+                mode: currentMode,
+                conversation_history: currentMode === 'continuous' ? conversationHistory : [],
+                context: currentContext
+            };
+            
+            socket.emit('quick_chat', messageData);
+            
+            // 연속대화 모드면 히스토리에 추가
+            if (currentMode === 'continuous') {
+                conversationHistory.push({
+                    role: 'user',
+                    message: message,
+                    timestamp: new Date().toISOString()
+                });
+            }
             
             input.value = '';
         }
