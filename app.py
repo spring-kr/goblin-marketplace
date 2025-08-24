@@ -528,26 +528,26 @@ def get_goblins():
     """도깨비 목록 API"""
     try:
         # 서버리스 환경에서는 고정된 도깨비 목록 반환
-        goblins = [
-            {"id": 1, "name": "AI전문가", "emoji": "🧠", "description": "AI와 머신러닝 전문가"},
-            {"id": 2, "name": "마케팅왕", "emoji": "📈", "description": "디지털 마케팅 전문가"},
-            {"id": 3, "name": "의료AI전문가", "emoji": "⚕️", "description": "의료 AI 전문가"},
-            {"id": 4, "name": "재테크박사", "emoji": "💰", "description": "투자 및 재무 전문가"},
-            {"id": 5, "name": "창업컨설턴트", "emoji": "🚀", "description": "스타트업 및 창업 전문가"},
-            {"id": 6, "name": "개발자멘토", "emoji": "💻", "description": "프로그래밍 및 개발 전문가"},
+        experts = [
+            {"id": 1, "name": "AI전문가", "emoji": "🧠", "description": "AI와 머신러닝 전문가", "avatar": "/static/avatar_ai_philosopher_happy_203828.png"},
+            {"id": 2, "name": "마케팅왕", "emoji": "📈", "description": "디지털 마케팅 전문가", "avatar": "/static/avatar_quantum_physicist_curious_194718.png"},
+            {"id": 3, "name": "의료AI전문가", "emoji": "⚕️", "description": "의료 AI 전문가", "avatar": "/static/avatar_ai_philosopher_neutral_202955.png"},
+            {"id": 4, "name": "재테크박사", "emoji": "💰", "description": "투자 및 재무 전문가", "avatar": "/static/avatar_ai_philosopher_happy_204241.png"},
+            {"id": 5, "name": "창업컨설턴트", "emoji": "🚀", "description": "스타트업 및 창업 전문가", "avatar": "/static/avatar_ai_philosopher_curious_194719.png"},
+            {"id": 6, "name": "개발자멘토", "emoji": "💻", "description": "프로그래밍 및 개발 전문가", "avatar": "/static/avatar_ai_philosopher_neutral_204651.png"},
         ]
         
-        print(f"🎯 도깨비 목록 요청 - {len(goblins)}명 반환")
+        print(f"🎯 도깨비 목록 요청 - {len(experts)}명 반환")
         
         return jsonify({
-            "success": True,
-            "goblins": goblins,
-            "count": len(goblins),
+            "status": "success",
+            "experts": experts,
+            "count": len(experts),
             "timestamp": datetime.now().isoformat()
         })
     except Exception as e:
         print(f"❌ 도깨비 목록 오류: {e}")
-        return jsonify({"success": False, "error": str(e)}), 500
+        return jsonify({"status": "error", "error": str(e)}), 500
 
 
 @app.route("/favicon.ico")
