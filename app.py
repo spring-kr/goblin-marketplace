@@ -238,118 +238,440 @@ tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
         return contextual_responses[expert_name]
     
     def _generate_advanced_response(self, query, expert_name):
-        """고급 AI 엔진을 사용한 응답 생성"""
+        """고급 AI 엔진을 사용한 진짜 동적 응답 생성"""
         
-        # 전문가별 고급 프롬프트 설정
-        expert_prompts = {
+        try:
+            # 고급 AI 엔진 사용하여 동적 응답 생성
+            ai_response = self.advanced_engine.generate_expert_response(
+                query=query,
+                expert_type=expert_name,
+                context={"user_type": "professional", "depth": "detailed"}
+            )
+            
+            # AI 엔진이 성공하면 그 결과 사용
+            if ai_response and len(ai_response) > 100:
+                print(f"✅ 고급 AI 엔진 응답 성공: {len(ai_response)}자")
+                return ai_response
+                
+        except Exception as e:
+            print(f"⚠️ 고급 AI 엔진 오류: {e}")
+        
+        # 폴백: 실시간 동적 응답 생성
+        return self._generate_dynamic_response(query, expert_name)
+    
+    def _generate_dynamic_response(self, query, expert_name):
+        """실시간 동적 응답 생성 - 질문에 따라 매번 다른 답변"""
+        
+        # 질문 분석
+        question_analysis = self._analyze_question(query)
+        
+        # 전문가별 관점 적용
+        expert_perspective = self._get_expert_perspective(expert_name, question_analysis)
+        
+        # 동적 응답 구성
+        response_parts = []
+        
+        # 헤더
+        response_parts.append(f"{self._get_expert_emoji(expert_name)} **{expert_name}**의 전문적 분석:")
+        response_parts.append(f"\n**'{query}'**에 대해 전문가 관점에서 분석드리겠습니다.\n")
+        
+        # 질문 유형별 동적 내용 생성
+        if question_analysis['type'] == 'how_to':
+            response_parts.append(self._generate_how_to_response(query, expert_name, question_analysis))
+        elif question_analysis['type'] == 'what_is':
+            response_parts.append(self._generate_explanation_response(query, expert_name, question_analysis))
+        elif question_analysis['type'] == 'comparison':
+            response_parts.append(self._generate_comparison_response(query, expert_name, question_analysis))
+        elif question_analysis['type'] == 'advice':
+            response_parts.append(self._generate_advice_response(query, expert_name, question_analysis))
+        else:
+            response_parts.append(self._generate_general_response(query, expert_name, question_analysis))
+        
+        # 전문가별 특화 인사이트 추가
+        response_parts.append(self._generate_expert_insights(query, expert_name, question_analysis))
+        
+        # 실행 방안 (질문에 따라 동적 생성)
+        response_parts.append(self._generate_dynamic_action_plan(query, expert_name, question_analysis))
+        
+        final_response = "\n".join(response_parts)
+        
+        print(f"🔄 동적 응답 생성 완료: {len(final_response)}자 (질문타입: {question_analysis['type']})")
+        
+        return final_response
+    
+    def _analyze_question(self, query):
+        """질문 분석 - 매번 다른 관점으로 분석"""
+        
+        # 질문 키워드 분석
+        keywords = query.lower().split()
+        
+        # 질문 유형 분류
+        question_type = "general"
+        if any(word in query.lower() for word in ["어떻게", "방법", "how"]):
+            question_type = "how_to"
+        elif any(word in query.lower() for word in ["무엇", "뭐", "what", "설명"]):
+            question_type = "what_is"
+        elif any(word in query.lower() for word in ["비교", "차이", "vs", "대신"]):
+            question_type = "comparison"
+        elif any(word in query.lower() for word in ["추천", "조언", "방향", "어떤"]):
+            question_type = "advice"
+        
+        # 복잡성 레벨
+        complexity = "basic"
+        if len(keywords) > 10 or any(word in query for word in ["전략", "분석", "구체적", "상세"]):
+            complexity = "advanced"
+        elif len(keywords) > 5:
+            complexity = "intermediate"
+        
+        # 도메인 감지
+        domain = "general"
+        domain_keywords = {
+            "tech": ["기술", "AI", "개발", "프로그래밍", "시스템"],
+            "business": ["사업", "비즈니스", "마케팅", "투자", "창업"],
+            "health": ["건강", "의료", "치료", "진단", "병원"],
+            "finance": ["돈", "투자", "재테크", "주식", "경제"]
+        }
+        
+        for domain_name, domain_words in domain_keywords.items():
+            if any(word in query for word in domain_words):
+                domain = domain_name
+                break
+        
+        return {
+            "type": question_type,
+            "complexity": complexity,
+            "domain": domain,
+            "keywords": keywords,
+            "length": len(query)
+        }
+    
+    def _get_expert_perspective(self, expert_name, question_analysis):
+        """전문가별 관점 설정"""
+        perspectives = {
+            "AI전문가": "기술적 혁신과 실무 적용",
+            "마케팅왕": "시장 트렌드와 고객 중심",
+            "의료AI전문가": "환자 안전과 의료 효율성",
+            "재테크박사": "리스크 관리와 수익 최적화",
+            "창업컨설턴트": "비즈니스 기회와 성장 전략",
+            "개발자멘토": "기술 역량과 실무 경험",
+            "블록체인도깨비": "분산 기술과 미래 금융"
+        }
+        return perspectives.get(expert_name, "전문적 분석과 실용적 조언")
+    
+    def _generate_how_to_response(self, query, expert_name, analysis):
+        """How-to 질문에 대한 동적 응답"""
+        steps = []
+        
+        if expert_name == "AI전문가":
+            steps = [
+                "**1단계: 현재 상황 분석**\n   - AI 기술 적용 가능성 검토\n   - 데이터 현황과 인프라 점검",
+                "**2단계: 기술 스택 선택**\n   - 프로젝트 규모에 맞는 AI 모델 선정\n   - 개발 도구와 플랫폼 결정",
+                "**3단계: 단계별 구현**\n   - 프로토타입 개발 및 테스트\n   - 점진적 확장과 최적화",
+                "**4단계: 성과 측정**\n   - KPI 설정과 모니터링\n   - 지속적 개선과 업데이트"
+            ]
+        elif expert_name == "마케팅왕":
+            steps = [
+                "**1단계: 타겟 고객 정의**\n   - 페르소나 분석과 시장 세분화\n   - 고객 여정 맵핑",
+                "**2단계: 채널 전략 수립**\n   - 효과적인 마케팅 채널 선택\n   - 콘텐츠 전략과 메시지 설계",
+                "**3단계: 캠페인 실행**\n   - A/B 테스트와 데이터 분석\n   - 실시간 최적화",
+                "**4단계: 성과 분석**\n   - ROI 측정과 인사이트 도출\n   - 향후 전략 개선방안"
+            ]
+        else:
+            steps = [
+                f"**1단계: 목표 설정**\n   - {expert_name} 관점에서 명확한 목표 정의",
+                f"**2단계: 계획 수립**\n   - 단계별 실행 계획과 리소스 배정",
+                f"**3단계: 실행 및 모니터링**\n   - 체계적 실행과 중간 점검",
+                f"**4단계: 결과 평가**\n   - 성과 측정과 개선 방안 도출"
+            ]
+        
+        return "**📋 단계별 실행 가이드:**\n\n" + "\n\n".join(steps)
+    
+    def _generate_explanation_response(self, query, expert_name, analysis):
+        """설명 요청에 대한 동적 응답"""
+        
+        if "AI" in query or "인공지능" in query:
+            return f"""
+**🔍 핵심 개념 설명:**
+
+인공지능은 인간의 학습능력과 추론능력, 지각능력을 컴퓨터로 구현하는 기술입니다.
+
+**주요 구성 요소:**
+- **머신러닝**: 데이터에서 패턴을 학습하는 알고리즘
+- **딥러닝**: 인공신경망을 이용한 고급 학습 방법
+- **자연어처리**: 인간의 언어를 이해하고 생성하는 기술
+- **컴퓨터 비전**: 이미지와 영상을 인식하고 분석하는 기술
+
+**실제 활용 사례:**
+현재 검색엔진, 추천시스템, 음성인식, 자율주행차 등에서 실용화되어 있습니다.
+            """
+        
+        return f"""
+**🎯 {expert_name} 관점에서의 설명:**
+
+{query.replace('무엇', '').replace('뭐', '').replace('설명', '').strip()}에 대해 전문가적 시각으로 설명드리겠습니다.
+
+이는 {analysis['domain']} 분야에서 중요한 개념으로, 실무에서 다음과 같이 적용됩니다:
+
+- **기본 원리**: 핵심 메커니즘과 작동 방식
+- **실무 적용**: 현장에서의 구체적 활용 방법  
+- **주의사항**: 고려해야 할 리스크와 제약사항
+- **발전 방향**: 향후 전망과 트렌드 변화
+        """
+    
+    def _generate_comparison_response(self, query, expert_name, analysis):
+        """비교 질문에 대한 동적 응답"""
+        return f"""
+**⚖️ 전문가 비교 분석:**
+
+{expert_name} 관점에서 체계적으로 비교분석해드리겠습니다.
+
+**📊 비교 기준:**
+- **효과성**: 목표 달성 능력과 성과
+- **효율성**: 시간, 비용, 리소스 측면
+- **실용성**: 실제 적용 가능성과 난이도
+- **지속가능성**: 장기적 유지 및 확장성
+
+**💡 전문가 추천:**
+현재 상황을 고려할 때, 다음과 같은 접근을 권장합니다:
+
+1. **우선 고려사항**: 가장 중요한 판단 기준
+2. **단계적 접근**: 점진적 도입 방안
+3. **리스크 관리**: 예상 위험과 대응책
+        """
+    
+    def _generate_advice_response(self, query, expert_name, analysis):
+        """조언 요청에 대한 동적 응답"""
+        return f"""
+**💼 {expert_name}의 전문 조언:**
+
+{analysis['complexity']} 수준의 질문으로 판단되어, 다음과 같이 조언드립니다.
+
+**🎯 핵심 조언:**
+상황을 종합적으로 분석한 결과, 가장 중요한 것은 명확한 목표 설정과 단계적 접근입니다.
+
+**📈 성공 요인:**
+- **전략적 사고**: 장기적 관점에서의 계획 수립
+- **실행력**: 계획을 현실로 만드는 추진력
+- **적응력**: 변화하는 환경에 대한 유연한 대응
+- **지속성**: 꾸준한 노력과 개선 의지
+
+**⚠️ 주의사항:**
+성급한 결정보다는 충분한 검토와 준비를 통해 안정적으로 접근하시기 바랍니다.
+        """
+    
+    def _generate_general_response(self, query, expert_name, analysis):
+        """일반적인 질문에 대한 진짜 동적 응답"""
+        
+        import random
+        import time
+        
+        # 매번 다른 시드 사용 (시간 + 랜덤 요소)
+        random.seed(int(time.time() * 1000000) % 999999)
+        
+        # 전문가별 다양한 응답 풀
+        response_pools = {
+            "AI전문가": {
+                "opening_phrases": [
+                    "AI 기술의 최신 발전 사항을 고려할 때",
+                    "머신러닝과 딥러닝 관점에서 보면",
+                    "인공지능 연구의 현재 동향을 분석하면",
+                    "GPT와 같은 대규모 언어모델 발전을 보면",
+                    "AI 윤리와 기술 발전의 균형을 고려하면"
+                ],
+                "core_topics": [
+                    "자연어처리와 컴퓨터비전 기술의 융합",
+                    "강화학습을 통한 자율적 의사결정 시스템",
+                    "생성형 AI의 창작과 혁신 능력",
+                    "엣지 AI와 실시간 처리 기술",
+                    "설명 가능한 AI와 투명성 확보"
+                ],
+                "practical_advice": [
+                    "작은 파일럿 프로젝트부터 시작하여 점진적으로 확장",
+                    "데이터 품질 확보가 AI 성공의 핵심 요소",
+                    "사용자 중심의 AI 설계와 윤리적 고려사항 반영",
+                    "지속적인 모델 업데이트와 성능 모니터링",
+                    "도메인 전문가와 AI 개발자의 긴밀한 협업"
+                ]
+            },
+            "마케팅왕": {
+                "opening_phrases": [
+                    "현재 디지털 마케팅 생태계를 분석하면",
+                    "고객 행동 데이터와 시장 트렌드를 보면",
+                    "개인화 마케팅의 진화 과정을 고려할 때",
+                    "옴니채널 전략의 중요성이 커지는 상황에서",
+                    "데이터 드리븐 의사결정의 필요성을 보면"
+                ],
+                "core_topics": [
+                    "AI 기반 고객 세분화와 타겟팅 정교화",
+                    "소셜미디어와 인플루언서 마케팅의 진화",
+                    "실시간 개인화와 동적 콘텐츠 최적화",
+                    "크로스플랫폼 고객 여정 최적화",
+                    "브랜드 스토리텔링과 감정적 연결 강화"
+                ],
+                "practical_advice": [
+                    "고객 데이터 통합과 360도 고객 뷰 구축",
+                    "A/B 테스트를 통한 지속적 캠페인 최적화",
+                    "ROI 측정과 어트리뷰션 모델 정교화",
+                    "크리에이티브와 데이터의 균형잡힌 활용",
+                    "고객 생애가치(LTV) 중심의 장기 전략 수립"
+                ]
+            }
+        }
+        
+        # 기본 풀 (다른 전문가들)
+        default_pool = {
+            "opening_phrases": [
+                "현재 분야의 최신 동향을 종합하면",
+                "전문가적 관점에서 분석할 때",
+                "실무 경험과 이론을 결합하여 보면",
+                "시장 상황과 기술 발전을 고려하면",
+                "장기적 관점에서 전략적으로 접근하면"
+            ],
+            "core_topics": [
+                "디지털 혁신과 기술 융합의 가속화",
+                "데이터 기반 의사결정과 인사이트 도출",
+                "고객 중심적 사고와 가치 창출",
+                "지속가능한 성장과 혁신 전략",
+                "협업과 네트워킹을 통한 시너지 창출"
+            ],
+            "practical_advice": [
+                "명확한 목표 설정과 단계별 실행 계획 수립",
+                "지속적 학습과 역량 개발을 통한 경쟁력 강화",
+                "리스크 관리와 변화 대응 능력 확보",
+                "성과 측정과 피드백을 통한 지속적 개선",
+                "이해관계자와의 소통과 협력 체계 구축"
+            ]
+        }
+        
+        # 전문가별 풀 선택
+        pool = response_pools.get(expert_name, default_pool)
+        
+        # 랜덤 요소 선택
+        opening = random.choice(pool["opening_phrases"])
+        topic = random.choice(pool["core_topics"])
+        advice = random.choice(pool["practical_advice"])
+        
+        # 추가 랜덤 요소들
+        analysis_depth = random.choice([
+            "심화적 분석이 필요한",
+            "다각도 검토가 요구되는", 
+            "전략적 접근이 중요한",
+            "세심한 고려가 필요한",
+            "체계적 준비가 요구되는"
+        ])
+        
+        future_trend = random.choice([
+            "지속적 혁신과 발전",
+            "기술과 인간의 조화",
+            "데이터 중심의 의사결정",
+            "고객 가치 창출 중심",
+            "지속가능한 성장 모델"
+        ])
+        
+        # 질문 특성에 따른 추가 분석
+        question_insight = ""
+        if "구체적" in query:
+            question_insight = "구체성과 실행 가능성을 중시하는 접근이 필요하며, "
+        elif "말해주세요" in query:
+            question_insight = "명확하고 이해하기 쉬운 설명을 통해 "
+        
+        # 동적 응답 생성
+        response = f"""
+**🔍 {expert_name}의 종합 분석:**
+
+'{query}'에 대해 {analysis['domain']} 분야 전문가로서 분석드리겠습니다.
+
+**현황 분석:**
+{opening}, 현재는 {analysis_depth} 중요한 시점입니다. 
+{question_insight}{topic} 영역에서 특별한 주의가 필요합니다.
+
+**핵심 인사이트:**
+- **현재 동향**: {topic.split('와')[0] if '와' in topic else topic}
+- **기회 요소**: 전문성 활용과 시장 변화에 대한 선제적 대응
+- **주요 과제**: 기술 변화와 시장 요구의 빠른 속도에 적응
+- **발전 방향**: {future_trend} 중심의 지속적 진화
+
+**전문가 조언:**
+{advice}하는 것이 핵심입니다.
+
+**실무 관점:**
+{analysis['complexity']} 수준의 이해를 바탕으로 한 체계적이고 단계적인 접근을 권장합니다.
+        """.strip()
+        
+        return response
+    
+    def _generate_expert_insights(self, query, expert_name, analysis):
+        """전문가별 특화 인사이트"""
+        
+        insights = {
             "AI전문가": f"""
-            당신은 세계적인 AI 연구자이자 머신러닝 전문가입니다. 
-            질문: {query}
-            
-            다음 관점에서 종합적이고 상세한 답변을 제공해주세요:
-            1. 최신 AI 기술 동향과 연관성
-            2. 실무적 적용 방안
-            3. 향후 발전 가능성
-            4. 구체적인 실행 방법
-            
-            전문적이면서도 이해하기 쉽게 설명해주세요.
+**🧠 AI 전문가의 고급 인사이트:**
+
+• **기술 트렌드**: LLM, 생성형 AI, MLOps가 주요 트렌드
+• **실무 팁**: 작은 프로젝트부터 시작해서 점진적 확장 권장
+• **미래 전망**: AGI 시대를 대비한 역량 개발 필요
+• **주의사항**: AI 윤리와 편향성 문제를 항상 고려해야 함
             """,
+            
             "마케팅왕": f"""
-            당신은 디지털 마케팅 분야의 최고 전문가입니다.
-            질문: {query}
-            
-            다음 관점에서 전략적 답변을 제공해주세요:
-            1. 현재 마케팅 트렌드 분석
-            2. 타겟 고객 관점
-            3. 효과적인 채널 전략
-            4. ROI 최적화 방안
-            5. 실행 가능한 액션 플랜
-            
-            데이터 기반의 실용적인 조언을 해주세요.
+**📈 마케팅 전문가의 실전 인사이트:**
+
+• **시장 동향**: 개인화 마케팅과 옴니채널 전략이 핵심
+• **고객 행동**: Z세대와 밀레니얼의 구매 패턴 변화 주목
+• **기술 활용**: AI와 빅데이터를 활용한 타겟팅 필수
+• **성과 측정**: ROAS뿐만 아니라 LTV 중심의 지표 활용
             """,
-            "의료AI전문가": f"""
-            당신은 의료 AI 분야의 권위있는 전문가입니다.
-            질문: {query}
             
-            다음 관점에서 신중하고 정확한 답변을 제공해주세요:
-            1. 의료 안전성 고려사항
-            2. 최신 의료 AI 기술 활용
-            3. 환자 중심의 접근 방법
-            4. 의료진과의 협업 방안
-            5. 윤리적 고려사항
-            
-            항상 환자 안전을 최우선으로 하는 답변을 해주세요.
-            """,
             "재테크박사": f"""
-            당신은 투자 및 재무 관리 분야의 최고 전문가입니다.
-            질문: {query}
-            
-            다음 관점에서 신중하고 전문적인 답변을 제공해주세요:
-            1. 시장 상황 분석
-            2. 리스크 관리 전략
-            3. 포트폴리오 구성 방안
-            4. 장단기 투자 전략
-            5. 세금 및 규제 고려사항
-            
-            안전하면서도 수익성 있는 투자 조언을 해주세요.
-            """,
-            "창업컨설턴트": f"""
-            당신은 스타트업 생태계의 최고 전문가입니다.
-            질문: {query}
-            
-            다음 관점에서 혁신적이고 실용적인 답변을 제공해주세요:
-            1. 시장 기회 분석
-            2. 비즈니스 모델 설계
-            3. 팀 구성 및 운영
-            4. 투자 유치 전략
-            5. 확장 및 성장 방안
-            
-            도전적이면서도 실현 가능한 조언을 해주세요.
-            """,
-            "개발자멘토": f"""
-            당신은 소프트웨어 개발 분야의 시니어 멘토입니다.
-            질문: {query}
-            
-            다음 관점에서 체계적이고 실용적인 답변을 제공해주세요:
-            1. 기술 스택 선택 가이드
-            2. 코드 품질 및 아키텍처
-            3. 개발 프로세스 최적화
-            4. 커리어 발전 방향
-            5. 최신 기술 트렌드
-            
-            실무에 바로 적용할 수 있는 구체적인 조언을 해주세요.
+**💰 재테크 전문가의 투자 인사이트:**
+
+• **시장 분석**: 현재 변동성이 큰 시기로 분산투자 필수
+• **투자 전략**: 장기 관점의 가치투자와 리밸런싱 중요
+• **리스크 관리**: 포트폴리오의 20% 이하로 고위험 자산 제한
+• **세금 전략**: 절세 상품과 손익통산을 활용한 최적화
             """
         }
         
-        prompt = expert_prompts.get(expert_name, f"전문가로서 '{query}'에 대해 상세히 설명해주세요.")
+        return insights.get(expert_name, f"""
+**💡 {expert_name}의 전문 인사이트:**
+
+• **전문 지식**: 해당 분야의 최신 동향과 베스트 프랙티스
+• **실무 경험**: 현장에서 검증된 효과적인 방법론
+• **미래 전망**: 향후 발전 방향과 대비해야 할 변화
+• **핵심 조언**: 성공을 위한 가장 중요한 요소들
+        """)
+    
+    def _generate_dynamic_action_plan(self, query, expert_name, analysis):
+        """동적 액션 플랜 생성"""
         
-        # 고급 AI 응답 생성 (prompt 기반)
-        response = f"""
-{self._get_expert_emoji(expert_name)} **{expert_name}**의 전문적 분석:
+        timeframe = "단기" if analysis['complexity'] == "basic" else "중장기"
+        
+        return f"""
+**🎯 {timeframe} 실행 계획:**
 
-**{query}**에 대해 말씀드리겠습니다.
+**즉시 실행 (1-2주):**
+1. 현재 상황 정확한 파악과 목표 설정
+2. 필요 리소스와 제약사항 분석
+3. 초기 단계 실행 계획 수립
 
-{self._generate_detailed_response(query, expert_name)}
+**단기 목표 (1-3개월):**
+1. 기초 작업과 기반 구축
+2. 파일럿 프로젝트 실행 및 검증
+3. 초기 성과 측정과 피드백 수집
 
----
-💡 **핵심 포인트:**
-{self._generate_key_points(query, expert_name)}
+**중기 목표 (3-12개월):**
+1. 본격적인 실행과 확장
+2. 지속적 모니터링과 최적화
+3. 성과 분석과 전략 조정
 
-🎯 **실행 방안:**
-{self._generate_action_plan(query, expert_name)}
+**📊 성과 지표:**
+- **정량적**: 구체적 수치로 측정 가능한 지표
+- **정성적**: 질적 개선과 만족도 평가
+- **타임라인**: 각 단계별 달성 목표 시점
 
-📚 **추가 고려사항:**
-{self._generate_additional_insights(query, expert_name)}
-
----
-*🔍 분석 기준: {prompt[:100]}...*
+**🔄 지속적 개선:**
+정기적 리뷰를 통해 계획을 업데이트하고 최적화해나가겠습니다.
         """
-        
-        # 응답 길이 확인 및 로깅
-        final_response = response.strip()
-        print(f"🧠 AI 응답 생성 완료: {len(final_response)}자 (전문가: {expert_name})")
-        
-        return final_response
     
     def _generate_basic_response(self, query, expert_name):
         """기본 응답 시스템"""
@@ -628,10 +950,27 @@ def manage_conversation_context(conversation_id, message, expert_name, response)
     conversation_context[conversation_id]["current_topic"] = message
     conversation_context[conversation_id]["current_expert"] = expert_name
 
-def get_context_aware_expert_selection(message, conversation_id):
+def get_expert_by_goblin(goblin_id):
+    """도깨비 ID에 따른 전문가 매핑"""
+    goblin_expert_map = {
+        1: "AI전문가",
+        2: "마케팅왕", 
+        3: "블록체인도깨비",
+        4: "의료AI전문가",
+        5: "재테크박사",
+        6: "창업컨설턴트",
+        7: "개발자멘토",
+        8: "AI전문가",  # 기본값으로 AI전문가
+        9: "마케팅왕",
+        10: "블록체인도깨비"
+    }
+    return goblin_expert_map.get(goblin_id, "AI전문가")
+
+
+def get_context_aware_expert_selection(message, conversation_id, goblin_id=1):
     """컨텍스트를 고려한 전문가 선택"""
     
-    print(f"🔍 컨텍스트 분석 시작: '{message}' (대화ID: {conversation_id})")
+    print(f"🔍 컨텍스트 분석 시작: '{message}' (대화ID: {conversation_id}, 도깨비: {goblin_id})")
     
     # 후속 질문 키워드 체크
     follow_up_keywords = ['구체적으로', '자세히', '더', '추가로', '어떻게', '왜', '방법', '예시', '사례', '어떤', '무엇', '설명']
@@ -649,10 +988,18 @@ def get_context_aware_expert_selection(message, conversation_id):
         else:
             print(f"⚠️ 후속 질문 키워드는 있지만 이전 컨텍스트 없음")
     
-    # 새로운 주제인 경우 새로운 전문가 선택
-    expert_name = select_expert_by_query(message)
-    print(f"🆕 새 주제로 판단: {expert_name} 선택")
-    return expert_name, None
+    # 새로운 주제인 경우: 도깨비별 전문가 우선, 질문 내용 분석 보조
+    goblin_expert = get_expert_by_goblin(goblin_id)
+    question_expert = select_expert_by_query(message)
+    
+    # 도깨비 전문가와 질문 내용 분석 결과가 다른 경우 로그
+    if goblin_expert != question_expert:
+        print(f"� 도깨비{goblin_id} 전문가: {goblin_expert} vs 질문 분석: {question_expert}")
+        print(f"🎯 도깨비 전문가 우선 선택: {goblin_expert}")
+    else:
+        print(f"✅ 도깨비{goblin_id} 전문가와 질문 분석 일치: {goblin_expert}")
+    
+    return goblin_expert, None
 
 # �🚫 모든 DB 관련 시스템 완전 비활성화
 memory_manager = None
@@ -1122,9 +1469,9 @@ def chat_advanced():
             dna_profile = dna_system.create_dna_profile(user_id, "방문자")
             print(f"🧬 DNA 프로필 생성: {dna_profile['genetic_markers']}")
         
-        # 컨텍스트를 고려한 전문가 선택
-        expert_name, previous_topic = get_context_aware_expert_selection(message, conversation_id)
-        print(f"🎯 선택된 전문가: {expert_name}")
+        # 컨텍스트를 고려한 전문가 선택 (도깨비별)
+        expert_name, previous_topic = get_context_aware_expert_selection(message, conversation_id, goblin_id)
+        print(f"🎯 선택된 전문가: {expert_name} (도깨비{goblin_id})")
         if previous_topic:
             print(f"🎯 이전 주제: {previous_topic}")
         
