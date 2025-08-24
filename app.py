@@ -38,6 +38,26 @@ except Exception as e:
     print("🔄 기본 AI 시스템으로 폴백")
     ADVANCED_AI_AVAILABLE = False
 
+# 👥 1단계: 16명 전문가 시스템 임포트
+try:
+    from experts.complete_16_experts_improved import Complete16ExpertAI
+    print("✅ 16명 전문가 시스템 v1.0 임포트 성공!")
+    EXPERTS_V1_AVAILABLE = True
+except Exception as e:
+    print(f"⚠️ 16명 전문가 시스템 임포트 실패: {e}")
+    print("🔄 기본 전문가 시스템으로 폴백")
+    EXPERTS_V1_AVAILABLE = False
+
+# 👥 2단계: Enhanced 전문가 시스템 임포트 (개인화 + 성능 모니터링)
+try:
+    from experts.complete_16_experts_v2_enhanced_20250823 import EnhancedComplete16ExpertAI
+    print("✅ Enhanced 16명 전문가 시스템 v2.0 임포트 성공!")
+    EXPERTS_V2_AVAILABLE = True
+except Exception as e:
+    print(f"⚠️ Enhanced 전문가 시스템 임포트 실패: {e}")
+    print("🔄 v1.0 전문가 시스템으로 폴백")
+    EXPERTS_V2_AVAILABLE = False
+
 print(f"🚀🚀🚀 COMPLETE REDEPLOY MODE v{APP_VERSION} 🚀🚀🚀")
 print(f"🔍 환경 정보: CWD={os.getcwd()}")
 print("⚠️ WARNING: ZERO DB ACCESS - PURE SERVERLESS MODE")
@@ -51,6 +71,79 @@ class UltraLightAIManager:
     """완전 서버리스 최적화 고급 AI 매니저"""
 
     def __init__(self):
+        # 🚀 2단계: Enhanced 16명 전문가 시스템 (개인화 + 성능 모니터링)
+        if EXPERTS_V2_AVAILABLE:
+            try:
+                self.expert_ai_v2 = EnhancedComplete16ExpertAI(db_path="expert_ai_v2.db")
+                print("🚀 Enhanced 16명 전문가 시스템 v2.0 활성화!")
+                self.use_16_experts_v2 = True
+                self.use_16_experts = False  # v1은 비활성화
+                # 16명 전문가 리스트 (2단계 Enhanced)
+                self.experts = {
+                    "assistant": "인공지능박사 하이도깨비 🤖",
+                    "builder": "경제학박사 부자도깨비 💰", 
+                    "counselor": "상담심리박사 상담도깨비 💬",
+                    "creative": "예술학박사 창작도깨비 🎨",
+                    "data_analyst": "데이터과학박사 분석도깨비 📊",
+                    "fortune": "운세학박사 점술도깨비 🔮",
+                    "growth": "교육학박사 성장도깨비 📈",
+                    "hr": "인사관리박사 인재도깨비 👥",
+                    "marketing": "마케팅박사 마케팅도깨비 📢",
+                    "medical": "의학박사 의료도깨비 🏥",
+                    "sales": "영업학박사 세일도깨비 💼",
+                    "seo": "SEO박사 검색도깨비 🔍",
+                    "shopping": "쇼핑박사 구매도깨비 🛒",
+                    "startup": "창업학박사 스타트도깨비 🚀",
+                    "wellness": "웰니스박사 건강도깨비 🌿",
+                    "writing": "문학박사 글쓰기도깨비 ✍️",
+                }
+            except Exception as e:
+                print(f"⚠️ Enhanced 전문가 시스템 초기화 실패: {e}")
+                print("🔄 v1.0으로 폴백 시도...")
+                self.use_16_experts_v2 = False
+                self._try_v1_fallback()
+        elif EXPERTS_V1_AVAILABLE:
+            # v2.0이 없으면 v1.0 사용
+            self._try_v1_fallback()
+        else:
+            self.use_16_experts = False
+            self.use_16_experts_v2 = False
+            self._init_fallback_experts()
+    
+    def _try_v1_fallback(self):
+        """v1.0 전문가 시스템으로 폴백"""
+        try:
+            self.expert_ai = Complete16ExpertAI()
+            print("🎯 16명 전문가 AI 시스템 v1.0 활성화!")
+            self.use_16_experts = True
+            self.use_16_experts_v2 = False
+            # 16명 전문가 리스트 (1단계)
+            self.experts = {
+                "assistant": "인공지능박사 하이도깨비 🤖",
+                "builder": "경제학박사 부자도깨비 💰", 
+                "counselor": "상담심리박사 상담도깨비 💬",
+                "creative": "예술학박사 창작도깨비 🎨",
+                "data_analyst": "데이터과학박사 분석도깨비 📊",
+                "fortune": "운세학박사 점술도깨비 🔮",
+                "growth": "교육학박사 성장도깨비 📈",
+                "hr": "인사관리박사 인재도깨비 👥",
+                "marketing": "마케팅박사 마케팅도깨비 📢",
+                "medical": "의학박사 의료도깨비 🏥",
+                "sales": "영업학박사 세일도깨비 💼",
+                "seo": "SEO박사 검색도깨비 🔍",
+                "shopping": "쇼핑박사 구매도깨비 🛒",
+                "startup": "창업학박사 스타트도깨비 🚀",
+                "wellness": "웰니스박사 건강도깨비 🌿",
+                "writing": "문학박사 글쓰기도깨비 ✍️",
+            }
+        except Exception as e:
+            print(f"⚠️ v1.0 전문가 시스템도 실패: {e}")
+            self.use_16_experts = False
+            self.use_16_experts_v2 = False
+            self._init_fallback_experts()
+    
+    def _init_fallback_experts(self):
+        """기본 6명 전문가로 폴백"""
         self.experts = {
             "AI전문가": "AI와 머신러닝 전문가",
             "마케팅왕": "디지털 마케팅 전문가",
@@ -59,6 +152,17 @@ class UltraLightAIManager:
             "창업컨설턴트": "스타트업 및 창업 전문가",
             "개발자멘토": "프로그래밍 및 개발 전문가",
         }
+        else:
+            self.use_16_experts = False
+            # 기본 6명 전문가
+            self.experts = {
+                "AI전문가": "AI와 머신러닝 전문가",
+                "마케팅왕": "디지털 마케팅 전문가",
+                "의료AI전문가": "의료 AI 전문가",
+                "재테크박사": "투자 및 재무 전문가",
+                "창업컨설턴트": "스타트업 및 창업 전문가",
+                "개발자멘토": "프로그래밍 및 개발 전문가",
+            }
         
         # 고급 AI 엔진 초기화 시도
         if ADVANCED_AI_AVAILABLE:
@@ -134,8 +238,8 @@ class UltraLightAIManager:
         # 기본 응답
         return '네, 무엇을 도와드릴까요? 궁금한 것이 있으시면 언제든 물어보세요! 😊'
 
-    def get_expert_response(self, query, expert_name="AI전문가", mode="deep"):
-        """고급 AI 응답 생성 (인터넷 검색 결과 활용, 모드별 차별화)"""
+    def get_expert_response(self, query, expert_name="assistant", mode="deep"):
+        """🎯 1단계: 16명 전문가 시스템 응답 생성"""
         
         print(f"🔧 모드 설정: {mode} ({'심화탐구' if mode == 'deep' else '창의협업' if mode == 'creative' else '기본'})")
         
@@ -143,6 +247,22 @@ class UltraLightAIManager:
         if is_casual_conversation(query):
             print(f"💬 일반 대화 감지: '{query}' → 캐주얼 응답 생성")
             return self.get_casual_response(query)
+        
+        # 🎯 16명 전문가 시스템 사용 (1단계)
+        if self.use_16_experts:
+            try:
+                print(f"🎯 16명 전문가 '{expert_name}' 응답 생성 중...")
+                expert_response = self.expert_ai.generate_expert_response(query, expert_name)
+                if expert_response and expert_response != "죄송합니다. 해당 전문 분야를 찾을 수 없습니다.":
+                    print(f"✅ 16명 전문가 응답 성공!")
+                    return expert_response
+                else:
+                    print(f"⚠️ 16명 전문가 응답 실패, 기본 시스템으로 폴백")
+            except Exception as e:
+                print(f"⚠️ 16명 전문가 시스템 오류: {e}")
+        
+        # 폴백: 기본 전문가 시스템 사용
+        print(f"🔄 기본 전문가 시스템으로 폴백: {expert_name}")
         
         # 후속 질문 처리
         if "이전 질문" in query and "후속 질문:" in query:
@@ -1653,26 +1773,32 @@ def index():
 
 @app.route("/chat", methods=["POST"])
 def chat():
-    """AI 채팅 엔드포인트"""
+    """🎯 1단계: 16명 전문가 AI 채팅 엔드포인트"""
     try:
         data = request.get_json()
         query = data.get("message", "")
-        expert = data.get("expert", "AI전문가")
+        expert = data.get("expert", "assistant")  # 기본값을 assistant로 변경
         mode = data.get("mode", "deep")  # 모드 정보 받기 (기본값: deep)
 
         if not query.strip():
             return jsonify({"error": "메시지를 입력해주세요"}), 400
 
-        # AI 응답 생성 (모드 정보 추가)
+        print(f"🎯 16명 전문가 채팅 요청: {expert} - {query[:50]}... (모드: {mode})")
+
+        # 🎯 1단계: 16명 전문가 AI 응답 생성
         response = real_ai_manager.get_expert_response(query, expert, mode)
 
+        # 16명 전문가 시스템이 사용되었는지 확인
+        used_16_experts = real_ai_manager.use_16_experts
+        
         return jsonify(
             {
                 "response": response,
                 "expert": expert,
                 "timestamp": datetime.now().isoformat(),
                 "success": True,
-                "version": APP_VERSION,
+                "version": f"{APP_VERSION}-16EXPERTS-V1",
+                "expert_system": "16명 전문가 시스템 v1.0" if used_16_experts else "기본 전문가 시스템",
             }
         )
 
@@ -1842,12 +1968,17 @@ def performance_analytics():
 
 @app.route("/experts")
 def get_experts():
-    """전문가 목록 반환"""
+    """🎯 1단계: 16명 전문가 목록 반환"""
+    expert_system_info = "16명 전문가 시스템 v1.0" if real_ai_manager.use_16_experts else "기본 전문가 시스템"
+    
     return jsonify(
         {
             "experts": list(real_ai_manager.experts.keys()),
+            "expert_details": real_ai_manager.experts if real_ai_manager.use_16_experts else None,
             "success": True,
-            "version": APP_VERSION,
+            "version": f"{APP_VERSION}-16EXPERTS-V1",
+            "expert_system": expert_system_info,
+            "total_experts": len(real_ai_manager.experts),
         }
     )
 

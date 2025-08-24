@@ -1,0 +1,19 @@
+Flask==2.3.3
+requests==2.31.0
+beautifulsoup4==4.12.2
+python-dateutil==2.8.2
+Werkzeug==2.3.7
+Jinja2==3.1.2
+MarkupSafe==2.1.3
+itsdangerous==2.1.2
+click==8.1.7
+
+# 문서 분석을 위한 패키지들
+PyPDF2==3.0.1
+python-docx==0.8.11
+pandas==2.0.3
+openpyxl==3.1.2
+python-pptx==0.6.21
+Pillow==10.0.0
+pytesseract==0.3.10
+nltk==3.8.1
