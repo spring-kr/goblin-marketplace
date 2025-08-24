@@ -1159,7 +1159,8 @@
                     },
                     body: JSON.stringify({
                         message: message,
-                        goblin_id: parseInt(goblinId)
+                        goblin_id: parseInt(goblinId),
+                        mode: currentMode  // 모드 정보 추가
                     })
                 });
 

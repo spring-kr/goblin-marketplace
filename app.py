@@ -124,8 +124,10 @@ class UltraLightAIManager:
         # 기본 응답
         return '네, 무엇을 도와드릴까요? 궁금한 것이 있으시면 언제든 물어보세요! 😊'
 
-    def get_expert_response(self, query, expert_name="AI전문가"):
-        """고급 AI 응답 생성 (인터넷 검색 결과 활용)"""
+    def get_expert_response(self, query, expert_name="AI전문가", mode="deep"):
+        """고급 AI 응답 생성 (인터넷 검색 결과 활용, 모드별 차별화)"""
+        
+        print(f"🔧 모드 설정: {mode} ({'심화탐구' if mode == 'deep' else '창의협업' if mode == 'creative' else '기본'})")
         
         # 🚨 먼저 일반 대화인지 확인
         if is_casual_conversation(query):
@@ -170,12 +172,12 @@ class UltraLightAIManager:
             search_info = ""
         
         try:
-            # 검색 정보가 있으면 함께 활용하여 응답 생성
-            return self._generate_advanced_response(query, expert_name, search_info)
+            # 검색 정보가 있으면 함께 활용하여 응답 생성 (모드 정보 포함)
+            return self._generate_advanced_response(query, expert_name, search_info, mode)
         except Exception as e:
             print(f"⚠️ 고급 AI 응답 생성 실패: {e}")
-            # 폴백: 기본 응답 사용
-            return self._generate_basic_response(query, expert_name)
+            # 폴백: 기본 응답 사용 (모드 정보 포함)
+            return self._generate_basic_response(query, expert_name, mode)
     
     def _generate_contextual_response(self, question, expert_name, previous_context):
         """컨텍스트 기반 후속 응답 생성"""
@@ -271,40 +273,56 @@ tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
         
         return contextual_responses[expert_name]
     
-    def _generate_advanced_response(self, query, expert_name, search_info=""):
-        """고급 AI 엔진을 사용한 진짜 동적 응답 생성 (인터넷 검색 정보 활용)"""
+    def _generate_advanced_response(self, query, expert_name, search_info="", mode="deep"):
+        """고급 AI 엔진을 사용한 진짜 동적 응답 생성 (인터넷 검색 정보 활용, 모드별 차별화)"""
+        
+        # 모드에 따른 응답 스타일 결정
+        if mode == "creative":
+            print(f"🎨 창의협업 모드 활성화")
+            response_style = "creative_collaborative"
+        else:  # mode == "deep" or default
+            print(f"🔍 심화탐구 모드 활성화")
+            response_style = "deep_analysis"
         
         try:
             # 고급 AI 엔진 사용하여 동적 응답 생성
-            context = {"user_type": "professional", "depth": "detailed"}
+            context = {
+                "user_type": "professional", 
+                "depth": "detailed" if mode == "deep" else "creative",
+                "response_style": response_style,
+                "mode": mode
+            }
             
             # 검색 정보가 있으면 컨텍스트에 추가
             if search_info:
                 context["search_info"] = search_info
                 print(f"🔍 검색 정보 활용하여 응답 생성: {len(search_info)}자")
             
-            ai_response = self.advanced_engine.generate_expert_response(
-                query=query,
-                expert_type=expert_name,
-                context=context
-            )
-            
-            # AI 엔진이 성공하면 그 결과 사용
-            if ai_response and len(ai_response) > 100:
-                print(f"✅ 고급 AI 엔진 응답 성공: {len(ai_response)}자")
-                return ai_response
+            # 모드별 응답 생성 방식 결정
+            if hasattr(self.advanced_engine, 'generate_expert_response'):
+                ai_response = self.advanced_engine.generate_expert_response(
+                    query=query,
+                    expert_type=expert_name,
+                    context=context
+                )
+                
+                # AI 엔진이 성공하면 그 결과 사용
+                if ai_response and len(ai_response) > 100:
+                    print(f"✅ 고급 AI 엔진 응답 성공: {len(ai_response)}자 ({mode} 모드)")
+                    return ai_response
                 
         except Exception as e:
             print(f"⚠️ 고급 AI 엔진 오류: {e}")
         
-        # 폴백: 실시간 동적 응답 생성 (검색 정보 포함)
-        return self._generate_dynamic_response(query, expert_name, search_info)
+        # 폴백: 실시간 동적 응답 생성 (검색 정보 포함, 모드별 차별화)
+        return self._generate_dynamic_response(query, expert_name, search_info, mode)
     
-    def _generate_dynamic_response(self, query, expert_name, search_info=""):
-        """실시간 동적 응답 생성 - 질문에 따라 매번 다른 답변 (인터넷 검색 정보 활용)"""
+    def _generate_dynamic_response(self, query, expert_name, search_info="", mode="deep"):
+        """실시간 동적 응답 생성 - 질문에 따라 매번 다른 답변 (인터넷 검색 정보 활용, 모드별 차별화)"""
         
         # 질문 분석
         question_analysis = self._analyze_question(query)
+        question_analysis['mode'] = mode
         
         # 검색 정보가 있으면 분석에 추가
         if search_info:
@@ -317,17 +335,24 @@ tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
         # 동적 응답 구성
         response_parts = []
         
-        # 헤더
-        response_parts.append(f"{self._get_expert_emoji(expert_name)} **{expert_name}**의 전문적 분석:")
-        response_parts.append(f"\n**'{query}'**에 대해 전문가 관점에서 분석드리겠습니다.\n")
+        # 모드별 헤더 차별화
+        if mode == "creative":
+            response_parts.append(f"🎨 **{expert_name}**의 창의적 협업 분석:")
+            response_parts.append(f"\n**'{query}'**에 대해 창의적이고 협업적인 관점에서 함께 탐구해보겠습니다!\n")
+        else:  # mode == "deep"
+            response_parts.append(f"🔍 **{expert_name}**의 심화 탐구 분석:")
+            response_parts.append(f"\n**'{query}'**에 대해 깊이 있는 전문적 분석을 제공드리겠습니다.\n")
         
         # 검색 정보가 있으면 최신 정보 섹션 추가
         if search_info:
-            response_parts.append("**🌐 최신 정보 기반 분석:**")
-            response_parts.append(f"{search_info[:200]}..." if len(search_info) > 200 else search_info)
+            if mode == "creative":
+                response_parts.append("**🌐 최신 정보를 바탕으로 한 창의적 아이디어:**")
+            else:
+                response_parts.append("**🌐 최신 정보 기반 전문 분석:**")
+            response_parts.append(f"{search_info[:300]}..." if len(search_info) > 300 else search_info)
             response_parts.append("")
         
-        # 질문 유형별 동적 내용 생성
+        # 질문 유형별 동적 내용 생성 (모드별 차별화)
         if question_analysis['type'] == 'how_to':
             response_parts.append(self._generate_how_to_response(query, expert_name, question_analysis))
         elif question_analysis['type'] == 'what_is':
@@ -339,10 +364,10 @@ tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
         else:
             response_parts.append(self._generate_general_response(query, expert_name, question_analysis))
         
-        # 전문가별 특화 인사이트 추가
+        # 전문가별 특화 인사이트 추가 (모드별 차별화)
         response_parts.append(self._generate_expert_insights(query, expert_name, question_analysis))
         
-        # 실행 방안 (질문에 따라 동적 생성)
+        # 실행 방안 (질문에 따라 동적 생성, 모드별 차별화)
         response_parts.append(self._generate_dynamic_action_plan(query, expert_name, question_analysis))
         
         final_response = "\n".join(response_parts)
@@ -654,45 +679,87 @@ tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
         return response
     
     def _generate_expert_insights(self, query, expert_name, analysis):
-        """전문가별 특화 인사이트"""
+        """전문가별 특화 인사이트 (모드별 차별화)"""
         
-        insights = {
-            "AI전문가": f"""
-**🧠 AI 전문가의 고급 인사이트:**
-
-• **기술 트렌드**: LLM, 생성형 AI, MLOps가 주요 트렌드
-• **실무 팁**: 작은 프로젝트부터 시작해서 점진적 확장 권장
-• **미래 전망**: AGI 시대를 대비한 역량 개발 필요
-• **주의사항**: AI 윤리와 편향성 문제를 항상 고려해야 함
-            """,
-            
-            "마케팅왕": f"""
-**📈 마케팅 전문가의 실전 인사이트:**
-
-• **시장 동향**: 개인화 마케팅과 옴니채널 전략이 핵심
-• **고객 행동**: Z세대와 밀레니얼의 구매 패턴 변화 주목
-• **기술 활용**: AI와 빅데이터를 활용한 타겟팅 필수
-• **성과 측정**: ROAS뿐만 아니라 LTV 중심의 지표 활용
-            """,
-            
-            "재테크박사": f"""
-**💰 재테크 전문가의 투자 인사이트:**
-
-• **시장 분석**: 현재 변동성이 큰 시기로 분산투자 필수
-• **투자 전략**: 장기 관점의 가치투자와 리밸런싱 중요
-• **리스크 관리**: 포트폴리오의 20% 이하로 고위험 자산 제한
-• **세금 전략**: 절세 상품과 손익통산을 활용한 최적화
-            """
-        }
+        mode = analysis.get('mode', 'deep')
         
-        return insights.get(expert_name, f"""
-**💡 {expert_name}의 전문 인사이트:**
+        if mode == "creative":
+            creative_insights = {
+                "AI전문가": f"""
+**🎨 AI 전문가의 창의적 협업 아이디어:**
 
-• **전문 지식**: 해당 분야의 최신 동향과 베스트 프랙티스
-• **실무 경험**: 현장에서 검증된 효과적인 방법론
-• **미래 전망**: 향후 발전 방향과 대비해야 할 변화
-• **핵심 조언**: 성공을 위한 가장 중요한 요소들
-        """)
+• **혁신 아이디어**: AI와 예술, 음악, 문학의 융합 가능성 탐구
+• **협업 방안**: 인간-AI 공동 창작 프로젝트 제안
+• **실험 제안**: 새로운 AI 활용법을 함께 브레인스토밍
+• **미래 상상**: AI가 만들어갈 창의적 미래 시나리오 구상
+                """,
+                
+                "마케팅왕": f"""
+**🎨 마케팅 전문가의 창의적 캠페인 아이디어:**
+
+• **스토리텔링**: 감성적 브랜드 스토리 공동 개발
+• **바이럴 전략**: 독창적인 소셜미디어 콘텐츠 아이디어
+• **체험 마케팅**: 고객 참여형 이벤트 기획 협업
+• **트렌드 창조**: 새로운 마케팅 트렌드 선도 방안
+                """,
+                
+                "재테크박사": f"""
+**🎨 재테크 전문가의 창의적 투자 아이디어:**
+
+• **혁신 투자**: 미래 기술과 새로운 투자 기회 발굴
+• **크리에이티브 펀딩**: 크라우드펀딩, 스타트업 투자 아이디어
+• **대안 투자**: 예술품, 수집품 등 대체 투자 방안
+• **커뮤니티**: 투자 스터디, 공동 투자 그룹 운영 아이디어
+                """
+            }
+            
+            return creative_insights.get(expert_name, f"""
+**🎨 {expert_name}의 창의적 협업 아이디어:**
+
+• **혁신 사고**: 기존 틀을 깨는 새로운 접근법
+• **협업 제안**: 함께 만들어갈 창의적 프로젝트
+• **실험 정신**: 새로운 시도와 도전에 대한 제안
+• **미래 비전**: 함께 그려나갈 혁신적 미래상
+            """)
+        
+        else:  # mode == "deep"
+            deep_insights = {
+                "AI전문가": f"""
+**🔍 AI 전문가의 심층 기술 분석:**
+
+• **기술 아키텍처**: Transformer, CNN, RNN의 구조적 특징과 적용 분야
+• **성능 최적화**: 모델 경량화, 양자화, 프루닝 기법의 실무 적용
+• **데이터 전략**: 고품질 학습 데이터 확보와 전처리 방법론
+• **운영 노하우**: MLOps, 모델 배포, 모니터링의 실제 구현 방안
+                """,
+                
+                "마케팅왕": f"""
+**🔍 마케팅 전문가의 전략적 심층 분석:**
+
+• **시장 세분화**: 정량적 분석을 통한 타겟 고객군 정의
+• **성과 측정**: CAC, LTV, ROAS 등 핵심 지표의 정확한 산출법
+• **채널 최적화**: 각 마케팅 채널별 ROI 분석과 예산 배분 전략
+• **경쟁 분석**: 시장 점유율, 포지셔닝 맵 분석을 통한 차별화 방안
+                """,
+                
+                "재테크박사": f"""
+**� 재테크 전문가의 전문적 투자 분석:**
+
+• **재무 분석**: PER, PBR, ROE 등 기업 가치 평가 지표 활용법
+• **포트폴리오 이론**: 현대 포트폴리오 이론과 자산 배분 최적화
+• **리스크 관리**: VaR, 샤프 비율을 활용한 정량적 위험 측정
+• **세무 최적화**: 양도소득세, 배당소득세 절세 전략의 구체적 방법
+                """
+            }
+            
+            return deep_insights.get(expert_name, f"""
+**� {expert_name}의 전문적 심층 분석:**
+
+• **이론적 기반**: 해당 분야의 핵심 이론과 학술적 배경
+• **실무 방법론**: 현장에서 검증된 체계적인 접근 방식
+• **정량적 분석**: 데이터와 지표를 활용한 객관적 평가
+• **전문가 노하우**: 경험에서 우러나온 실무적 통찰과 조언
+            """)
     
     def _generate_dynamic_action_plan(self, query, expert_name, analysis):
         """동적 액션 플랜 생성"""
@@ -726,21 +793,36 @@ tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
 정기적 리뷰를 통해 계획을 업데이트하고 최적화해나가겠습니다.
         """
     
-    def _generate_basic_response(self, query, expert_name):
-        """기본 응답 시스템"""
-        responses = {
-            "AI전문가": f"🤖 AI 전문가로서 '{query}'에 대해 말씀드리면, 현재 AI 기술은 놀라운 속도로 발전하고 있습니다. 특히 자연어 처리, 컴퓨터 비전, 생성형 AI 분야에서 혁신적인 변화가 일어나고 있어, 다양한 산업에 혁신을 가져다주고 있습니다.",
-            "마케팅왕": f"📈 마케팅 전문가로서 '{query}'를 분석해보면, 디지털 시대의 마케팅은 데이터 기반 의사결정과 개인화된 고객 경험이 핵심입니다. 소셜미디어, 콘텐츠 마케팅, AI를 활용한 타겟팅이 성공의 열쇠입니다.",
-            "의료AI전문가": f"🏥 의료 AI 전문가로서 '{query}'에 대해 설명드리면, 의료 분야에서 AI는 진단 정확도 향상, 치료법 개발, 환자 관리 최적화에 도움을 줍니다. 항상 환자 안전과 의료진의 전문성을 최우선으로 고려해야 합니다.",
-            "재테크박사": f"💰 투자 전문가로서 '{query}'를 분석하면, 성공적인 투자는 장기적 관점, 분산투자, 지속적인 학습이 기반입니다. 시장 변동성을 이해하고 리스크를 관리하며, 자신만의 투자 철학을 갖는 것이 중요합니다.",
-            "창업컨설턴트": f"🚀 창업 전문가로서 '{query}'에 대해 조언드리면, 성공적인 창업은 명확한 문제 정의와 혁신적인 솔루션, 끈질긴 실행력이 핵심입니다. 시장 검증, 팀 빌딩, 자금 조달 등 체계적인 접근이 필요합니다.",
-            "개발자멘토": f"💻 개발 전문가로서 '{query}'에 대해 말씀드리면, 좋은 개발자가 되기 위해서는 기술적 역량뿐만 아니라 문제 해결 능력, 지속적인 학습, 협업 능력이 중요합니다. 최신 기술 트렌드를 따라가며 실무 경험을 쌓는 것이 핵심입니다.",
-        }
-
-        return responses.get(
-            expert_name,
-            f"전문가 관점에서 '{query}'에 대한 상세한 분석을 제공해드리겠습니다.",
-        )
+    def _generate_basic_response(self, query, expert_name, mode="deep"):
+        """기본 응답 시스템 (모드별 차별화)"""
+        
+        # 모드별 기본 응답 차별화
+        if mode == "creative":
+            creative_responses = {
+                "AI전문가": f"🎨 AI 전문가로서 '{query}'에 대해 창의적으로 접근해보면, AI와 인간의 협업이 만들어낼 새로운 가능성들을 탐구해볼 수 있습니다. 함께 브레인스토밍하며 혁신적인 아이디어를 발굴해보는 것은 어떨까요?",
+                "마케팅왕": f"🎨 마케팅 전문가로서 '{query}'를 창의적으로 분석해보면, 스토리텔링과 감성 마케팅을 통해 고객과 진정한 연결고리를 만들어보는 것은 어떨까요? 함께 독창적인 캠페인 아이디어를 구상해보겠습니다!",
+                "의료AI전문가": f"🎨 의료 AI 전문가로서 '{query}'에 대해 창의적으로 생각해보면, 환자 중심의 혁신적인 솔루션을 함께 고민해볼 수 있겠네요. 의료진과 환자가 모두 만족할 수 있는 새로운 접근법을 탐구해보겠습니다!",
+                "재테크박사": f"🎨 투자 전문가로서 '{query}'를 창의적으로 접근해보면, 전통적인 투자 방식을 넘어서는 새로운 기회들을 함께 발굴해볼 수 있겠네요. 혁신적인 투자 전략을 협업으로 만들어보는 것은 어떨까요?",
+                "창업컨설턴트": f"🎨 창업 전문가로서 '{query}'에 대해 창의적으로 생각해보면, 기존 비즈니스 모델의 틀을 깨는 혁신적인 아이디어를 함께 브레인스토밍해볼 수 있겠네요! 파괴적 혁신의 가능성을 탐구해보겠습니다.",
+                "개발자멘토": f"🎨 개발 전문가로서 '{query}'를 창의적으로 접근해보면, 기술적 한계를 뛰어넘는 새로운 솔루션을 함께 구상해볼 수 있겠네요. 혁신적인 개발 방법론과 아이디어를 협업으로 만들어보겠습니다!",
+            }
+            return creative_responses.get(
+                expert_name,
+                f"🎨 전문가로서 '{query}'에 대해 창의적이고 협업적인 관점에서 함께 탐구해보겠습니다!"
+            )
+        else:  # mode == "deep"
+            deep_responses = {
+                "AI전문가": f"🔍 AI 전문가로서 '{query}'에 대해 심층 분석드리면, 현재 AI 기술의 근본적 메커니즘부터 실제 구현 세부사항까지 체계적으로 분석해드리겠습니다. 기술적 깊이와 실무적 통찰을 모두 제공하겠습니다.",
+                "마케팅왕": f"🔍 마케팅 전문가로서 '{query}'를 심화 분석하면, 시장 동향 분석, 소비자 행동 심리학, 데이터 기반 성과 측정까지 포괄적으로 다루어 전략적 인사이트를 제공하겠습니다.",
+                "의료AI전문가": f"� 의료 AI 전문가로서 '{query}'에 대해 깊이 있는 분석을 제공하면, 의학적 근거, 임상 데이터, 기술적 구현 방안까지 전문적 관점에서 체계적으로 설명드리겠습니다.",
+                "재테크박사": f"🔍 투자 전문가로서 '{query}'를 심층 분석하면, 재무 이론, 시장 구조 분석, 리스크 관리 방법론까지 포함한 전문적 투자 전략을 상세히 제공하겠습니다.",
+                "창업컨설턴트": f"� 창업 전문가로서 '{query}'에 대해 심화 컨설팅을 제공하면, 사업 모델 설계, 시장 진입 전략, 성장 단계별 핵심 과제까지 체계적으로 분석해드리겠습니다.",
+                "개발자멘토": f"� 개발 전문가로서 '{query}'에 대해 심층 기술 분석을 제공하면, 아키텍처 설계, 성능 최적화, 보안 고려사항까지 포함한 전문적 개발 가이드를 제공하겠습니다.",
+            }
+            return deep_responses.get(
+                expert_name,
+                f"🔍 전문가 관점에서 '{query}'에 대한 심층적이고 체계적인 분석을 제공해드리겠습니다.",
+            )
     
     def _get_expert_emoji(self, expert_name):
         emojis = {
@@ -1558,12 +1640,13 @@ def chat():
         data = request.get_json()
         query = data.get("message", "")
         expert = data.get("expert", "AI전문가")
+        mode = data.get("mode", "deep")  # 모드 정보 받기 (기본값: deep)
 
         if not query.strip():
             return jsonify({"error": "메시지를 입력해주세요"}), 400
 
-        # AI 응답 생성 (매개변수 순서 수정)
-        response = real_ai_manager.get_expert_response(query, expert)
+        # AI 응답 생성 (모드 정보 추가)
+        response = real_ai_manager.get_expert_response(query, expert, mode)
 
         return jsonify(
             {
@@ -1592,11 +1675,12 @@ def chat_advanced():
         data = request.get_json()
         message = data.get("message", "")
         goblin_id = data.get("goblin_id", 1)
+        mode = data.get("mode", "deep")  # 모드 정보 받기
         
         if not message:
             return jsonify({"status": "error", "message": "메시지가 필요합니다."}), 400
         
-        print(f"🧠 고급 AI 요청: 도깨비{goblin_id} - {message[:50]}...")
+        print(f"🧠 고급 AI 요청: 도깨비{goblin_id} - {message[:50]}... (모드: {mode})")
         
         # 🧠 우주급 감정 분석 (95%+ 정확도)
         detected_emotion = emotion_analyzer.analyze_emotion(message)
@@ -1664,9 +1748,9 @@ def chat_advanced():
                 print(f"🔗 후속 응답 생성 완료: {len(response)}자")
                 print(f"🔗 후속 응답 시작 부분: {response[:100]}...")
             else:
-                # 새로운 질문인 경우 일반 전문가 응답
-                print(f"🆕 새 질문 처리: {message}")
-                response = real_ai_manager.get_expert_response(message, expert_name)
+                # 새로운 질문인 경우 일반 전문가 응답 (모드 정보 포함)
+                print(f"🆕 새 질문 처리: {message} (모드: {mode})")
+                response = real_ai_manager.get_expert_response(message, expert_name, mode)
                 print(f"🆕 새 응답 생성 완료: {len(response)}자")
             
             # 🧠 감정 기반 공감 메시지 추가
