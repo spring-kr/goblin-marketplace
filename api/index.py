@@ -1,4 +1,3 @@
-# Vercel Python Serverless Function
 from flask import Flask
 
 app = Flask(__name__)
@@ -8,21 +7,21 @@ def index():
     return """<!DOCTYPE html>
 <html>
 <head>
-    <title>도깨비 테스트</title>
+    <title>🧌 도깨비마을장터</title>
     <meta charset="utf-8">
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+        h1 { color: #4CAF50; }
+    </style>
 </head>
 <body>
     <h1>🧌 도깨비마을장터</h1>
-    <p>드디어 성공! 다운로드되지 않고 웹페이지로 표시되나요?</p>
-    <script>
-        console.log('웹페이지가 정상 로드됨!');
-    </script>
+    <p><strong>성공! 웹페이지가 정상적으로 표시되었습니다!</strong></p>
+    <p>더 이상 다운로드되지 않아요! 🎉</p>
+    <button onclick="alert('도깨비 버튼 클릭!')">도깨비 버튼</button>
 </body>
 </html>"""
 
-# Vercel에서 필요한 핸들러
-def handler(request):
-    return app(request.environ, lambda status, headers: None)
-
+# Vercel이 자동으로 인식하는 Flask 앱
 if __name__ == "__main__":
     app.run(debug=True)
