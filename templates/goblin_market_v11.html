@@ -28,27 +28,180 @@
             padding: 1rem 2rem;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .header h1 {
+        .header-left h1 {
             color: #5a67d8;
             font-size: 2rem;
             margin-bottom: 0.5rem;
         }
 
-        .header .subtitle {
+        .header-left .subtitle {
             color: #666;
             font-size: 1rem;
         }
 
+        .header-right {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .dashboard-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dashboard-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            text-decoration: none;
+        }
+
         .main-container {
             display: grid;
-            grid-template-columns: 300px 1fr 250px;
+            grid-template-columns: 300px 1fr 500px;
             gap: 1rem;
             padding: 1rem;
-            max-width: 1400px;
+            max-width: 1800px;
             margin: 0 auto;
             height: calc(100vh - 120px);
+        }
+
+        /* 오른쪽 아바타 대시보드 */
+        .avatar-dashboard {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .avatar-dashboard h3 {
+            color: #5a67d8;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+
+        #avatar-container {
+            width: 100%;
+            height: 900px;
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .avatar-info {
+            background: rgba(90, 103, 216, 0.1);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .avatar-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .stat-item {
+            background: rgba(255,255,255,0.8);
+            padding: 0.5rem;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        .emotion-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .emotion-btn {
+            padding: 0.4rem 0.8rem;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 80px;
+        }
+
+        .emotion-btn.happy { background: #e8f5e8; color: #27ae60; }
+        .emotion-btn.sad { background: #f8e8e8; color: #e74c3c; }
+        .emotion-btn.excited { background: #fff3e0; color: #f39c12; }
+        .emotion-btn.neutral { background: #f8f9fa; color: #6c757d; }
+        .emotion-btn.thinking { background: #e3f2fd; color: #2196f3; }
+
+        .emotion-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .memory-display {
+            background: rgba(155, 89, 182, 0.1);
+            border-radius: 8px;
+            padding: 0.8rem;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .avatar-chat {
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .avatar-chat input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .avatar-chat button {
+            width: 100%;
+            padding: 0.5rem;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .avatar-chat button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
 
         /* 도깨비 패널 */
@@ -430,8 +583,15 @@
 <body>
     <!-- 헤더 -->
     <div class="header">
-        <h1>🏆 도깨비마을장터 v11.5</h1>
-        <p class="subtitle">32명 전문가 × 27명 도깨비 × 실시간 학습 = 완전체 AI 상담 시스템</p>
+        <div class="header-left">
+            <h1>🏆 도깨비마을장터 v11.5</h1>
+            <p class="subtitle">32명 전문가 × 27명 도깨비 × 실시간 학습 = 완전체 AI 상담 시스템</p>
+        </div>
+        <div class="header-right">
+            <a href="/dashboard" class="dashboard-btn">
+                🎮 3D 실시간 대시보드
+            </a>
+        </div>
     </div>
 
     <!-- 메인 컨테이너 -->
@@ -491,42 +651,34 @@
             </div>
         </div>
 
-        <!-- 성능 대시보드 -->
-        <div class="performance-panel">
-            <h3>📊 실시간 대시보드</h3>
+        <!-- 실시간 아바타 대시보드 -->
+        <div class="avatar-dashboard">
+            <h3>� 실시간 아바타 대시보드</h3>
             
-            <div class="stat-card">
-                <div class="stat-value" id="active-users">0</div>
-                <div class="stat-label">활성 사용자</div>
+            <!-- 3D 아바타 컨테이너 -->
+            <div id="avatar-container">
+            </div>
+            <!-- 감정 제어 -->
+            <div class="emotion-controls">
+                <button class="emotion-btn happy" onclick="setAvatarEmotion('happy')">😊 기쁨</button>
+                <button class="emotion-btn neutral" onclick="setAvatarEmotion('neutral')">😐 중립</button>
+                <button class="emotion-btn excited" onclick="setAvatarEmotion('excited')">🤩 흥분</button>
+                <button class="emotion-btn thinking" onclick="setAvatarEmotion('thinking')">🤔 생각</button>
+                <button class="emotion-btn sad" onclick="setAvatarEmotion('sad')">😢 슬픔</button>
             </div>
             
-            <div class="stat-card">
-                <div class="stat-value" id="total-goblins">27</div>
-                <div class="stat-label">총 도깨비 수</div>
-            </div>
-            
-            <div class="stat-card">
-                <div class="stat-value" id="total-experts">32</div>
-                <div class="stat-label">총 전문가 수</div>
-            </div>
-            
-            <div class="feedback-section">
-                <h4>📝 피드백</h4>
-                <p>마지막 응답이 어떠셨나요?</p>
-                <div class="rating-stars" id="rating-stars">
-                    <span class="star" data-rating="1">⭐</span>
-                    <span class="star" data-rating="2">⭐</span>
-                    <span class="star" data-rating="3">⭐</span>
-                    <span class="star" data-rating="4">⭐</span>
-                    <span class="star" data-rating="5">⭐</span>
-                </div>
-                <button class="feedback-btn" onclick="submitFeedback()" disabled>
-                    피드백 제출
-                </button>
+            <!-- 아바타와 직접 대화 -->
+            <div class="avatar-chat">
+                <div style="font-weight: bold; margin-bottom: 0.5rem; color: #5a67d8;">💬 아바타와 대화</div>
+                <div id="avatar-messages" style="height: 200px; overflow-y: auto; border: 1px solid #e2e8f0; padding: 0.5rem; margin-bottom: 0.5rem; background: white; border-radius: 4px;"></div>
+                <input type="text" id="avatar-chat-input" placeholder="아바타에게 직접 말해보세요..." onkeypress="handleAvatarKeyPress(event)">
+                <button onclick="sendAvatarMessage()">전송</button>
             </div>
         </div>
     </div>
 
+    <!-- Three.js for 3D Avatar -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <!-- JavaScript -->
     <script>
         // 전역 변수
@@ -1245,10 +1397,653 @@ ${content}
             });
         }
 
+        // 3D 아바타 시스템 변수
+        let scene, camera, renderer, avatar, light;
+        let currentEmotion = 'neutral';
+        let isAvatarInitialized = false;
+        
+        // 얼굴 표정 요소들
+        let leftEye, rightEye, mouth, leftPupil, rightPupil;
+        
+        // 감정 분석 및 아바타 시스템 함수들
+        function analyzeKoreanEmotion(text) {
+            if (!text) return { emotion: 'neutral', confidence: 0.5 };
+            
+            const emotionKeywords = {
+                happy: ['기쁘', '기뻐', '행복', '좋', '웃', '즐거', '신나', '만족', '감사', '최고', '굿', '야호', '와우', '대박좋', '짱'],
+                sad: ['슬프', '슬퍼', '우울', '힘들', '아프', '외로', '괴로', '절망', '실망', '눈물', '울어', '속상', '안타깝'],
+                angry: ['화', '화나', '짜증', '분노', '열받', '빡쳐', '미쳐', '악', '싫어', '짜증나', '분해', '화났'],
+                excited: ['신나', '흥분', '두근', '기대', '설레', '와', '오오', '대박', '완전', '쩔어'],
+                thinking: ['생각', '고민', '음', '흠', '글쎄', '어떨까', '모르겠', '궁금', '한번'],
+                surprise: ['놀라', '깜짝', '와', '어머', '헐', '대박', '진짜', '세상에', '어떻게', '믿을수없어'],
+                fear: ['무서', '두려', '걱정', '불안', '떨려', '겁나', '조심', '위험', '아이고'],
+                neutral: ['그냥', '보통', '별로', '음', '글쎄', '하지만', '그러나', '네', '아니요']
+            };
+            
+            let maxScore = 0;
+            let detectedEmotion = 'neutral';
+            
+            // 텍스트를 소문자로 변환하고 공백 제거
+            const normalizedText = text.toLowerCase().replace(/\s/g, '');
+            
+            for (const [emotion, keywords] of Object.entries(emotionKeywords)) {
+                let score = 0;
+                keywords.forEach(keyword => {
+                    if (normalizedText.includes(keyword)) {
+                        score += 2; // 점수를 2배로 증가
+                    }
+                    // 부분 매칭도 확인
+                    if (text.includes(keyword.substring(0, 2)) && keyword.length > 2) {
+                        score += 1;
+                    }
+                });
+                
+                if (score > maxScore) {
+                    maxScore = score;
+                    detectedEmotion = emotion;
+                }
+            }
+            
+            const confidence = Math.min(maxScore / 2, 1.0);
+            return { emotion: detectedEmotion, confidence: confidence };
+        }
+        
+        function createRealisticAvatar() {
+            // 3D 씬 초기화
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, 400 / 500, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(400, 500);
+            renderer.setClearColor(0x000000, 0);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            
+            const avatarContainer = document.getElementById('avatar-container');
+            if (avatarContainer) {
+                avatarContainer.appendChild(renderer.domElement);
+            }
+            
+            // 조명 설정
+            const ambientLight = new THREE.AmbientLight(0x404040, 0.4);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(5, 10, 5);
+            directionalLight.castShadow = true;
+            directionalLight.shadow.mapSize.width = 2048;
+            directionalLight.shadow.mapSize.height = 2048;
+            scene.add(directionalLight);
+            
+            // 포인트 라이트 추가 (얼굴 조명)
+            const pointLight = new THREE.PointLight(0xffffff, 0.6, 100);
+            pointLight.position.set(0, 3, 3);
+            scene.add(pointLight);
+            
+            // 리얼리스틱 아바타 생성
+            const group = new THREE.Group();
+            
+            // 🎨 리얼리스틱 머티리얼
+            const skinMaterial = new THREE.MeshLambertMaterial({ 
+                color: 0xffdbac,
+                transparent: true,
+                opacity: 0.95
+            });
+            
+            const hairMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0x8b4513,
+                shininess: 20
+            });
+            
+            const clothMaterial = new THREE.MeshLambertMaterial({ 
+                color: 0x3498db
+            });
+            
+            const eyeMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0x333333,
+                shininess: 100
+            });
+            
+            // 👤 리얼리스틱 헤드 (더 정교한 형태)
+            const headGroup = new THREE.Group();
+            
+            // 메인 헤드 (타원형)
+            const headGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+            headGeometry.scale(1, 1.1, 0.85);
+            const head = new THREE.Mesh(headGeometry, skinMaterial);
+            head.castShadow = true;
+            head.receiveShadow = true;
+            headGroup.add(head);
+            
+            // 목
+            const neckGeometry = new THREE.CylinderGeometry(0.25, 0.3, 0.4);
+            const neck = new THREE.Mesh(neckGeometry, skinMaterial);
+            neck.position.set(0, -0.4, 0);
+            neck.castShadow = true;
+            headGroup.add(neck);
+            
+            // 더 사실적인 눈
+            const eyeGeometry = new THREE.SphereGeometry(0.08, 16, 16);
+            
+            leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+            leftEye.position.set(-0.18, 0.1, 0.42);
+            headGroup.add(leftEye);
+            
+            rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+            rightEye.position.set(0.18, 0.1, 0.42);
+            headGroup.add(rightEye);
+            
+            // 눈동자 하이라이트
+            const pupilGeometry = new THREE.SphereGeometry(0.02, 8, 8);
+            const pupilMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            
+            leftPupil = new THREE.Mesh(pupilGeometry, pupilMaterial);
+            leftPupil.position.set(-0.16, 0.12, 0.48);
+            headGroup.add(leftPupil);
+            
+            rightPupil = new THREE.Mesh(pupilGeometry, pupilMaterial);
+            rightPupil.position.set(0.20, 0.12, 0.48);
+            headGroup.add(rightPupil);
+            
+            // 리얼리스틱 코
+            const noseGeometry = new THREE.ConeGeometry(0.04, 0.12, 8);
+            const nose = new THREE.Mesh(noseGeometry, skinMaterial);
+            nose.position.set(0, 0, 0.45);
+            nose.rotation.x = Math.PI;
+            headGroup.add(nose);
+            
+            // 입
+            const mouthGeometry = new THREE.SphereGeometry(0.06, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2);
+            const mouthMaterial = new THREE.MeshLambertMaterial({ color: 0xff6b6b });
+            mouth = new THREE.Mesh(mouthGeometry, mouthMaterial);
+            mouth.position.set(0, -0.1, 0.44);
+            mouth.rotation.x = Math.PI;
+            headGroup.add(mouth);
+            
+            // 더 자연스러운 머리카락
+            const hairGeometry = new THREE.SphereGeometry(0.52, 24, 24);
+            hairGeometry.scale(1, 1.2, 0.9);
+            const hair = new THREE.Mesh(hairGeometry, hairMaterial);
+            hair.position.set(0, 0.2, -0.1);
+            hair.castShadow = true;
+            headGroup.add(hair);
+            
+            headGroup.position.set(0, 2.4, 0);
+            group.add(headGroup);
+            
+            // 🫵 리얼리스틱 몸통 (더 자연스러운 형태)
+            const torsoGeometry = new THREE.CylinderGeometry(0.35, 0.45, 1.0);
+            const torso = new THREE.Mesh(torsoGeometry, clothMaterial);
+            torso.position.set(0, 1.5, 0);
+            torso.castShadow = true;
+            torso.receiveShadow = true;
+            group.add(torso);
+            
+            // 가슴 부분 (더 자연스러운 체형)
+            const chestGeometry = new THREE.SphereGeometry(0.4, 16, 16);
+            chestGeometry.scale(1, 0.6, 0.8);
+            const chest = new THREE.Mesh(chestGeometry, clothMaterial);
+            chest.position.set(0, 1.8, 0);
+            chest.castShadow = true;
+            group.add(chest);
+            
+            // 🦾 간단하고 자연스러운 팔
+            const armGeometry = new THREE.CylinderGeometry(0.07, 0.05, 1.2);
+            
+            // 왼쪽 팔
+            const leftArm = new THREE.Mesh(armGeometry, skinMaterial);
+            leftArm.position.set(-0.45, 1.4, 0);
+            leftArm.rotation.z = -0.4;
+            leftArm.castShadow = true;
+            group.add(leftArm);
+            
+            // 오른쪽 팔
+            const rightArm = new THREE.Mesh(armGeometry, skinMaterial);
+            rightArm.position.set(0.45, 1.4, 0);
+            rightArm.rotation.z = 0.4;
+            rightArm.castShadow = true;
+            group.add(rightArm);
+            
+            // 손
+            const handGeometry = new THREE.SphereGeometry(0.08, 12, 12);
+            handGeometry.scale(1.3, 1, 0.8);
+            
+            const leftHand = new THREE.Mesh(handGeometry, skinMaterial);
+            leftHand.position.set(-0.2, 0.8, 0);
+            leftHand.castShadow = true;
+            group.add(leftHand);
+            
+            const rightHand = new THREE.Mesh(handGeometry, skinMaterial);
+            rightHand.position.set(0.2, 0.8, 0);
+            rightHand.castShadow = true;
+            group.add(rightHand);
+            
+            // 🦵 리얼리스틱 다리
+            const pantsMaterial = new THREE.MeshLambertMaterial({ color: 0x2c3e50 });
+            
+            // 허리
+            const waistGeometry = new THREE.CylinderGeometry(0.4, 0.35, 0.3);
+            const waist = new THREE.Mesh(waistGeometry, pantsMaterial);
+            waist.position.set(0, 0.85, 0);
+            waist.castShadow = true;
+            group.add(waist);
+            
+            // 왼쪽 다리
+            const leftThighGeometry = new THREE.CylinderGeometry(0.12, 0.15, 0.8);
+            const leftThigh = new THREE.Mesh(leftThighGeometry, pantsMaterial);
+            leftThigh.position.set(-0.15, 0.3, 0);
+            leftThigh.castShadow = true;
+            group.add(leftThigh);
+            
+            const leftShinGeometry = new THREE.CylinderGeometry(0.1, 0.12, 0.7);
+            const leftShin = new THREE.Mesh(leftShinGeometry, pantsMaterial);
+            leftShin.position.set(-0.15, -0.55, 0);
+            leftShin.castShadow = true;
+            group.add(leftShin);
+            
+            // 오른쪽 다리
+            const rightThighGeometry = new THREE.CylinderGeometry(0.12, 0.15, 0.8);
+            const rightThigh = new THREE.Mesh(rightThighGeometry, pantsMaterial);
+            rightThigh.position.set(0.15, 0.3, 0);
+            rightThigh.castShadow = true;
+            group.add(rightThigh);
+            
+            const rightShinGeometry = new THREE.CylinderGeometry(0.1, 0.12, 0.7);
+            const rightShin = new THREE.Mesh(rightShinGeometry, pantsMaterial);
+            rightShin.position.set(0.15, -0.55, 0);
+            rightShin.castShadow = true;
+            group.add(rightShin);
+            
+            // 👟 신발
+            const shoeGeometry = new THREE.BoxGeometry(0.15, 0.08, 0.3);
+            const shoeMaterial = new THREE.MeshLambertMaterial({ color: 0x2c3e50 });
+            
+            const leftShoe = new THREE.Mesh(shoeGeometry, shoeMaterial);
+            leftShoe.position.set(-0.15, -0.95, 0.1);
+            leftShoe.castShadow = true;
+            group.add(leftShoe);
+            
+            const rightShoe = new THREE.Mesh(shoeGeometry, shoeMaterial);
+            rightShoe.position.set(0.15, -0.95, 0.1);
+            rightShoe.castShadow = true;
+            group.add(rightShoe);
+            
+            // 아바타 그룹을 scene에 추가
+            avatar = group;
+            scene.add(avatar);
+            
+            // 카메라 위치 설정 (아바타가 잘 보이도록)
+            camera.position.set(0, 1.5, 4);
+            camera.lookAt(0, 1.5, 0);
+            
+            // 애니메이션 시작
+            animate();
+            isAvatarInitialized = true;
+            
+            console.log('🎯 리얼리스틱 3D 아바타 초기화 완료');
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            if (avatar) {
+                // 기본 호흡 애니메이션
+                avatar.position.y = Math.sin(Date.now() * 0.002) * 0.05;
+                
+                // 감정에 따른 고급 애니메이션
+                switch(currentEmotion) {
+                    case 'happy':
+                        // 즐거운 좌우 흔들림 + 점프
+                        avatar.rotation.z = Math.sin(Date.now() * 0.008) * 0.15;
+                        avatar.position.y += Math.sin(Date.now() * 0.01) * 0.1;
+                        break;
+                        
+                    case 'sad':
+                        // 슬픈 고개 숙임 + 느린 움직임
+                        avatar.rotation.x = -0.3 + Math.sin(Date.now() * 0.002) * 0.05;
+                        avatar.position.y -= 0.1;
+                        break;
+                        
+                    case 'angry':
+                        // 화난 좌우 격렬한 흔들림 + 떨림
+                        avatar.rotation.y = Math.sin(Date.now() * 0.02) * 0.3;
+                        avatar.rotation.z = Math.sin(Date.now() * 0.025) * 0.1;
+                        break;
+                        
+                    case 'excited':
+                        // 흥분한 크기 변화 + 빠른 회전
+                        avatar.scale.setScalar(1 + Math.sin(Date.now() * 0.015) * 0.15);
+                        avatar.rotation.y = Math.sin(Date.now() * 0.01) * 0.2;
+                        break;
+                        
+                    case 'thinking':
+                        // 생각하는 천천히 고개 끄덕임 + 좌우 살펴보기
+                        avatar.rotation.x = Math.sin(Date.now() * 0.003) * 0.1;
+                        avatar.rotation.y = Math.sin(Date.now() * 0.002) * 0.2;
+                        break;
+                        
+                    case 'surprise':
+                        // 놀란 갑작스러운 뒤로 젖힘 + 크기 변화
+                        avatar.rotation.x = 0.2 + Math.sin(Date.now() * 0.02) * 0.1;
+                        avatar.scale.setScalar(1 + Math.sin(Date.now() * 0.03) * 0.2);
+                        break;
+                        
+                    case 'fear':
+                        // 두려운 떨림 + 움츠러듦
+                        avatar.rotation.x = Math.sin(Date.now() * 0.05) * 0.05;
+                        avatar.rotation.z = Math.sin(Date.now() * 0.07) * 0.05;
+                        avatar.scale.setScalar(0.95 + Math.sin(Date.now() * 0.04) * 0.05);
+                        break;
+                        
+                    case 'neutral':
+                    default:
+                        // 기본 상태로 부드럽게 복귀
+                        avatar.rotation.x = avatar.rotation.x * 0.95;
+                        avatar.rotation.y = avatar.rotation.y * 0.95;
+                        avatar.rotation.z = avatar.rotation.z * 0.95;
+                        avatar.scale.setScalar(avatar.scale.x * 0.99 + 0.01);
+                        break;
+                }
+                
+                // 옷 색상 변경 (감정에 따라)
+                if (avatar.children && avatar.children.length > 0) {
+                    updateAvatarColors(currentEmotion);
+                }
+            }
+            
+            if (renderer) {
+                renderer.render(scene, camera);
+            }
+        }
+        
+        function updateAvatarColors(emotion) {
+            // 감정별 색상 설정
+            const emotionColors = {
+                'happy': { cloth: 0x3498db, intensity: 1.2 },      // 밝은 파랑
+                'sad': { cloth: 0x7f8c8d, intensity: 0.6 },        // 회색
+                'angry': { cloth: 0xe74c3c, intensity: 1.5 },      // 빨강
+                'excited': { cloth: 0xf39c12, intensity: 1.4 },    // 주황
+                'thinking': { cloth: 0x9b59b6, intensity: 1.0 },   // 보라
+                'surprise': { cloth: 0xf1c40f, intensity: 1.3 },   // 노랑
+                'fear': { cloth: 0x34495e, intensity: 0.7 },       // 어두운 회색
+                'neutral': { cloth: 0x3498db, intensity: 1.0 }     // 기본 파랑
+            };
+            
+            const config = emotionColors[emotion] || emotionColors.neutral;
+            
+            // 옷 색상 변경 (torso, chest 찾아서 변경)
+            avatar.traverse(function(child) {
+                if (child.isMesh && child.material) {
+                    if (child.material.color && 
+                        (child.material.color.getHex() === 0x3498db || 
+                         child.material.color.getHex() === 0xe74c3c || 
+                         child.material.color.getHex() === 0xf39c12 ||
+                         child.material.color.getHex() === 0x7f8c8d ||
+                         child.material.color.getHex() === 0x9b59b6 ||
+                         child.material.color.getHex() === 0xf1c40f ||
+                         child.material.color.getHex() === 0x34495e)) {
+                        child.material.color.setHex(config.cloth);
+                    }
+                }
+            });
+        }
+        
+        function updateFacialExpression(emotion) {
+            if (!leftEye || !rightEye || !mouth) return;
+            
+            // 감정별 표정 설정
+            switch(emotion) {
+                case 'happy':
+                    // 웃는 표정: 눈 작아지고 입 위로
+                    leftEye.scale.set(1, 0.6, 1);
+                    rightEye.scale.set(1, 0.6, 1);
+                    mouth.position.y = -0.05;
+                    mouth.scale.set(1.3, 0.8, 1);
+                    mouth.material.color.setHex(0xff8a95);
+                    break;
+                    
+                case 'sad':
+                    // 슬픈 표정: 눈 처지고 입 아래로
+                    leftEye.scale.set(1, 1.2, 1);
+                    rightEye.scale.set(1, 1.2, 1);
+                    leftEye.rotation.z = 0.2;
+                    rightEye.rotation.z = -0.2;
+                    mouth.position.y = -0.15;
+                    mouth.scale.set(0.8, 1.2, 1);
+                    mouth.material.color.setHex(0x8b7d7d);
+                    break;
+                    
+                case 'angry':
+                    // 화난 표정: 눈 찡그리고 입 일그러짐
+                    leftEye.scale.set(0.8, 1.3, 1);
+                    rightEye.scale.set(0.8, 1.3, 1);
+                    leftEye.rotation.z = -0.3;
+                    rightEye.rotation.z = 0.3;
+                    mouth.position.y = -0.12;
+                    mouth.scale.set(0.6, 1.5, 1);
+                    mouth.material.color.setHex(0xcc4444);
+                    break;
+                    
+                case 'excited':
+                    // 흥분한 표정: 눈 크고 입 벌어짐
+                    leftEye.scale.set(1.4, 1.4, 1.4);
+                    rightEye.scale.set(1.4, 1.4, 1.4);
+                    mouth.position.y = -0.08;
+                    mouth.scale.set(1.6, 1.6, 1.6);
+                    mouth.material.color.setHex(0xff5566);
+                    break;
+                    
+                case 'thinking':
+                    // 생각하는 표정: 한쪽 눈 찡그림
+                    leftEye.scale.set(0.7, 1, 1);
+                    rightEye.scale.set(1.2, 1, 1);
+                    mouth.position.y = -0.1;
+                    mouth.scale.set(0.9, 0.9, 1);
+                    mouth.material.color.setHex(0xaa6666);
+                    break;
+                    
+                case 'surprise':
+                    // 놀란 표정: 눈과 입 크게 벌어짐
+                    leftEye.scale.set(1.6, 1.8, 1.6);
+                    rightEye.scale.set(1.6, 1.8, 1.6);
+                    mouth.position.y = -0.05;
+                    mouth.scale.set(1.8, 2.0, 1.8);
+                    mouth.material.color.setHex(0xff4455);
+                    break;
+                    
+                case 'fear':
+                    // 두려운 표정: 눈 크고 입 작아짐
+                    leftEye.scale.set(1.3, 1.5, 1.3);
+                    rightEye.scale.set(1.3, 1.5, 1.3);
+                    mouth.position.y = -0.13;
+                    mouth.scale.set(0.5, 0.8, 1);
+                    mouth.material.color.setHex(0x996666);
+                    break;
+                    
+                case 'neutral':
+                default:
+                    // 기본 표정으로 복원
+                    leftEye.scale.set(1, 1, 1);
+                    rightEye.scale.set(1, 1, 1);
+                    leftEye.rotation.z = 0;
+                    rightEye.rotation.z = 0;
+                    mouth.position.y = -0.1;
+                    mouth.scale.set(1, 1, 1);
+                    mouth.material.color.setHex(0xff6b6b);
+                    break;
+            }
+        }
+        
+        function updateAvatarEmotion(emotion) {
+            currentEmotion = emotion;
+            
+            console.log(`🎭 아바타 감정 변경: ${emotion}`);
+            
+            // 즉시 색상 변경
+            if (avatar) {
+                updateAvatarColors(emotion);
+            }
+            
+            // 표정 변화 적용
+            updateFacialExpression(emotion);
+            
+            // 감정 표시 업데이트
+            const emotionDisplay = document.getElementById('current-emotion');
+            if (emotionDisplay) {
+                emotionDisplay.textContent = getEmotionKorean(emotion);
+            }
+            
+            // 감정 통계 업데이트
+            updateEmotionStats(emotion);
+        }
+        
+        function getEmotionKorean(emotion) {
+            const emotionMap = {
+                'happy': '😊 기쁨',
+                'sad': '😢 슬픔',
+                'angry': '😠 화남',
+                'excited': '🤩 흥분',
+                'thinking': '🤔 생각',
+                'surprise': '😮 놀람',
+                'fear': '😨 두려움',
+                'neutral': '😐 평온'
+            };
+            return emotionMap[emotion] || '😐 평온';
+        }
+        
+        function updateEmotionStats(emotion) {
+            const statsElement = document.getElementById('emotion-stats');
+            if (!statsElement) return;
+            
+            // 간단한 통계 업데이트 (실제로는 서버에서 데이터를 가져와야 함)
+            const stats = {
+                'happy': Math.floor(Math.random() * 50) + 20,
+                'sad': Math.floor(Math.random() * 30) + 10,
+                'angry': Math.floor(Math.random() * 20) + 5,
+                'surprise': Math.floor(Math.random() * 25) + 10,
+                'fear': Math.floor(Math.random() * 15) + 5,
+                'neutral': Math.floor(Math.random() * 40) + 30
+            };
+            
+            let statsHtml = '';
+            for (const [key, value] of Object.entries(stats)) {
+                const korean = getEmotionKorean(key);
+                statsHtml += `<div class="stat-item">
+                    <span>${korean}</span>
+                    <span>${value}%</span>
+                </div>`;
+            }
+            
+            statsElement.innerHTML = statsHtml;
+        }
+        
+        // 아바타 채팅 기능
+        function sendAvatarMessage() {
+            const input = document.getElementById('avatar-chat-input');
+            const messages = document.getElementById('avatar-messages');
+            
+            if (!input || !messages) return;
+            
+            const message = input.value.trim();
+            if (!message) return;
+            
+            // 사용자 메시지 추가
+            const userMessage = document.createElement('div');
+            userMessage.className = 'message user-message';
+            userMessage.textContent = message;
+            messages.appendChild(userMessage);
+            
+            // 감정 분석
+            const emotionResult = analyzeKoreanEmotion(message);
+            updateAvatarEmotion(emotionResult.emotion);
+            
+            // 감정별 맞춤 응답
+            const emotionResponses = {
+                'happy': [
+                    '정말 기쁘시겠어요! 😊 저도 덩달아 기분이 좋아져요!',
+                    '와! 행복한 기분이 전해져요! 🎉',
+                    '좋은 일이 있으셨나봐요! 축하드려요! ✨'
+                ],
+                'sad': [
+                    '힘든 시간이시군요... 😢 괜찮아질 거예요.',
+                    '슬프시겠어요. 제가 곁에 있을게요.',
+                    '모든 게 다 지나갈 거예요. 힘내세요! 💙'
+                ],
+                'angry': [
+                    '화가 많이 나셨나봐요 😠 잠시 심호흡해보세요.',
+                    '스트레스 받으셨군요. 조금 진정해보실까요?',
+                    '힘든 상황이시겠네요. 이야기해보세요.'
+                ],
+                'excited': [
+                    '와! 정말 신나시는군요! 🤩 저도 기대돼요!',
+                    '흥미진진하네요! 더 자세히 들려주세요!',
+                    '에너지가 넘치시네요! 멋져요! ⚡'
+                ],
+                'thinking': [
+                    '깊이 생각하고 계시는군요 🤔 천천히 생각해보세요.',
+                    '고민이 있으시군요. 함께 생각해볼까요?',
+                    '어려운 문제인가봐요. 도움이 될까요?'
+                ],
+                'surprise': [
+                    '정말 놀라우셨겠어요! 😮 어떤 일인지 궁금해요!',
+                    '깜짝 놀라셨군요! 대단한 일이 있었나봐요!',
+                    '와! 믿을 수 없으시겠어요! 🌟'
+                ],
+                'fear': [
+                    '무서우셨겠어요 😨 괜찮아요, 안전할 거예요.',
+                    '걱정이 많으시군요. 차근차근 해결해봐요.',
+                    '불안하시겠지만 모든 게 잘 될 거예요. 🤗'
+                ],
+                'neutral': [
+                    '말씀해주세요. 어떻게 도와드릴까요? 😊',
+                    '네, 잘 들었어요. 더 이야기해주세요.',
+                    '그렇군요. 궁금한 것이 있으시면 언제든 물어보세요!'
+                ]
+            };
+            
+            // 아바타 응답
+            setTimeout(() => {
+                const responses = emotionResponses[emotionResult.emotion] || emotionResponses['neutral'];
+                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                
+                const avatarMessage = document.createElement('div');
+                avatarMessage.className = 'message avatar-message';
+                avatarMessage.textContent = randomResponse;
+                messages.appendChild(avatarMessage);
+                
+                // 스크롤 하단으로
+                messages.scrollTop = messages.scrollHeight;
+                
+                console.log(`🎭 감정 분석: ${emotionResult.emotion} (신뢰도: ${emotionResult.confidence.toFixed(2)})`);
+            }, 800);
+            
+            input.value = '';
+            messages.scrollTop = messages.scrollHeight;
+        }
+        
+        // 엔터키로 메시지 전송
+        function handleAvatarKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendAvatarMessage();
+            }
+        }
+        
+        // 감정 버튼 클릭 핸들러
+        function setAvatarEmotion(emotion) {
+            updateAvatarEmotion(emotion);
+        }
+
         // 초기화
         document.addEventListener('DOMContentLoaded', function() {
             initSocket();
             loadGoblins();
+            
+            // 3D 아바타 초기화
+            setTimeout(() => {
+                if (document.getElementById('avatar-container')) {
+                    createRealisticAvatar();
+                    updateEmotionStats('neutral');
+                }
+            }, 1000);
             
             // 주기적으로 성능 데이터 요청
             setInterval(async () => {

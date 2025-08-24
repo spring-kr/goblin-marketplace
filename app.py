@@ -2,16 +2,67 @@ from flask import Flask, render_template, request, jsonify
 import os
 from datetime import datetime, timedelta
 
-# 1000자 고급 AI 시스템 임포트
+# 1000자 고급 AI 시스템 임포트 (1단계)
 try:
     from complete_16_experts_improved import RealAIManager
+
     real_ai_manager = RealAIManager()
     AI_SYSTEM_ENABLED = True
-    print("🎉 1000자 고급 AI 시스템이 활성화되었습니다!")
+    print("🎉 1단계: 1000자 고급 AI 시스템이 활성화되었습니다!")
 except ImportError as e:
-    print(f"⚠️ 고급 AI 시스템을 불러올 수 없습니다: {e}")
+    print(f"⚠️ 1단계 AI 시스템을 불러올 수 없습니다: {e}")
     real_ai_manager = None
     AI_SYSTEM_ENABLED = False
+
+# 멀티모달 AI 시스템 임포트 (2단계)
+try:
+    from complete_16_experts_v4_multimodal_20250823 import MultimodalAIManager
+
+    multimodal_ai_manager = MultimodalAIManager()
+    MULTIMODAL_SYSTEM_ENABLED = True
+    print("🎥 2단계: 멀티모달 AI 시스템이 활성화되었습니다!")
+except ImportError as e:
+    print(f"⚠️ 2단계 멀티모달 시스템을 불러올 수 없습니다: {e}")
+    multimodal_ai_manager = None
+    MULTIMODAL_SYSTEM_ENABLED = False
+
+# 메모리 & 학습 시스템 임포트 (3단계)
+try:
+    from advanced_memory_system_v11 import AdvancedMemorySystem
+
+    memory_manager = AdvancedMemorySystem()
+    MEMORY_SYSTEM_ENABLED = True
+    print("🧠 3단계: 메모리 & 학습 시스템이 활성화되었습니다!")
+except ImportError as e:
+    print(f"⚠️ 3단계 메모리 시스템을 불러올 수 없습니다: {e}")
+    memory_manager = None
+    MEMORY_SYSTEM_ENABLED = False
+
+# 글로벌 확장 시스템 임포트 (4단계)
+try:
+    from complete_16_experts_v5_global_expansion_20250823 import GlobalExpertSystemV5
+
+    global_manager = GlobalExpertSystemV5()
+    GLOBAL_SYSTEM_ENABLED = True
+    print("🌍 4단계: 글로벌 확장 시스템이 활성화되었습니다!")
+except ImportError as e:
+    print(f"⚠️ 4단계 글로벌 시스템을 불러올 수 없습니다: {e}")
+    global_manager = None
+    GLOBAL_SYSTEM_ENABLED = False
+
+# DNA 개인화 시스템 임포트 (5단계)
+try:
+    from complete_16_experts_v9_dna_personalized_20250823 import (
+        DNAPersonalizedExpertSystem,
+    )
+
+    dna_manager = DNAPersonalizedExpertSystem()
+    DNA_SYSTEM_ENABLED = True
+    print("🧬 5단계: DNA 개인화 시스템이 활성화되었습니다!")
+except ImportError as e:
+    print(f"⚠️ 5단계 DNA 시스템을 불러올 수 없습니다: {e}")
+    dna_manager = None
+    DNA_SYSTEM_ENABLED = False
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "goblin_marketplace_secret_key_2024")
@@ -24,6 +75,64 @@ payment_records = {}
 @app.route("/")
 def home():
     return render_template("goblin_market_v11.html")
+
+
+@app.route("/dashboard")
+def dashboard_3d():
+    """3D 아바타 실시간 대시보드로 리다이렉트"""
+    return f"""
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>🎮 3D 대시보드로 이동 중...</title>
+        <style>
+            body {{
+                background: linear-gradient(135deg, #1e3c72, #2a5298);
+                color: white;
+                font-family: Arial, sans-serif;
+                text-align: center;
+                padding: 50px;
+            }}
+            .redirect-container {{
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                border-radius: 20px;
+                padding: 40px;
+                margin: 20px auto;
+                max-width: 600px;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }}
+            .btn {{
+                background: linear-gradient(45deg, #667eea, #764ba2);
+                border: none;
+                padding: 15px 30px;
+                border-radius: 25px;
+                color: white;
+                font-weight: bold;
+                text-decoration: none;
+                display: inline-block;
+                margin: 10px;
+                transition: transform 0.3s ease;
+            }}
+            .btn:hover {{
+                transform: translateY(-2px);
+            }}
+        </style>
+        <meta http-equiv="refresh" content="3;url=http://127.0.0.1:5001">
+    </head>
+    <body>
+        <div class="redirect-container">
+            <h1>🎮 3D 아바타 실시간 대시보드</h1>
+            <p>🚀 5단계 AI 시스템 + 3D 아바타 대시보드로 이동 중...</p>
+            <p>3초 후 자동으로 이동됩니다.</p>
+            <a href="http://127.0.0.1:5001" class="btn">즉시 이동</a>
+            <a href="/" class="btn">홈으로 돌아가기</a>
+        </div>
+    </body>
+    </html>
+    """
 
 
 @app.route("/mobile")
@@ -597,59 +706,414 @@ def advanced_chat():
         data = request.get_json()
         message = data.get("message", "")
         goblin_id = data.get("goblin_id", 1)
-        
+
         if not AI_SYSTEM_ENABLED:
-            return jsonify({
-                "status": "error",
-                "message": "고급 AI 시스템이 비활성화되어 있습니다."
-            })
-            
+            return jsonify(
+                {
+                    "status": "error",
+                    "message": "고급 AI 시스템이 비활성화되어 있습니다.",
+                }
+            )
+
         # 도깨비 ID를 전문가 타입으로 매핑
         goblin_to_expert_mapping = {
-            1: "assistant",      # AI전문가
-            2: "data_analyst",   # 데이터과학박사  
-            3: "builder",        # 블록체인개발자 -> 투자전문가로 매핑
-            4: "assistant",      # 보안전문가 -> AI전문가로 매핑
-            5: "assistant",      # 로봇공학자 -> AI전문가로 매핑
-            6: "assistant",      # 양자컴퓨팅전문가 -> AI전문가로 매핑
-            7: "assistant",      # 우주항공공학자 -> AI전문가로 매핑
-            8: "medical",        # 바이오기술자 -> 의료전문가로 매핑
-            9: "assistant",      # 나노기술자 -> AI전문가로 매핑
-            10: "assistant",     # 인공지능박사도깨비
-            11: "builder",       # 경영학박사도깨비 -> 투자전문가로 매핑
-            12: "medical",       # 의학박사도깨비
-            13: "assistant",     # 법학박사도깨비 -> AI전문가로 매핑
-            14: "growth",        # 교육학박사도깨비
-            15: "counselor",     # 심리학박사도깨비
-            16: "assistant",     # 언어학박사도깨비 -> AI전문가로 매핑
-            17: "creative"       # 철학박사도깨비 -> 창작전문가로 매핑
+            1: "assistant",  # AI전문가
+            2: "data_analyst",  # 데이터과학박사
+            3: "builder",  # 블록체인개발자 -> 투자전문가로 매핑
+            4: "assistant",  # 보안전문가 -> AI전문가로 매핑
+            5: "assistant",  # 로봇공학자 -> AI전문가로 매핑
+            6: "assistant",  # 양자컴퓨팅전문가 -> AI전문가로 매핑
+            7: "assistant",  # 우주항공공학자 -> AI전문가로 매핑
+            8: "medical",  # 바이오기술자 -> 의료전문가로 매핑
+            9: "assistant",  # 나노기술자 -> AI전문가로 매핑
+            10: "assistant",  # 인공지능박사도깨비
+            11: "builder",  # 경영학박사도깨비 -> 투자전문가로 매핑
+            12: "medical",  # 의학박사도깨비
+            13: "assistant",  # 법학박사도깨비 -> AI전문가로 매핑
+            14: "growth",  # 교육학박사도깨비
+            15: "counselor",  # 심리학박사도깨비
+            16: "assistant",  # 언어학박사도깨비 -> AI전문가로 매핑
+            17: "creative",  # 철학박사도깨비 -> 창작전문가로 매핑
         }
-        
+
         expert_type = goblin_to_expert_mapping.get(goblin_id, "assistant")
-        
+
         # 1000자 AI 시스템으로 응답 생성
         if real_ai_manager:
             response = real_ai_manager.generate_response(message, expert_type)
         else:
             response = f"🤖 고급 AI 시스템이 일시적으로 비활성화되어 있습니다. '{message}'에 대한 기본 응답을 제공합니다."
-        
-        return jsonify({
-            "status": "success",
-            "result": {
-                "response": response,
-                "conversation_id": f"advanced_{datetime.now().timestamp()}",
-                "goblin_id": goblin_id,
-                "expert_type": expert_type,
-                "response_length": len(response),
-                "timestamp": datetime.now().isoformat()
+
+        return jsonify(
+            {
+                "status": "success",
+                "result": {
+                    "response": response,
+                    "conversation_id": f"advanced_{datetime.now().timestamp()}",
+                    "goblin_id": goblin_id,
+                    "expert_type": expert_type,
+                    "response_length": len(response),
+                    "timestamp": datetime.now().isoformat(),
+                },
             }
-        })
-        
+        )
+
     except Exception as e:
-        return jsonify({
-            "status": "error",
-            "message": f"AI 응답 생성 중 오류가 발생했습니다: {str(e)}"
-        })
+        return jsonify(
+            {
+                "status": "error",
+                "message": f"AI 응답 생성 중 오류가 발생했습니다: {str(e)}",
+            }
+        )
+
+
+@app.route("/api/ai/status")
+def ai_system_status():
+    """5단계 AI 시스템 상태 확인"""
+    return jsonify(
+        {
+            "status": "success",
+            "ai_systems": {
+                "stage_1_basic": {
+                    "name": "1000자 고급 AI 시스템",
+                    "enabled": AI_SYSTEM_ENABLED,
+                    "description": "기본 1000자 전문가 응답 시스템",
+                },
+                "stage_2_multimodal": {
+                    "name": "멀티모달 AI 시스템",
+                    "enabled": MULTIMODAL_SYSTEM_ENABLED,
+                    "description": "이미지, 영상, 음성 처리 시스템",
+                },
+                "stage_3_memory": {
+                    "name": "메모리 & 학습 시스템",
+                    "enabled": MEMORY_SYSTEM_ENABLED,
+                    "description": "대화 기억 및 개인화 학습 시스템",
+                },
+                "stage_4_global": {
+                    "name": "글로벌 확장 시스템",
+                    "enabled": GLOBAL_SYSTEM_ENABLED,
+                    "description": "다국어 및 문화 적응 시스템",
+                },
+                "stage_5_dna": {
+                    "name": "DNA 개인화 시스템",
+                    "enabled": DNA_SYSTEM_ENABLED,
+                    "description": "유전자 수준 개인 맞춤 AI 시스템",
+                },
+            },
+            "total_enabled": sum(
+                [
+                    AI_SYSTEM_ENABLED,
+                    MULTIMODAL_SYSTEM_ENABLED,
+                    MEMORY_SYSTEM_ENABLED,
+                    GLOBAL_SYSTEM_ENABLED,
+                    DNA_SYSTEM_ENABLED,
+                ]
+            ),
+        }
+    )
+
+
+@app.route("/api/chat/multimodal", methods=["POST"])
+def multimodal_chat():
+    """2단계: 멀티모달 AI 채팅 (이미지, 영상, 음성 포함)"""
+    try:
+        data = request.get_json()
+        message = data.get("message", "")
+        goblin_id = data.get("goblin_id", 1)
+        media_type = data.get("media_type", "text")  # text, image, video, audio
+        media_data = data.get("media_data", "")
+
+        if not MULTIMODAL_SYSTEM_ENABLED:
+            return jsonify(
+                {
+                    "status": "error",
+                    "message": "멀티모달 AI 시스템이 비활성화되어 있습니다.",
+                    "fallback": "기본 텍스트 시스템으로 대체됩니다.",
+                }
+            )
+
+        # 멀티모달 AI 시스템으로 응답 생성
+        if multimodal_ai_manager:
+            import asyncio
+
+            response = asyncio.run(
+                multimodal_ai_manager.get_multimodal_expert_response(
+                    expert_id=str(goblin_id),
+                    question=message,
+                    media_types=[media_type] if media_type != "text" else ["text"],
+                )
+            )
+            response = (
+                response.text_response
+                if hasattr(response, "text_response")
+                else str(response)
+            )
+        else:
+            response = f"🎥 멀티모달 시스템이 일시적으로 비활성화되어 있습니다. 텍스트 메시지: '{message}'"
+
+        return jsonify(
+            {
+                "status": "success",
+                "result": {
+                    "response": response,
+                    "media_type_processed": media_type,
+                    "conversation_id": f"multimodal_{datetime.now().timestamp()}",
+                    "goblin_id": goblin_id,
+                    "timestamp": datetime.now().isoformat(),
+                },
+            }
+        )
+
+    except Exception as e:
+        return jsonify(
+            {
+                "status": "error",
+                "message": f"멀티모달 AI 처리 중 오류가 발생했습니다: {str(e)}",
+            }
+        )
+
+
+@app.route("/api/chat/memory", methods=["POST"])
+def memory_chat():
+    """3단계: 메모리 & 학습 시스템 채팅"""
+    try:
+        data = request.get_json()
+        message = data.get("message", "")
+        user_id = data.get("user_id", "anonymous")
+        goblin_id = data.get("goblin_id", 1)
+
+        if not MEMORY_SYSTEM_ENABLED:
+            return jsonify(
+                {
+                    "status": "error",
+                    "message": "메모리 & 학습 시스템이 비활성화되어 있습니다.",
+                    "fallback": "기본 시스템으로 대체됩니다.",
+                }
+            )
+
+        # 메모리 시스템으로 응답 생성
+        if memory_manager:
+            response = memory_manager.generate_contextual_response(
+                message=message, expert="assistant"  # 기본 전문가 타입
+            )
+        else:
+            response = f"🧠 메모리 시스템이 일시적으로 비활성화되어 있습니다. 메시지: '{message}'"
+
+        return jsonify(
+            {
+                "status": "success",
+                "result": {
+                    "response": response,
+                    "user_id": user_id,
+                    "conversation_id": f"memory_{datetime.now().timestamp()}",
+                    "goblin_id": goblin_id,
+                    "timestamp": datetime.now().isoformat(),
+                },
+            }
+        )
+
+    except Exception as e:
+        return jsonify(
+            {
+                "status": "error",
+                "message": f"메모리 시스템 처리 중 오류가 발생했습니다: {str(e)}",
+            }
+        )
+
+
+@app.route("/api/chat/global", methods=["POST"])
+def global_chat():
+    """4단계: 글로벌 확장 시스템 채팅"""
+    try:
+        data = request.get_json()
+        message = data.get("message", "")
+        language = data.get("language", "ko")  # 언어 설정
+        culture = data.get("culture", "korean")  # 문화 설정
+        goblin_id = data.get("goblin_id", 1)
+
+        if not GLOBAL_SYSTEM_ENABLED:
+            return jsonify(
+                {
+                    "status": "error",
+                    "message": "글로벌 확장 시스템이 비활성화되어 있습니다.",
+                    "fallback": "기본 시스템으로 대체됩니다.",
+                }
+            )
+
+        # 글로벌 시스템으로 응답 생성
+        if global_manager:
+            import asyncio
+
+            response_obj = asyncio.run(
+                global_manager.get_global_expert_response(
+                    expert_id=str(goblin_id),
+                    question=message,
+                    language=language,
+                    cultural_adaptation=True,
+                )
+            )
+            response = (
+                response_obj.text_response
+                if hasattr(response_obj, "text_response")
+                else str(response_obj)
+            )
+        else:
+            response = f"🌍 글로벌 시스템이 일시적으로 비활성화되어 있습니다. 메시지: '{message}'"
+
+        return jsonify(
+            {
+                "status": "success",
+                "result": {
+                    "response": response,
+                    "language": language,
+                    "culture": culture,
+                    "conversation_id": f"global_{datetime.now().timestamp()}",
+                    "goblin_id": goblin_id,
+                    "timestamp": datetime.now().isoformat(),
+                },
+            }
+        )
+
+    except Exception as e:
+        return jsonify(
+            {
+                "status": "error",
+                "message": f"글로벌 시스템 처리 중 오류가 발생했습니다: {str(e)}",
+            }
+        )
+
+
+@app.route("/api/chat/dna", methods=["POST"])
+def dna_chat():
+    """5단계: DNA 개인화 시스템 채팅"""
+    try:
+        data = request.get_json()
+        message = data.get("message", "")
+        user_dna_profile = data.get("dna_profile", {})  # DNA 프로필 정보
+        personality_traits = data.get("personality_traits", [])
+        goblin_id = data.get("goblin_id", 1)
+
+        if not DNA_SYSTEM_ENABLED:
+            return jsonify(
+                {
+                    "status": "error",
+                    "message": "DNA 개인화 시스템이 비활성화되어 있습니다.",
+                    "fallback": "기본 시스템으로 대체됩니다.",
+                }
+            )
+
+        # DNA 개인화 시스템으로 응답 생성
+        if dna_manager:
+            try:
+                import asyncio
+
+                # 간단한 응답 생성
+                response = f"🧬 DNA 개인화 시스템이 활성화되었습니다! '{message}'에 대한 개인 맞춤형 응답을 준비 중입니다..."
+            except Exception as e:
+                response = f"🧬 DNA 시스템 처리 중 오류: {str(e)}"
+        else:
+            response = (
+                f"🧬 DNA 시스템이 일시적으로 비활성화되어 있습니다. 메시지: '{message}'"
+            )
+
+        return jsonify(
+            {
+                "status": "success",
+                "result": {
+                    "response": response,
+                    "dna_personalization": bool(user_dna_profile),
+                    "conversation_id": f"dna_{datetime.now().timestamp()}",
+                    "goblin_id": goblin_id,
+                    "timestamp": datetime.now().isoformat(),
+                },
+            }
+        )
+
+    except Exception as e:
+        return jsonify(
+            {
+                "status": "error",
+                "message": f"DNA 개인화 시스템 처리 중 오류가 발생했습니다: {str(e)}",
+            }
+        )
+
+
+@app.route("/api/chat/ultimate", methods=["POST"])
+def ultimate_chat():
+    """최종 단계: 모든 AI 시스템을 통합한 궁극의 채팅"""
+    try:
+        data = request.get_json()
+        message = data.get("message", "")
+        user_id = data.get("user_id", "anonymous")
+        goblin_id = data.get("goblin_id", 1)
+        media_type = data.get("media_type", "text")
+        media_data = data.get("media_data", "")
+        language = data.get("language", "ko")
+        culture = data.get("culture", "korean")
+        dna_profile = data.get("dna_profile", {})
+
+        # 단계별로 처리하여 최고의 응답 생성
+        response_stages = []
+
+        # 1단계: 기본 1000자 응답
+        if AI_SYSTEM_ENABLED and real_ai_manager:
+            stage1_response = real_ai_manager.generate_response(message, "assistant")
+            response_stages.append(f"1단계 기본: {stage1_response[:100]}...")
+
+        # 2단계: 멀티모달 처리 (임시 응답)
+        if MULTIMODAL_SYSTEM_ENABLED and multimodal_ai_manager:
+            stage2_response = f"🎥 멀티모달 시스템 활성화: {media_type} 타입 처리 중..."
+            response_stages.append(f"2단계 멀티모달: {stage2_response}")
+
+        # 3단계: 메모리 시스템
+        if MEMORY_SYSTEM_ENABLED and memory_manager:
+            stage3_response = memory_manager.generate_contextual_response(
+                message, "assistant"
+            )
+            response_stages.append(f"3단계 메모리: {stage3_response[:100]}...")
+
+        # 4단계: 글로벌 시스템 (임시 응답)
+        if GLOBAL_SYSTEM_ENABLED and global_manager:
+            stage4_response = (
+                f"🌍 글로벌 시스템 활성화: {language} 언어, {culture} 문화 적응 중..."
+            )
+            response_stages.append(f"4단계 글로벌: {stage4_response}")
+
+        # 5단계: DNA 개인화 (임시 응답)
+        final_response = message
+        if DNA_SYSTEM_ENABLED and dna_manager:
+            final_response = f"🧬 DNA 개인화 시스템 활성화: 개인 맞춤형 응답 생성 중... 원본 메시지: {message}"
+            response_stages.append(f"5단계 DNA: {final_response[:100]}...")
+        elif AI_SYSTEM_ENABLED and real_ai_manager:
+            final_response = real_ai_manager.generate_response(message, "assistant")
+
+        return jsonify(
+            {
+                "status": "success",
+                "result": {
+                    "final_response": final_response,
+                    "processing_stages": response_stages,
+                    "systems_used": {
+                        "stage_1": AI_SYSTEM_ENABLED,
+                        "stage_2": MULTIMODAL_SYSTEM_ENABLED,
+                        "stage_3": MEMORY_SYSTEM_ENABLED,
+                        "stage_4": GLOBAL_SYSTEM_ENABLED,
+                        "stage_5": DNA_SYSTEM_ENABLED,
+                    },
+                    "conversation_id": f"ultimate_{datetime.now().timestamp()}",
+                    "goblin_id": goblin_id,
+                    "timestamp": datetime.now().isoformat(),
+                },
+            }
+        )
+
+    except Exception as e:
+        return jsonify(
+            {
+                "status": "error",
+                "message": f"통합 AI 시스템 처리 중 오류가 발생했습니다: {str(e)}",
+            }
+        )
 
 
 @app.route("/api/test")
@@ -658,7 +1122,22 @@ def api_test():
         "status": "success",
         "message": "도깨비마을장터 API 테스트 성공!",
         "experts": 39,
-        "advanced_ai": AI_SYSTEM_ENABLED,
+        "ai_systems": {
+            "stage_1_basic": AI_SYSTEM_ENABLED,
+            "stage_2_multimodal": MULTIMODAL_SYSTEM_ENABLED,
+            "stage_3_memory": MEMORY_SYSTEM_ENABLED,
+            "stage_4_global": GLOBAL_SYSTEM_ENABLED,
+            "stage_5_dna": DNA_SYSTEM_ENABLED,
+        },
+        "total_ai_stages": sum(
+            [
+                AI_SYSTEM_ENABLED,
+                MULTIMODAL_SYSTEM_ENABLED,
+                MEMORY_SYSTEM_ENABLED,
+                GLOBAL_SYSTEM_ENABLED,
+                DNA_SYSTEM_ENABLED,
+            ]
+        ),
     }
 
 
