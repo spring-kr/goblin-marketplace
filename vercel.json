@@ -19,11 +19,5 @@
     "PYTHONPATH": ".",
     "FLASK_ENV": "production",
     "VERCEL_ENV": "production"
-  },
-  "functions": {
-    "app.py": {
-      "memory": 1024,
-      "maxDuration": 30
-    }
   }
 }
