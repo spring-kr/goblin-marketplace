@@ -2011,11 +2011,15 @@ def index():
 
         if use_simple_index:
             print("🔧 테스트 모드: index.html 사용 (환경 변수 USE_SIMPLE_INDEX=true)")
-            return render_template("index.html")
+            from flask import Response
+            html_content = render_template("index.html")
+            return Response(html_content, mimetype='text/html')
         else:
             print("🏪 실제 홈페이지 모드: goblin_market_v11.html 사용 (기본값)")
             # 실제 배포되는 도깨비마을장터 v11 완전체 템플릿 로딩
-            return render_template("goblin_market_v11.html")
+            from flask import Response
+            html_content = render_template("goblin_market_v11.html")
+            return Response(html_content, mimetype='text/html')
     except Exception as e:
         print(f"❌ 템플릿 로딩 오류: {e}")
         print(f"❌ 오류 타입: {type(e).__name__}")
