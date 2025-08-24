@@ -1,5 +1,10 @@
 from flask import Flask, render_template, request, jsonify
 import os
+import requests
+import urllib.parse
+from bs4 import BeautifulSoup
+import time
+import re
 from datetime import datetime
 
 # ⚡ 강제 서버리스 모드 (SQLite 완전 차단) - v4.0 COMPLETE REDEPLOY
@@ -120,7 +125,7 @@ class UltraLightAIManager:
         return '네, 무엇을 도와드릴까요? 궁금한 것이 있으시면 언제든 물어보세요! 😊'
 
     def get_expert_response(self, query, expert_name="AI전문가"):
-        """고급 AI 응답 생성"""
+        """고급 AI 응답 생성 (인터넷 검색 결과 활용)"""
         
         # 🚨 먼저 일반 대화인지 확인
         if is_casual_conversation(query):
@@ -142,8 +147,31 @@ class UltraLightAIManager:
         
         # 전문 질문의 경우 고급 응답 시스템 사용
         print(f"🎯 전문 질문 감지: '{query}' → {expert_name} 전문가 응답 생성")
+        
+        # 인터넷 검색을 통한 추가 정보 수집 시도
+        search_info = ""
         try:
-            return self._generate_advanced_response(query, expert_name)
+            # 질문이 기본 키워드에 매칭되지 않는 경우 검색 정보 활용
+            query_lower = query.lower()
+            basic_keywords = ['블록체인', 'blockchain', '암호화폐', '비트코인', 'crypto', 
+                             '마케팅', 'marketing', '광고', '브랜딩', '홍보',
+                             '의료', '건강', '병원', '의사', '치료', '진단',
+                             '투자', '재테크', '주식', '펀드', '금융', '돈',
+                             '창업', '스타트업', '사업', '비즈니스', '기업',
+                             '개발', '프로그래밍', '코딩', '개발자', '프로그램',
+                             'ai', '인공지능', '머신러닝', '딥러닝', '알고리즘']
+            
+            # 기본 키워드가 없으면 인터넷 검색 수행
+            if not any(keyword in query_lower for keyword in basic_keywords):
+                print(f"🔍 특수 키워드 감지 - 인터넷 검색 수행: {query}")
+                search_info = search_internet_for_query(query)
+        except Exception as e:
+            print(f"⚠️ 검색 정보 수집 실패: {e}")
+            search_info = ""
+        
+        try:
+            # 검색 정보가 있으면 함께 활용하여 응답 생성
+            return self._generate_advanced_response(query, expert_name, search_info)
         except Exception as e:
             print(f"⚠️ 고급 AI 응답 생성 실패: {e}")
             # 폴백: 기본 응답 사용
@@ -243,15 +271,22 @@ tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
         
         return contextual_responses[expert_name]
     
-    def _generate_advanced_response(self, query, expert_name):
-        """고급 AI 엔진을 사용한 진짜 동적 응답 생성"""
+    def _generate_advanced_response(self, query, expert_name, search_info=""):
+        """고급 AI 엔진을 사용한 진짜 동적 응답 생성 (인터넷 검색 정보 활용)"""
         
         try:
             # 고급 AI 엔진 사용하여 동적 응답 생성
+            context = {"user_type": "professional", "depth": "detailed"}
+            
+            # 검색 정보가 있으면 컨텍스트에 추가
+            if search_info:
+                context["search_info"] = search_info
+                print(f"🔍 검색 정보 활용하여 응답 생성: {len(search_info)}자")
+            
             ai_response = self.advanced_engine.generate_expert_response(
                 query=query,
                 expert_type=expert_name,
-                context={"user_type": "professional", "depth": "detailed"}
+                context=context
             )
             
             # AI 엔진이 성공하면 그 결과 사용
@@ -262,14 +297,19 @@ tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
         except Exception as e:
             print(f"⚠️ 고급 AI 엔진 오류: {e}")
         
-        # 폴백: 실시간 동적 응답 생성
-        return self._generate_dynamic_response(query, expert_name)
+        # 폴백: 실시간 동적 응답 생성 (검색 정보 포함)
+        return self._generate_dynamic_response(query, expert_name, search_info)
     
-    def _generate_dynamic_response(self, query, expert_name):
-        """실시간 동적 응답 생성 - 질문에 따라 매번 다른 답변"""
+    def _generate_dynamic_response(self, query, expert_name, search_info=""):
+        """실시간 동적 응답 생성 - 질문에 따라 매번 다른 답변 (인터넷 검색 정보 활용)"""
         
         # 질문 분석
         question_analysis = self._analyze_question(query)
+        
+        # 검색 정보가 있으면 분석에 추가
+        if search_info:
+            question_analysis['search_info'] = search_info
+            print(f"🔍 검색 정보를 분석에 반영: {len(search_info)}자")
         
         # 전문가별 관점 적용
         expert_perspective = self._get_expert_perspective(expert_name, question_analysis)
@@ -280,6 +320,12 @@ tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
         # 헤더
         response_parts.append(f"{self._get_expert_emoji(expert_name)} **{expert_name}**의 전문적 분석:")
         response_parts.append(f"\n**'{query}'**에 대해 전문가 관점에서 분석드리겠습니다.\n")
+        
+        # 검색 정보가 있으면 최신 정보 섹션 추가
+        if search_info:
+            response_parts.append("**🌐 최신 정보 기반 분석:**")
+            response_parts.append(f"{search_info[:200]}..." if len(search_info) > 200 else search_info)
+            response_parts.append("")
         
         # 질문 유형별 동적 내용 생성
         if question_analysis['type'] == 'how_to':
@@ -301,7 +347,8 @@ tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
         
         final_response = "\n".join(response_parts)
         
-        print(f"🔄 동적 응답 생성 완료: {len(final_response)}자 (질문타입: {question_analysis['type']})")
+        search_tag = " + 검색정보" if search_info else ""
+        print(f"🔄 동적 응답 생성 완료: {len(final_response)}자 (질문타입: {question_analysis['type']}{search_tag})")
         
         return final_response
     
@@ -895,8 +942,53 @@ def is_casual_conversation(query):
     return False
 
 
+def search_internet_for_query(query):
+    """인터넷 검색을 통해 질문에 대한 정보를 수집"""
+    try:
+        # 검색 쿼리 준비
+        search_query = urllib.parse.quote(f"{query} 정보 설명")
+        search_url = f"https://search.naver.com/search.naver?query={search_query}"
+        
+        # 헤더 설정 (봇 차단 방지)
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
+        
+        # 웹 페이지 가져오기
+        response = requests.get(search_url, headers=headers, timeout=10)
+        soup = BeautifulSoup(response.content, 'html.parser')
+        
+        # 검색 결과에서 텍스트 추출
+        content_parts = []
+        
+        # 네이버 검색 결과에서 요약 정보 추출
+        summary_elements = soup.select('.sc_new .api_txt_lines')
+        for element in summary_elements[:3]:  # 상위 3개만
+            text = element.get_text().strip()
+            if text and len(text) > 20:
+                content_parts.append(text)
+        
+        # 일반 검색 결과에서도 추출
+        if not content_parts:
+            result_elements = soup.select('.total_tit')
+            for element in result_elements[:3]:
+                text = element.get_text().strip()
+                if text:
+                    content_parts.append(text)
+        
+        # 수집된 정보 정리
+        if content_parts:
+            return ' '.join(content_parts[:2])  # 처음 2개 결과만 사용
+        else:
+            return f"{query}에 대한 상세 정보를 찾고 있습니다."
+            
+    except Exception as e:
+        print(f"인터넷 검색 오류: {e}")
+        return f"{query}에 대한 정보를 검색 중 오류가 발생했습니다."
+
+
 def select_expert_by_query(query):
-    """질문 내용을 분석하여 적절한 전문가 선택"""
+    """질문 내용을 분석하여 적절한 전문가 선택 (인터넷 검색 기능 포함)"""
     # 먼저 일반 대화인지 확인
     if is_casual_conversation(query):
         return "일반대화"
@@ -904,23 +996,58 @@ def select_expert_by_query(query):
     query_lower = query.lower()
     
     # 키워드 기반 전문가 매칭
+    expert_matched = False
+    selected_expert = None
+    
     if any(keyword in query_lower for keyword in ['블록체인', 'blockchain', '암호화폐', '비트코인', 'crypto']):
-        return "블록체인도깨비"
+        selected_expert = "블록체인도깨비"
+        expert_matched = True
     elif any(keyword in query_lower for keyword in ['마케팅', 'marketing', '광고', '브랜딩', '홍보']):
-        return "마케팅왕"
+        selected_expert = "마케팅왕"
+        expert_matched = True
     elif any(keyword in query_lower for keyword in ['의료', '건강', '병원', '의사', '치료', '진단']):
-        return "의료AI전문가"
+        selected_expert = "의료AI전문가"
+        expert_matched = True
     elif any(keyword in query_lower for keyword in ['투자', '재테크', '주식', '펀드', '금융', '돈']):
-        return "재테크박사"
+        selected_expert = "재테크박사"
+        expert_matched = True
     elif any(keyword in query_lower for keyword in ['창업', '스타트업', '사업', '비즈니스', '기업']):
-        return "창업컨설턴트"
+        selected_expert = "창업컨설턴트"
+        expert_matched = True
     elif any(keyword in query_lower for keyword in ['개발', '프로그래밍', '코딩', '개발자', '프로그램']):
-        return "개발자멘토"
+        selected_expert = "개발자멘토"
+        expert_matched = True
     elif any(keyword in query_lower for keyword in ['ai', '인공지능', '머신러닝', '딥러닝', '알고리즘']):
-        return "AI전문가"
-    else:
-        # 기본값: AI전문가
-        return "AI전문가"
+        selected_expert = "AI전문가"
+        expert_matched = True
+    
+    # 키워드 매칭이 되지 않았다면 인터넷 검색 수행
+    if not expert_matched:
+        print(f"키워드 매핑이 없는 질문: {query} - 인터넷 검색을 시작합니다.")
+        search_result = search_internet_for_query(query)
+        
+        # 검색 결과를 기반으로 다시 키워드 매칭 시도
+        combined_text = f"{query} {search_result}".lower()
+        
+        if any(keyword in combined_text for keyword in ['블록체인', 'blockchain', '암호화폐', '비트코인', 'crypto']):
+            return "블록체인도깨비"
+        elif any(keyword in combined_text for keyword in ['마케팅', 'marketing', '광고', '브랜딩', '홍보', '판매', '고객']):
+            return "마케팅왕"
+        elif any(keyword in combined_text for keyword in ['의료', '건강', '병원', '의사', '치료', '진단', '약', '질병']):
+            return "의료AI전문가"
+        elif any(keyword in combined_text for keyword in ['투자', '재테크', '주식', '펀드', '금융', '돈', '경제', '자산']):
+            return "재테크박사"
+        elif any(keyword in combined_text for keyword in ['창업', '스타트업', '사업', '비즈니스', '기업', '회사']):
+            return "창업컨설턴트"
+        elif any(keyword in combined_text for keyword in ['개발', '프로그래밍', '코딩', '개발자', '프로그램', '소프트웨어']):
+            return "개발자멘토"
+        elif any(keyword in combined_text for keyword in ['ai', '인공지능', '머신러닝', '딥러닝', '알고리즘', '기술']):
+            return "AI전문가"
+        else:
+            # 인터넷 검색 후에도 매칭이 안되면 AI전문가가 인터넷 검색 결과를 활용해서 답변
+            return "AI전문가"
+    
+    return selected_expert
 
 
 # 🔒 전역 변수 초기화 (완전 서버리스 모드)
