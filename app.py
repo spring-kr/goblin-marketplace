@@ -1091,9 +1091,23 @@ def chat_advanced():
         empathy_response = emotion_analyzer.generate_empathy_response(detected_emotion)
         print(f"😊 감정 분석: {detected_emotion} → {empathy_response[:30]}...")
         
-        # conversation_id가 없으면 생성
-        conversation_id = data.get("conversation_id") or f"conv_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        # conversation_id 처리 및 로깅
+        conversation_id = data.get("conversation_id")
+        if not conversation_id:
+            conversation_id = f"conv_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+            print(f"🆕 새 대화 시작: {conversation_id}")
+        else:
+            print(f"🔄 기존 대화 계속: {conversation_id}")
+            
         user_id = data.get("user_id", conversation_id)  # 사용자 ID 추출
+        
+        # 현재 컨텍스트 상태 확인
+        if conversation_id in conversation_context:
+            print(f"📝 기존 컨텍스트 발견: {len(conversation_context[conversation_id]['messages'])}개 메시지")
+            print(f"📝 현재 전문가: {conversation_context[conversation_id]['current_expert']}")
+            print(f"📝 현재 주제: {conversation_context[conversation_id]['current_topic']}")
+        else:
+            print(f"📝 새 컨텍스트 생성")
         
         # 🧬 DNA 프로필 생성 (첫 대화시)
         if not dna_system.get_dna_profile(user_id):
@@ -1103,6 +1117,8 @@ def chat_advanced():
         # 컨텍스트를 고려한 전문가 선택
         expert_name, previous_topic = get_context_aware_expert_selection(message, conversation_id)
         print(f"🎯 선택된 전문가: {expert_name}")
+        if previous_topic:
+            print(f"🎯 이전 주제: {previous_topic}")
         
         # 일반 대화인지 전문 질문인지 판단
         if expert_name == "일반대화":
@@ -1117,11 +1133,19 @@ def chat_advanced():
             # 전문적인 질문 - 상세한 전문가 응답
             if previous_topic:
                 # 후속 질문인 경우 컨텍스트 기반 응답 생성
-                print(f"🔗 후속 질문 처리: {previous_topic} → {message}")
+                print(f"🔗 후속 질문 처리 시작")
+                print(f"🔗 이전 주제: '{previous_topic}'")
+                print(f"🔗 현재 질문: '{message}'")
+                print(f"🔗 전문가: {expert_name}")
+                
                 response = real_ai_manager._generate_contextual_response(message, expert_name, previous_topic)
+                print(f"🔗 후속 응답 생성 완료: {len(response)}자")
+                print(f"🔗 후속 응답 시작 부분: {response[:100]}...")
             else:
                 # 새로운 질문인 경우 일반 전문가 응답
+                print(f"🆕 새 질문 처리: {message}")
                 response = real_ai_manager.get_expert_response(message, expert_name)
+                print(f"🆕 새 응답 생성 완료: {len(response)}자")
             
             # 🧠 감정 기반 공감 메시지 추가
             response_with_empathy = f"{empathy_response}\n\n{response}"
