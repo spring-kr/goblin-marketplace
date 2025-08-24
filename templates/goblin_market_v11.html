@@ -644,7 +644,12 @@
         <!-- 채팅 영역 -->
         <div class="chat-container">
             <div class="chat-header">
-                <h3 id="chat-title">도깨비를 선택해주세요</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 id="chat-title">도깨비를 선택해주세요</h3>
+                    <button id="new-chat-btn" onclick="startNewChatSession()" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 0.4rem 0.8rem; border-radius: 15px; cursor: pointer; font-size: 0.8rem; display: none;">
+                        🔄 새 대화
+                    </button>
+                </div>
                 <div class="chat-mode-selector">
                     <div class="mode-btn active" data-mode="deep">심화탐구</div>
                     <div class="mode-btn" data-mode="creative">창의협업</div>
@@ -715,6 +720,60 @@
         let isTeamMode = false;
         let lastMessageId = null;
         let selectedRating = 0;
+
+        // 세션 기반 conversation_id 관리
+        function getSessionConversationId() {
+            const currentGoblinId = Array.from(selectedGoblins)[0];
+            if (!currentGoblinId) return null;
+            
+            const sessionKey = `conversation_${currentGoblinId}`;
+            let conversationId = sessionStorage.getItem(sessionKey);
+            
+            if (!conversationId) {
+                // 새 세션 생성
+                conversationId = `session_${currentGoblinId}_${Date.now()}`;
+                sessionStorage.setItem(sessionKey, conversationId);
+                console.log(`🆕 새 세션 시작: ${conversationId}`);
+            } else {
+                console.log(`🔄 기존 세션 계속: ${conversationId}`);
+            }
+            
+            return conversationId;
+        }
+
+        // 새로운 대화 세션 시작 (다른 도깨비 선택시)
+        function startNewSession() {
+            const currentGoblinId = Array.from(selectedGoblins)[0];
+            if (!currentGoblinId) return;
+            
+            const sessionKey = `conversation_${currentGoblinId}`;
+            const conversationId = `session_${currentGoblinId}_${Date.now()}`;
+            sessionStorage.setItem(sessionKey, conversationId);
+            currentConversationId = conversationId;
+            
+            console.log(`🆕 새 대화 세션 시작: ${conversationId}`);
+            
+            // 채팅 화면 초기화
+            const messagesContainer = document.getElementById('chat-messages');
+            if (messagesContainer) {
+                messagesContainer.innerHTML = '';
+            }
+        }
+
+        // 사용자가 수동으로 새 대화 시작
+        function startNewChatSession() {
+            const currentGoblinId = Array.from(selectedGoblins)[0];
+            if (!currentGoblinId) {
+                showToast('먼저 도깨비를 선택해주세요', 'error');
+                return;
+            }
+            
+            // 확인 대화상자
+            if (confirm('새로운 대화를 시작하시겠습니까? 이전 대화 내용은 초기화됩니다.')) {
+                startNewSession();
+                showToast('새로운 대화가 시작되었습니다! 🆕');
+            }
+        }
 
         // Socket.IO 연결 (임시 비활성화)
         function initSocket() {
@@ -804,17 +863,31 @@
                 
                 // 새로운 선택
                 document.querySelector(`[data-goblin-id="${goblinId}"]`).classList.add('selected');
+                
+                // 이전 도깨비와 다른 경우에만 새 세션 시작
+                const previousGoblin = Array.from(selectedGoblins)[0];
                 selectedGoblins.clear();
                 selectedGoblins.add(goblinId);
                 
+                if (previousGoblin !== goblinId) {
+                    // 다른 도깨비 선택시 새 세션 시작
+                    startNewSession();
+                    console.log(`🔄 도깨비 변경: ${previousGoblin} → ${goblinId}`);
+                } else {
+                    // 같은 도깨비면 기존 세션 유지
+                    currentConversationId = getSessionConversationId();
+                }
+                
                 // 채팅 제목 업데이트
                 document.getElementById('chat-title').textContent = `💬 ${goblinInfo.name}과 대화 중`;
+                
+                // 새 대화 버튼 표시
+                document.getElementById('new-chat-btn').style.display = 'block';
                 
                 // 채팅 입력 활성화
                 document.getElementById('chat-input').disabled = false;
                 document.getElementById('send-btn').disabled = false;
                 
-                currentConversationId = null;
             } else {
                 // 팀 모드일 때
                 const card = document.querySelector(`[data-goblin-id="${goblinId}"]`);
@@ -1152,6 +1225,9 @@
         // 실제 1000자 고급 AI API 호출
         async function callAdvancedAI(message, goblinId) {
             try {
+                // 세션 기반 conversation_id 가져오기
+                const sessionConversationId = getSessionConversationId();
+                
                 const response = await fetch('/api/chat/advanced', {
                     method: 'POST',
                     headers: {
@@ -1160,7 +1236,8 @@
                     body: JSON.stringify({
                         message: message,
                         goblin_id: parseInt(goblinId),
-                        mode: currentMode  // 모드 정보 추가
+                        mode: currentMode,  // 모드 정보 추가
+                        conversation_id: sessionConversationId  // 세션 ID 전송
                     })
                 });
 

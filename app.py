@@ -1687,13 +1687,14 @@ def chat_advanced():
         empathy_response = emotion_analyzer.generate_empathy_response(detected_emotion)
         print(f"😊 감정 분석: {detected_emotion} → {empathy_response[:30]}...")
         
-        # conversation_id 처리 및 로깅
+        # conversation_id 처리 및 로깅 (세션 기반)
         conversation_id = data.get("conversation_id")
         if not conversation_id:
+            # 프론트엔드에서 conversation_id를 보내지 않은 경우에만 새로 생성
             conversation_id = f"conv_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-            print(f"🆕 새 대화 시작: {conversation_id}")
+            print(f"🆕 새 대화 생성: {conversation_id}")
         else:
-            print(f"🔄 기존 대화 계속: {conversation_id}")
+            print(f"🔄 세션 기반 대화 계속: {conversation_id}")
             
         user_id = data.get("user_id", conversation_id)  # 사용자 ID 추출
         
