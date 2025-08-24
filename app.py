@@ -122,6 +122,11 @@ class UltraLightAIManager:
     def get_expert_response(self, query, expert_name="AI전문가"):
         """고급 AI 응답 생성"""
         
+        # 🚨 먼저 일반 대화인지 확인
+        if is_casual_conversation(query):
+            print(f"💬 일반 대화 감지: '{query}' → 캐주얼 응답 생성")
+            return self.get_casual_response(query)
+        
         # 후속 질문 처리
         if "이전 질문" in query and "후속 질문:" in query:
             # 컨텍스트가 있는 후속 질문
@@ -135,7 +140,8 @@ class UltraLightAIManager:
                 # 후속 질문용 특별 응답 생성
                 return self._generate_contextual_response(current_question, expert_name, previous_context)
         
-        # 항상 고급 응답 시스템 사용 (더 상세한 응답을 위해)
+        # 전문 질문의 경우 고급 응답 시스템 사용
+        print(f"🎯 전문 질문 감지: '{query}' → {expert_name} 전문가 응답 생성")
         try:
             return self._generate_advanced_response(query, expert_name)
         except Exception as e:
@@ -971,6 +977,11 @@ def get_context_aware_expert_selection(message, conversation_id, goblin_id=1):
     """컨텍스트를 고려한 전문가 선택"""
     
     print(f"🔍 컨텍스트 분석 시작: '{message}' (대화ID: {conversation_id}, 도깨비: {goblin_id})")
+    
+    # 🚨 우선: 일반 대화인지 먼저 확인
+    if is_casual_conversation(message):
+        print(f"💬 일반 대화로 판정: '{message}'")
+        return "일반대화", None
     
     # 후속 질문 키워드 체크
     follow_up_keywords = ['구체적으로', '자세히', '더', '추가로', '어떻게', '왜', '방법', '예시', '사례', '어떤', '무엇', '설명']
