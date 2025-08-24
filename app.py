@@ -67,9 +67,23 @@ DNA_SYSTEM_ENABLED = False
 print("🛡️ 서버리스 완전 보호 모드 - 모든 DB 시스템 차단 완료!")
 
 # Flask 앱 초기화 (템플릿 폴더 명시적 지정)
+template_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'templates'))
+static_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'static'))
+
 app = Flask(__name__, 
-           template_folder='templates',
-           static_folder='static')
+           template_folder=template_dir,
+           static_folder=static_dir)
+
+print(f"🔍 Flask 앱 초기화:")
+print(f"   - 템플릿 폴더: {template_dir}")
+print(f"   - 정적 파일 폴더: {static_dir}")
+print(f"   - 템플릿 폴더 존재: {os.path.exists(template_dir)}")
+print(f"   - 정적 파�더 존재: {os.path.exists(static_dir)}")
+
+# index.html 파일 확인
+index_path = os.path.join(template_dir, 'index.html')
+print(f"   - index.html 경로: {index_path}")
+print(f"   - index.html 존재: {os.path.exists(index_path)}")
 app.secret_key = os.getenv("SECRET_KEY", "goblin_marketplace_secret_key_2024")
 
 print(f"🌟 도깨비 마을 장터 v{APP_VERSION} - 완전 서버리스 모드")
@@ -113,16 +127,25 @@ def index():
     """메인 페이지"""
     try:
         print(f"🔍 템플릿 로딩 시도 - 현재 디렉토리: {os.getcwd()}")
-        print(f"🔍 템플릿 폴더 경로: {app.template_folder}")
+        print(f"🔍 현재 디렉토리 파일 목록: {os.listdir('.')}")
+        
+        # templates 폴더 확인
+        if os.path.exists('templates'):
+            print(f"🔍 templates 폴더 파일 목록: {os.listdir('templates')}")
+        else:
+            print("❌ templates 폴더가 존재하지 않습니다!")
+        
+        print(f"🔍 Flask 앱 템플릿 폴더: {app.template_folder}")
         
         # 템플릿 폴더 확인
         if app.template_folder:
             print(f"🔍 템플릿 폴더 존재 여부: {os.path.exists(app.template_folder)}")
             
             # 템플릿 파일 존재 확인
-            template_path = os.path.join(app.template_folder, "index.html")
-            print(f"🔍 index.html 경로: {template_path}")
-            print(f"🔍 index.html 존재 여부: {os.path.exists(template_path)}")
+            if os.path.exists(app.template_folder):
+                template_path = os.path.join(app.template_folder, "index.html")
+                print(f"🔍 index.html 경로: {template_path}")
+                print(f"🔍 index.html 존재 여부: {os.path.exists(template_path)}")
         
         return render_template("index.html")
     except Exception as e:
