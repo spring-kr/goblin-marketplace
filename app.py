@@ -534,9 +534,21 @@ def is_casual_conversation(query):
         '날씨', '오늘', '내일', '어제', '시간', '몇시'
     ]
     
-    # 짧은 질문들 (10자 이하면서 전문 키워드가 없는 경우)
-    if len(query_lower) <= 10:
-        return True
+    # 전문 키워드들 (이런 키워드가 있으면 전문 질문으로 처리)
+    professional_keywords = [
+        'ai', '인공지능', '머신러닝', '딥러닝', '알고리즘',
+        '블록체인', 'blockchain', '암호화폐', '비트코인', 'crypto',
+        '마케팅', 'marketing', '광고', '브랜딩', '홍보',
+        '의료', '건강', '병원', '의사', '치료', '진단',
+        '투자', '재테크', '주식', '펀드', '금융', '돈',
+        '창업', '스타트업', '사업', '비즈니스', '기업',
+        '개발', '프로그래밍', '코딩', '개발자', '프로그램'
+    ]
+    
+    # 전문 키워드가 포함된 경우 전문 질문으로 처리
+    for keyword in professional_keywords:
+        if keyword in query_lower:
+            return False
     
     # 기본 인사말 체크
     for greeting in casual_greetings:
@@ -547,6 +559,10 @@ def is_casual_conversation(query):
     for phrase in casual_phrases:
         if phrase in query_lower:
             return True
+    
+    # 짧은 질문이면서 전문 키워드가 없는 경우만 일반 대화로 처리
+    if len(query_lower) <= 10:
+        return True
             
     return False
 
