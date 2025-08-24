@@ -1996,30 +1996,65 @@ def index():
     """메인 페이지 - 환경에 따른 템플릿 선택"""
     try:
         print(f"🔍 템플릿 로딩 시도 - 현재 디렉토리: {os.getcwd()}")
-        print(f"🔍 현재 디렉토리 파일 목록: {os.listdir('.')}")
-
-        # templates 폴더 확인
-        if os.path.exists("templates"):
-            print(f"🔍 templates 폴더 파일 목록: {os.listdir('templates')}")
-        else:
-            print("❌ templates 폴더가 존재하지 않습니다!")
-
-        print(f"🔍 Flask 앱 템플릿 폴더: {app.template_folder}")
-
-        # 실제 배포 홈페이지를 기본값으로 사용 (로컬 테스트도 동일한 환경)
-        use_simple_index = os.environ.get("USE_SIMPLE_INDEX", "true").lower() == "true"
-
-        if use_simple_index:
-            print("🔧 테스트 모드: index.html 사용 (환경 변수 USE_SIMPLE_INDEX=true)")
-            from flask import Response
-            html_content = render_template("index.html")
-            return Response(html_content, mimetype='text/html')
-        else:
-            print("🏪 실제 홈페이지 모드: goblin_market_v11.html 사용 (기본값)")
-            # 실제 배포되는 도깨비마을장터 v11 완전체 템플릿 로딩
-            from flask import Response
-            html_content = render_template("goblin_market_v11.html")
-            return Response(html_content, mimetype='text/html')
+        
+        # 간단한 HTML을 직접 반환 (테스트)
+        simple_html = """
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>도깨비마을장터</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+        h1 { color: #4CAF50; }
+        .container { max-width: 600px; margin: 0 auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧌 도깨비마을장터에 오신 것을 환영합니다! 🧌</h1>
+        <p>안녕하세요! 저는 친근한 도깨비 AI입니다!</p>
+        <p>현재 테스트 모드로 운영 중입니다.</p>
+        <p>곧 완전한 기능을 만나보실 수 있어요! ✨</p>
+        
+        <div style="margin-top: 30px;">
+            <input type="text" id="userInput" placeholder="메시지를 입력하세요..." 
+                   style="width: 300px; padding: 10px; margin-right: 10px;">
+            <button onclick="sendMessage()" style="padding: 10px 20px;">전송</button>
+        </div>
+        
+        <div id="chatArea" style="margin-top: 20px; min-height: 200px; border: 1px solid #ddd; padding: 10px;">
+            <p>� 대화 영역</p>
+        </div>
+    </div>
+    
+    <script>
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const chatArea = document.getElementById('chatArea');
+            const message = input.value.trim();
+            
+            if (message) {
+                chatArea.innerHTML += '<p><strong>사용자:</strong> ' + message + '</p>';
+                chatArea.innerHTML += '<p><strong>도깨비:</strong> 안녕! 나는 도깨비야~ "' + message + '"에 대해 답변해줄게!</p>';
+                input.value = '';
+                chatArea.scrollTop = chatArea.scrollHeight;
+            }
+        }
+        
+        document.getElementById('userInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
+        """
+        
+        from flask import Response
+        return Response(simple_html, mimetype='text/html; charset=utf-8')
     except Exception as e:
         print(f"❌ 템플릿 로딩 오류: {e}")
         print(f"❌ 오류 타입: {type(e).__name__}")
