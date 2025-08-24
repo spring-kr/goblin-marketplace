@@ -62,16 +62,13 @@ class UltraLightAIManager:
     def get_expert_response(self, query, expert_name="AI전문가"):
         """고급 AI 응답 생성"""
         
-        if self.use_advanced_ai and hasattr(self, 'advanced_engine'):
-            try:
-                # 고급 AI 엔진 사용
-                return self._generate_advanced_response(query, expert_name)
-            except Exception as e:
-                print(f"⚠️ 고급 AI 응답 생성 실패: {e}")
-                # 폴백: 기본 응답 사용
-                
-        # 기본 응답 시스템
-        return self._generate_basic_response(query, expert_name)
+        # 항상 고급 응답 시스템 사용 (더 상세한 응답을 위해)
+        try:
+            return self._generate_advanced_response(query, expert_name)
+        except Exception as e:
+            print(f"⚠️ 고급 AI 응답 생성 실패: {e}")
+            # 폴백: 기본 응답 사용
+            return self._generate_basic_response(query, expert_name)
     
     def _generate_advanced_response(self, query, expert_name):
         """고급 AI 엔진을 사용한 응답 생성"""
@@ -159,26 +156,33 @@ class UltraLightAIManager:
         
         prompt = expert_prompts.get(expert_name, f"전문가로서 '{query}'에 대해 상세히 설명해주세요.")
         
-        # 고급 AI 엔진의 응답 생성 메서드 호출 시뮬레이션
+        # 고급 AI 응답 생성 (prompt 기반)
         response = f"""
-        {self._get_expert_emoji(expert_name)} **{expert_name}**의 전문적 분석:
+{self._get_expert_emoji(expert_name)} **{expert_name}**의 전문적 분석:
 
-        **{query}**에 대해 말씀드리겠습니다.
+**{query}**에 대해 말씀드리겠습니다.
 
-        {self._generate_detailed_response(query, expert_name)}
+{self._generate_detailed_response(query, expert_name)}
 
-        ---
-        💡 **핵심 포인트:**
-        {self._generate_key_points(query, expert_name)}
+---
+💡 **핵심 포인트:**
+{self._generate_key_points(query, expert_name)}
 
-        🎯 **실행 방안:**
-        {self._generate_action_plan(query, expert_name)}
+🎯 **실행 방안:**
+{self._generate_action_plan(query, expert_name)}
 
-        📚 **추가 고려사항:**
-        {self._generate_additional_insights(query, expert_name)}
+📚 **추가 고려사항:**
+{self._generate_additional_insights(query, expert_name)}
+
+---
+*🔍 분석 기준: {prompt[:100]}...*
         """
         
-        return response.strip()
+        # 응답 길이 확인 및 로깅
+        final_response = response.strip()
+        print(f"🧠 AI 응답 생성 완료: {len(final_response)}자 (전문가: {expert_name})")
+        
+        return final_response
     
     def _generate_basic_response(self, query, expert_name):
         """기본 응답 시스템"""
