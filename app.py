@@ -66,8 +66,10 @@ DNA_SYSTEM_ENABLED = False
 
 print("🛡️ 서버리스 완전 보호 모드 - 모든 DB 시스템 차단 완료!")
 
-# Flask 앱 초기화
-app = Flask(__name__)
+# Flask 앱 초기화 (템플릿 폴더 명시적 지정)
+app = Flask(__name__, 
+           template_folder='templates',
+           static_folder='static')
 app.secret_key = os.getenv("SECRET_KEY", "goblin_marketplace_secret_key_2024")
 
 print(f"🌟 도깨비 마을 장터 v{APP_VERSION} - 완전 서버리스 모드")
@@ -110,9 +112,25 @@ def not_found(error):
 def index():
     """메인 페이지"""
     try:
+        print(f"🔍 템플릿 로딩 시도 - 현재 디렉토리: {os.getcwd()}")
+        print(f"🔍 템플릿 폴더 경로: {app.template_folder}")
+        
+        # 템플릿 폴더 확인
+        if app.template_folder:
+            print(f"🔍 템플릿 폴더 존재 여부: {os.path.exists(app.template_folder)}")
+            
+            # 템플릿 파일 존재 확인
+            template_path = os.path.join(app.template_folder, "index.html")
+            print(f"🔍 index.html 경로: {template_path}")
+            print(f"🔍 index.html 존재 여부: {os.path.exists(template_path)}")
+        
         return render_template("index.html")
     except Exception as e:
         print(f"❌ 템플릿 로딩 오류: {e}")
+        print(f"❌ 오류 타입: {type(e).__name__}")
+        import traceback
+        print(f"❌ 상세 오류: {traceback.format_exc()}")
+        
         # 템플릿 오류 시 간단한 HTML 반환
         return f"""
         <!DOCTYPE html>
@@ -121,12 +139,17 @@ def index():
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>🏰 도깨비마을장터 v{APP_VERSION}</title>
+            
+            <!-- Vercel Analytics -->
+            <script defer src="https://analytics.eu.vercel-insights.com/script.js"></script>
         </head>
         <body style="font-family: Arial; text-align: center; padding: 50px;">
             <h1>🏰 도깨비마을장터</h1>
-            <h2>✅ 서버 정상 작동 중! v{APP_VERSION}</h2>
+            <h2>⚠️ 백업 모드 - 템플릿 로딩 오류 v{APP_VERSION}</h2>
             <p>AI 전문가 시스템이 활성화되었습니다.</p>
             <p>현재 시간: {datetime.now().isoformat()}</p>
+            <p>오류: {str(e)}</p>
+            <button onclick="location.reload()">🔄 페이지 새로고침</button>
         </body>
         </html>
         """
