@@ -716,7 +716,7 @@ def not_found(error):
 
 @app.route("/")
 def index():
-    """메인 페이지 - 도깨비마을장터 v11.5 완전체"""
+    """메인 페이지 - 환경에 따른 템플릿 선택"""
     try:
         print(f"🔍 템플릿 로딩 시도 - 현재 디렉토리: {os.getcwd()}")
         print(f"🔍 현재 디렉토리 파일 목록: {os.listdir('.')}")
@@ -729,8 +729,16 @@ def index():
         
         print(f"🔍 Flask 앱 템플릿 폴더: {app.template_folder}")
         
-        # 도깨비마을장터 v11 완전체 템플릿 로딩 (아바타 포함)
-        return render_template("goblin_market_v11.html")
+        # 실제 배포 홈페이지를 기본값으로 사용 (로컬 테스트도 동일한 환경)
+        use_simple_index = os.environ.get('USE_SIMPLE_INDEX', 'false').lower() == 'true'
+        
+        if use_simple_index:
+            print("🔧 테스트 모드: index.html 사용 (환경 변수 USE_SIMPLE_INDEX=true)")
+            return render_template("index.html")
+        else:
+            print("🏪 실제 홈페이지 모드: goblin_market_v11.html 사용 (기본값)")
+            # 실제 배포되는 도깨비마을장터 v11 완전체 템플릿 로딩
+            return render_template("goblin_market_v11.html")
     except Exception as e:
         print(f"❌ 템플릿 로딩 오류: {e}")
         print(f"❌ 오류 타입: {type(e).__name__}")
