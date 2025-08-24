@@ -3537,7 +3537,9 @@ dna_system = DNAPersonalizationSystem()
 
 if __name__ == "__main__":
     print("🖥️ 로컬 환경에서 실행 중...")
-    app.run(debug=True, host="0.0.0.0", port=5000)
+# Vercel용 앱 객체 export
+app.wsgi_app = app
 
-# Vercel 배포를 위한 WSGI 애플리케이션 객체 노출
-application = app
+# Flask 앱이 직접 실행될 때 (로컬 개발용)  
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=5000)
