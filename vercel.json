@@ -2,44 +2,29 @@
   "version": 2,
   "builds": [
     {
-      "src": "commercial-ai-js/src/server.js",
+      "src": "server.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/socket.io/(.*)",
-      "dest": "commercial-ai-js/src/server.js"
+      "dest": "server.js"
     },
     {
       "src": "/api/(.*)",
-      "dest": "commercial-ai-js/src/server.js"
+      "dest": "server.js"
     },
     {
       "src": "/(.*\\.(js|css|html|png|jpg|svg|ico))",
-      "dest": "commercial-ai-js/public/$1"
+      "dest": "/$1"
     },
     {
       "src": "/(.*)",
-      "dest": "commercial-ai-js/src/server.js"
+      "dest": "server.js"
     }
   ],
   "env": {
     "NODE_ENV": "production"
-  },
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "text/html; charset=utf-8"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=0, must-revalidate"
-        }
-      ]
-    }
-  ]
+  }
 }

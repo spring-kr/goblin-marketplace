@@ -3,45 +3,803 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🧌 도깨비마을장터</title>
+    <title>🏪 도깨비마을장터 AI 에이전트 v1.0 (JavaScript)</title>
+    
     <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            text-align: center; 
-            padding: 50px;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1rem;
+            text-align: center;
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        
+        .main-container {
+            flex: 1;
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem;
+            gap: 1rem;
+            width: 100%;
+        }
+        
+        .sidebar {
+            width: 300px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            height: fit-content;
+        }
+        
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            overflow: hidden;
+        }
+        
+        .experts-section h3 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+        
+        .expert-card {
+            background: #f8f9ff;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .expert-card:hover {
+            background: #e8f0ff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+        
+        .expert-card.selected {
+            border-color: #667eea;
+            background: #e8f0ff;
+        }
+        
+        .expert-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 0.3rem;
+            font-size: 1rem;
+        }
+        
+        .expert-title {
+            color: #666;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .expert-specialties {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+        }
+        
+        .specialty-tag {
+            background: #667eea;
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+        }
+        
+        .chat-header {
+            background: #667eea;
+            color: white;
+            padding: 1rem 1.5rem;
+            font-weight: bold;
+            font-size: 1.1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .connection-status {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            min-height: 400px;
+            max-height: 500px;
+            background: #fafbff;
+        }
+        
+        .message {
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .user-message {
+            align-self: flex-end;
+            background: #667eea;
+            color: white;
+            padding: 1rem 1.2rem;
+            border-radius: 18px 18px 4px 18px;
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+        
+        .ai-message {
+            align-self: flex-start;
+            background: white;
+            color: #333;
+            padding: 1rem 1.2rem;
+            border-radius: 18px 18px 18px 4px;
+            max-width: 85%;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e1e8ff;
+            white-space: pre-line;
+        }
+        
+        .message-header {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #667eea;
+        }
+        
+        .message-time {
+            font-size: 0.7rem;
+            color: #888;
+            margin-top: 0.5rem;
+        }
+        
+        .chat-input-container {
+            padding: 1.5rem;
+            background: white;
+            border-top: 1px solid #e1e8ff;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 0.8rem;
+            align-items: flex-end;
+        }
+        
+        .message-input {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid #e1e8ff;
+            border-radius: 25px;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+            resize: none;
+            min-height: 50px;
+            max-height: 120px;
+        }
+        
+        .message-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .send-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 1rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            min-width: 80px;
+        }
+        
+        .send-button:hover:not(:disabled) {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+        
+        .send-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .auto-expert {
+            background: #28a745;
+            color: white;
+            padding: 0.8rem 1rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .auto-expert.selected {
+            background: #1e7e34;
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        }
+        
+        .auto-expert:hover {
+            background: #218838;
+        }
+        
+        .status-indicator {
+            text-align: center;
+            padding: 1rem;
+            font-style: italic;
+            color: #666;
+        }
+        
+        .processing {
+            color: #667eea;
             display: flex;
             align-items: center;
             justify-content: center;
+            gap: 0.5rem;
         }
-        .container { 
-            background: rgba(255,255,255,0.1); 
-            padding: 40px; 
-            border-radius: 20px; 
-            backdrop-filter: blur(10px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
         }
-        h1 { font-size: 3rem; margin-bottom: 20px; }
-        p { font-size: 1.2rem; margin-bottom: 15px; }
-        .status { 
-            background: rgba(76, 175, 80, 0.3); 
-            padding: 15px; 
-            border-radius: 10px; 
-            margin: 20px 0;
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            background: #ffe6e6;
+            color: #d63031;
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            border-left: 4px solid #d63031;
+        }
+        
+        .system-status {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #f0f8ff;
+            border-radius: 10px;
+            font-size: 0.85rem;
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.3rem;
+        }
+        
+        .connected {
+            color: #28a745;
+        }
+        
+        .disconnected {
+            color: #dc3545;
+        }
+        
+        .connecting {
+            color: #ffc107;
+        }
+        
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+                padding: 0.5rem;
+            }
+            
+            .sidebar {
+                width: 100%;
+                order: 2;
+            }
+            
+            .chat-container {
+                order: 1;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .chat-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 0.5rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🧌 도깨비마을장터</h1>
-        <div class="status">
-            ✅ HTML 정상 렌더링 성공!
-        </div>
-        <p>정적 HTML 파일이 올바르게 표시되고 있습니다.</p>
-        <p>다운로드되지 않고 브라우저에서 렌더링됩니다!</p>
-        <p><strong>문제 해결 완료! 🎉</strong></p>
+    <div class="header">
+        <h1>🏪 도깨비마을장터 AI 에이전트 v1.0</h1>
+        <p>JavaScript 기반 실시간 상용 AI 상담 시스템</p>
     </div>
+    
+    <div class="main-container">
+        <!-- 사이드바: 전문가 목록 -->
+        <div class="sidebar">
+            <div class="experts-section">
+                <h3>🧙‍♂️ 전문 도깨비 선택</h3>
+                <div class="auto-expert selected" id="auto-expert">
+                    🤖 자동 선택 (AI가 최적의 전문가 선택)
+                </div>
+                <div id="experts-list">
+                    <div class="status-indicator">전문가 목록을 불러오는 중...</div>
+                </div>
+            </div>
+            
+            <div class="system-status">
+                <h4>📊 시스템 상태</h4>
+                <div id="system-status">
+                    <div class="status-item">
+                        <span>연결 상태:</span>
+                        <span id="connection-status" class="connecting">연결 중...</span>
+                    </div>
+                    <div class="status-item">
+                        <span>대화 수:</span>
+                        <span id="conversation-count">0</span>
+                    </div>
+                    <div class="status-item">
+                        <span>시스템:</span>
+                        <span id="system-version">JavaScript v1.0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 메인 채팅 영역 -->
+        <div class="chat-container">
+            <div class="chat-header">
+                <span>
+                    💬 실시간 AI 상담
+                    <span id="selected-expert-info" style="font-weight: normal; opacity: 0.9;"></span>
+                </span>
+                <span class="connection-status" id="header-status">연결 중...</span>
+            </div>
+            
+            <div class="chat-messages" id="chat-messages">
+                <div class="message">
+                    <div class="ai-message">
+                        <div class="message-header">🤖 시스템</div>
+                        안녕하세요! 도깨비마을장터 AI 에이전트에 오신 것을 환영합니다! 🎉
+
+JavaScript 기반의 상용 AI 시스템으로 10명의 박사급 전문가가 여러분의 질문에 답변해드립니다!
+
+왼쪽에서 원하는 전문 도깨비를 선택하거나, 자동 선택 모드로 질문해보세요.
+                        <div class="message-time">시스템 메시지</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chat-input-container">
+                <div class="input-group">
+                    <textarea 
+                        id="message-input" 
+                        class="message-input" 
+                        placeholder="무엇이든 물어보세요! 전문 도깨비가 답변해드립니다..."
+                        rows="1"
+                    ></textarea>
+                    <button id="send-button" class="send-button">전송</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Socket.IO 라이브러리 (로컬) -->
+    <script src="/socket.io/socket.io.js"></script>
+    
+    <script>
+        // 전역 변수
+        let socket;
+        let selectedExpert = null;
+        let conversationCount = 0;
+        let isConnected = false;
+        
+        // Socket.IO 연결 초기화
+        function initializeSocket() {
+            socket = io();
+            
+            // 연결 이벤트
+            socket.on('connect', function() {
+                console.log('서버에 연결되었습니다.');
+                isConnected = true;
+                updateConnectionStatus('연결됨', 'connected');
+                socket.emit('get_experts');
+            });
+            
+            socket.on('disconnect', function() {
+                console.log('서버와의 연결이 끊어졌습니다.');
+                isConnected = false;
+                updateConnectionStatus('연결 끊어짐', 'disconnected');
+            });
+            
+            socket.on('connect_error', function(error) {
+                console.error('연결 오류:', error);
+                updateConnectionStatus('연결 실패', 'disconnected');
+            });
+            
+            // 전문가 목록 수신
+            socket.on('experts_list', function(data) {
+                if (data.success) {
+                    displayExperts(data.experts);
+                } else {
+                    showError('전문가 목록을 불러올 수 없습니다.');
+                }
+            });
+            
+            // 메시지 응답 수신
+            socket.on('message_response', function(data) {
+                hideProcessingIndicator();
+                if (data.success) {
+                    displayAIMessage(data.response);
+                    conversationCount++;
+                    updateConversationCount();
+                } else {
+                    showError('응답 생성에 실패했습니다.');
+                }
+                enableInput();
+            });
+            
+            // 처리 중 상태
+            socket.on('processing', function(data) {
+                showProcessingIndicator(data.message);
+            });
+            
+            // 에러 처리
+            socket.on('error', function(data) {
+                hideProcessingIndicator();
+                showError(data.message);
+                enableInput();
+            });
+        }
+        
+        // 연결 상태 업데이트
+        function updateConnectionStatus(status, className) {
+            const statusElement = document.getElementById('connection-status');
+            const headerStatusElement = document.getElementById('header-status');
+            
+            statusElement.textContent = status;
+            statusElement.className = className;
+            headerStatusElement.textContent = status;
+            headerStatusElement.className = `connection-status ${className}`;
+        }
+        
+        // 전문가 목록 표시
+        function displayExperts(experts) {
+            const expertsList = document.getElementById('experts-list');
+            expertsList.innerHTML = '';
+            
+            experts.forEach(expert => {
+                const expertCard = document.createElement('div');
+                expertCard.className = 'expert-card';
+                expertCard.dataset.expertId = expert.id;
+                
+                const specialtiesHtml = expert.specialties.map(s => 
+                    `<span class="specialty-tag">${s}</span>`
+                ).join('');
+                
+                expertCard.innerHTML = `
+                    <div class="expert-name">${expert.emoji} ${expert.name}</div>
+                    <div class="expert-title">${expert.title}</div>
+                    <div class="expert-specialties">${specialtiesHtml}</div>
+                `;
+                
+                expertCard.addEventListener('click', () => selectExpert(expert, expertCard));
+                expertsList.appendChild(expertCard);
+            });
+        }
+        
+        // 전문가 선택
+        function selectExpert(expert, cardElement) {
+            // 이전 선택 해제
+            document.querySelectorAll('.expert-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            document.getElementById('auto-expert').classList.remove('selected');
+            
+            // 새 선택 적용
+            cardElement.classList.add('selected');
+            selectedExpert = expert.id;
+            
+            // 헤더 업데이트
+            const expertInfo = document.getElementById('selected-expert-info');
+            expertInfo.textContent = ` - ${expert.emoji} ${expert.name}`;
+            
+            // 시스템 메시지 추가
+            displaySystemMessage(`${expert.emoji} ${expert.name}을(를) 선택했습니다.`);
+        }
+        
+        // 자동 선택 모드
+        function selectAutoMode() {
+            // 이전 선택 해제
+            document.querySelectorAll('.expert-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // 자동 선택 모드 활성화
+            const autoExpert = document.getElementById('auto-expert');
+            autoExpert.classList.add('selected');
+            selectedExpert = null;
+            
+            // 헤더 업데이트
+            const expertInfo = document.getElementById('selected-expert-info');
+            expertInfo.textContent = ' - 🤖 자동 선택 모드';
+            
+            // 시스템 메시지 추가
+            displaySystemMessage('🤖 자동 선택 모드가 활성화되었습니다. AI가 질문에 가장 적합한 전문가를 선택합니다.');
+        }
+        
+        // 메시지 전송
+        function sendMessage() {
+            const messageInput = document.getElementById('message-input');
+            const message = messageInput.value.trim();
+            
+            if (!message) return;
+            
+            if (!isConnected) {
+                showError('서버에 연결되지 않았습니다. 잠시 후 다시 시도해주세요.');
+                return;
+            }
+            
+            // 사용자 메시지 표시
+            displayUserMessage(message);
+            
+            // 입력 필드 초기화 및 비활성화
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+            disableInput();
+            
+            // 서버로 메시지 전송
+            socket.emit('send_message', {
+                message: message,
+                expertId: selectedExpert
+            });
+            
+            // 처리 중 표시
+            showProcessingIndicator('답변을 생성하고 있습니다...');
+        }
+        
+        // 사용자 메시지 표시
+        function displayUserMessage(message) {
+            const chatMessages = document.getElementById('chat-messages');
+            const messageElement = document.createElement('div');
+            messageElement.className = 'message';
+            
+            messageElement.innerHTML = `
+                <div class="user-message">
+                    ${escapeHtml(message)}
+                    <div class="message-time">${getCurrentTime()}</div>
+                </div>
+            `;
+            
+            chatMessages.appendChild(messageElement);
+            scrollToBottom();
+        }
+        
+        // AI 메시지 표시
+        function displayAIMessage(response) {
+            const chatMessages = document.getElementById('chat-messages');
+            const messageElement = document.createElement('div');
+            messageElement.className = 'message';
+            
+            const expertInfo = response.expertInfo;
+            const expertName = `${expertInfo.emoji} ${expertInfo.name}`;
+            
+            messageElement.innerHTML = `
+                <div class="ai-message">
+                    <div class="message-header">${expertName}</div>
+                    ${formatMessage(response.response)}
+                    <div class="message-time">${getCurrentTime()}</div>
+                </div>
+            `;
+            
+            chatMessages.appendChild(messageElement);
+            scrollToBottom();
+        }
+        
+        // 시스템 메시지 표시
+        function displaySystemMessage(message) {
+            const chatMessages = document.getElementById('chat-messages');
+            const messageElement = document.createElement('div');
+            messageElement.className = 'message';
+            
+            messageElement.innerHTML = `
+                <div class="ai-message">
+                    <div class="message-header">🤖 시스템</div>
+                    ${escapeHtml(message)}
+                    <div class="message-time">${getCurrentTime()}</div>
+                </div>
+            `;
+            
+            chatMessages.appendChild(messageElement);
+            scrollToBottom();
+        }
+        
+        // 처리 중 표시
+        function showProcessingIndicator(message) {
+            const chatMessages = document.getElementById('chat-messages');
+            
+            // 기존 처리 중 표시 제거
+            const existingIndicator = document.getElementById('processing-indicator');
+            if (existingIndicator) {
+                existingIndicator.remove();
+            }
+            
+            const indicatorElement = document.createElement('div');
+            indicatorElement.id = 'processing-indicator';
+            indicatorElement.className = 'status-indicator processing';
+            indicatorElement.innerHTML = `
+                <div class="spinner"></div>
+                <span>${message}</span>
+            `;
+            
+            chatMessages.appendChild(indicatorElement);
+            scrollToBottom();
+        }
+        
+        // 처리 중 표시 숨기기
+        function hideProcessingIndicator() {
+            const indicator = document.getElementById('processing-indicator');
+            if (indicator) {
+                indicator.remove();
+            }
+        }
+        
+        // 에러 메시지 표시
+        function showError(message) {
+            const chatMessages = document.getElementById('chat-messages');
+            const errorElement = document.createElement('div');
+            errorElement.className = 'error-message';
+            errorElement.textContent = `❌ 오류: ${message}`;
+            
+            chatMessages.appendChild(errorElement);
+            scrollToBottom();
+        }
+        
+        // 입력 비활성화
+        function disableInput() {
+            document.getElementById('message-input').disabled = true;
+            document.getElementById('send-button').disabled = true;
+        }
+        
+        // 입력 활성화
+        function enableInput() {
+            document.getElementById('message-input').disabled = false;
+            document.getElementById('send-button').disabled = false;
+            document.getElementById('message-input').focus();
+        }
+        
+        // 대화 수 업데이트
+        function updateConversationCount() {
+            document.getElementById('conversation-count').textContent = conversationCount;
+        }
+        
+        // 유틸리티 함수들
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function formatMessage(message) {
+            // 간단한 마크다운 스타일 변환
+            return message
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/\n/g, '<br>');
+        }
+        
+        function getCurrentTime() {
+            return new Date().toLocaleTimeString('ko-KR');
+        }
+        
+        function scrollToBottom() {
+            const chatMessages = document.getElementById('chat-messages');
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // 이벤트 리스너 설정
+        function setupEventListeners() {
+            // 전송 버튼 클릭
+            document.getElementById('send-button').addEventListener('click', sendMessage);
+            
+            // 엔터키로 전송 (Shift+Enter는 줄바꿈)
+            document.getElementById('message-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+            
+            // 자동 선택 모드 클릭
+            document.getElementById('auto-expert').addEventListener('click', selectAutoMode);
+            
+            // 텍스트 영역 자동 크기 조절
+            const messageInput = document.getElementById('message-input');
+            messageInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+            });
+        }
+        
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('도깨비마을장터 AI 에이전트 v1.0 (JavaScript) 시작!');
+            
+            // 기본적으로 자동 선택 모드 활성화
+            selectAutoMode();
+            
+            // 이벤트 리스너 설정
+            setupEventListeners();
+            
+            // Socket.IO 연결
+            initializeSocket();
+            
+            // 시스템 상태 주기적 업데이트
+            setInterval(() => {
+                if (isConnected) {
+                    fetch('/api/status')
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success && data.status) {
+                                // 필요시 상태 업데이트
+                            }
+                        })
+                        .catch(error => {
+                            console.error('상태 업데이트 실패:', error);
+                        });
+                }
+            }, 30000);
+        });
+    </script>
 </body>
 </html>
