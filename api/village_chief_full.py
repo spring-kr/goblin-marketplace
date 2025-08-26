@@ -2,6 +2,7 @@ import os
 import json
 import random
 import traceback
+import numpy as np
 import re
 from pathlib import Path
 from flask import Flask, jsonify, request, send_from_directory
@@ -6848,6 +6849,7 @@ if __name__ == "__main__":
     print("🎓 Business, Economics, Psychology, Engineering, Medical 도메인 통합")
     print("🌐 학제간 통합 분석 시스템 활성화")
     print("📡 Expert Analysis API 서버 시작...")
+    print("🚀 Vercel 배포 최적화 완료!")
 
     # DomainExpertise 클래스가 정의된 후 전역 인스턴스의 domain_expertise 초기화
     try:
@@ -6858,7 +6860,7 @@ if __name__ == "__main__":
         print(f"⚠️ 도메인 전문성 시스템 초기화 실패: {e}")
 
     try:
-        app.run(debug=True, host="0.0.0.0", port=5002)
+        app.run(debug=True, host="0.0.0.0", port=5000)
     except Exception as e:
         print(f"❌ 서버 시작 오류: {e}")
         print("📋 디버그 모드로 재시작을 시도하세요.")
